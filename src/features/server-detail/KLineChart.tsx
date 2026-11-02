@@ -451,7 +451,7 @@ function KLineCanvas({
 			<div
 				ref={containerRef}
 				data-testid="kline-chart"
-				className="h-[360px] w-full md:h-[440px]"
+				className="anim-fade h-[360px] w-full md:h-[440px]"
 			/>
 		</div>
 	);

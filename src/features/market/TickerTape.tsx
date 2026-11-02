@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { saveMainPageScrollPosition } from "@/lib/navigation";
+import { useServerLinkClick } from "@/hooks/use-open-server";
 import { preloadServerDetail } from "@/lib/server-detail-preload";
 import { cn } from "@/lib/utils";
 import { QuoteChange, QuotePrice } from "./QuoteText";
@@ -18,16 +18,20 @@ const TickerEntry = memo(function TickerEntry({
 	hidden?: boolean;
 }) {
 	const { t } = useTranslation();
+	const linkClick = useServerLinkClick();
 	return (
 		<li className="shrink-0">
 			<Link
 				to={`/server/${item.id}`}
 				tabIndex={hidden ? -1 : undefined}
-				onClick={saveMainPageScrollPosition}
+				onClick={(event) => linkClick(item.id, event)}
 				onPointerEnter={preloadServerDetail}
 				className="flex items-center gap-1.5 px-3 text-xs leading-7 hover:bg-accent focus-visible:bg-accent focus-visible:outline-none"
 			>
-				<span className="max-w-[10rem] truncate font-medium text-foreground/90">
+				<span
+					data-vt-name
+					className="max-w-[10rem] truncate font-medium text-foreground/90"
+				>
 					{item.name}
 				</span>
 				{item.quote.direction === "suspended" ? (

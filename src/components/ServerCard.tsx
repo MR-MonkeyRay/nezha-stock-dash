@@ -1,6 +1,5 @@
-import { memo } from "react";
+import { type MouseEvent, memo } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
 import ServerFlag from "@/components/ServerFlag";
 import ServerUsageBar from "@/components/ServerUsageBar";
 import {
@@ -15,13 +14,13 @@ import {
 } from "@/features/market/QuoteText";
 import { type Quote, SUSPENDED_QUOTE } from "@/features/market/quote-series";
 import { Sparkline } from "@/features/market/Sparkline";
+import { useOpenServer } from "@/hooks/use-open-server";
 import { formatBytes } from "@/lib/format";
 import {
 	GetFontLogoClass,
 	GetOsName,
 	MageMicrosoftWindows,
 } from "@/lib/logo-class";
-import { saveMainPageScrollPosition } from "@/lib/navigation";
 import { useRuntimeConfig } from "@/lib/runtime-config";
 import { preloadServerDetail } from "@/lib/server-detail-preload";
 import { cn, formatNezhaInfo, parsePublicNote } from "@/lib/utils";
@@ -41,7 +40,7 @@ function ServerCard({
 	quote?: Quote;
 }) {
 	const { t } = useTranslation();
-	const navigate = useNavigate();
+	const open = useOpenServer();
 	const {
 		name,
 		country_code,
@@ -65,10 +64,8 @@ function ServerCard({
 	const effectiveQuote = online ? quote : SUSPENDED_QUOTE;
 	const halted = effectiveQuote.direction === "suspended";
 
-	const cardClick = () => {
-		saveMainPageScrollPosition();
-		navigate(`/server/${serverInfo.id}`);
-	};
+	const cardClick = (event: MouseEvent<HTMLElement>) =>
+		open(serverInfo.id, event.currentTarget);
 
 	return (
 		<Card
@@ -91,7 +88,9 @@ function ServerCard({
 						)}
 					>
 						<ServerFlag country_code={country_code} />
-						<span className="truncate">{name}</span>
+						<span data-vt-name className="truncate">
+							{name}
+						</span>
 					</p>
 					<p className="mt-0.5 flex items-center gap-1.5 text-[10px] text-muted-foreground">
 						<span className="num">{stockCode(serverInfo.id)}</span>

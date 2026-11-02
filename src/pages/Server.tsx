@@ -104,7 +104,7 @@ export default function Servers({
 	const hasServers = nezhaWsData.servers.length > 0;
 
 	return (
-		<div className="mx-auto w-full max-w-7xl px-0">
+		<div className="anim-rise mx-auto w-full max-w-7xl px-0">
 			<TickerTape items={market.ticker} className="-mx-3 mb-3 md:mx-0" />
 			<ServerOverview
 				total={totalServers}
@@ -126,10 +126,14 @@ export default function Servers({
 				customBackgroundImage={customBackgroundImage}
 			/>
 			{hasServers && showMap === "1" && (
-				<GlobalMap now={nezhaWsData.now} serverList={nezhaWsData.servers} />
+				<div className="anim-expand">
+					<GlobalMap now={nezhaWsData.now} serverList={nezhaWsData.servers} />
+				</div>
 			)}
 			{hasServers && showServices === "1" && (
-				<ServiceTracker serverList={filteredServers} />
+				<div className="anim-expand">
+					<ServiceTracker serverList={filteredServers} />
+				</div>
 			)}
 			<ServerList
 				hasServers={hasServers}

@@ -8,7 +8,7 @@ import {
 	TrendingDown,
 	TrendingUp,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import {
@@ -26,6 +26,8 @@ import { useTheme } from "@/hooks/use-theme";
 import { useWebSocketContext } from "@/hooks/use-websocket-context";
 import { saveMainPageScrollPosition } from "@/lib/navigation";
 import { formatNezhaInfo } from "@/lib/utils";
+import { withViewTransition } from "@/lib/view-transition";
+import type { Theme } from "./ThemeProvider";
 
 export function DashCommand() {
 	const { isOpen, closeCommand, toggleCommand } = useCommand();
@@ -34,6 +36,14 @@ export function DashCommand() {
 	const { t } = useTranslation();
 	const { setTheme } = useTheme();
 	const { setPriceColor, forced: priceColorForced } = usePriceColor();
+	// From the palette the reveal grows from the center of the screen.
+	const themeTransition = useCallback(
+		(next: Theme) =>
+			withViewTransition(() => setTheme(next), "theme", {
+				origin: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+			}),
+		[setTheme],
+	);
 
 	const { lastData, connected } = useWebSocketContext();
 
@@ -64,19 +74,19 @@ export function DashCommand() {
 					keywords: ["light", "theme", "lightmode"],
 					icon: <Sun />,
 					label: t("ToggleLightMode"),
-					action: () => setTheme("light"),
+					action: () => themeTransition("light"),
 				},
 				{
 					keywords: ["dark", "theme", "darkmode"],
 					icon: <Moon />,
 					label: t("ToggleDarkMode"),
-					action: () => setTheme("dark"),
+					action: () => themeTransition("dark"),
 				},
 				{
 					keywords: ["system", "theme", "systemmode"],
 					icon: <SunMoon />,
 					label: t("ToggleSystemMode"),
-					action: () => setTheme("system"),
+					action: () => themeTransition("system"),
 				},
 				...(priceColorForced
 					? []
@@ -85,20 +95,22 @@ export function DashCommand() {
 								keywords: ["color", "red", "up", "涨跌", "红涨绿跌"],
 								icon: <TrendingUp />,
 								label: t("priceColor.useRedUp"),
-								action: () => setPriceColor("red-up"),
+								action: () =>
+									withViewTransition(() => setPriceColor("red-up"), "fade"),
 							},
 							{
 								keywords: ["color", "green", "up", "涨跌", "绿涨红跌"],
 								icon: <TrendingDown />,
 								label: t("priceColor.useGreenUp"),
-								action: () => setPriceColor("green-up"),
+								action: () =>
+									withViewTransition(() => setPriceColor("green-up"), "fade"),
 							},
 						]),
 			].map((item) => ({
 				...item,
 				value: `${item.keywords.join(" ")} ${item.label}`,
 			})),
-		[navigate, setTheme, setPriceColor, priceColorForced, t],
+		[navigate, themeTransition, setPriceColor, priceColorForced, t],
 	);
 
 	const serverCommands = useMemo(() => {

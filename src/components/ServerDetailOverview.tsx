@@ -171,7 +171,8 @@ export default function ServerDetailOverview({
 					<span className="flex transition-[translate] duration-(--dur-base) ease-(--ease-out) motion-safe:group-hover:-translate-x-1">
 						<BackIcon />
 					</span>
-					{name}
+					{/* Morph target for the server name clicked on the home page. */}
+					<span className="vt-server-name">{name}</span>
 				</button>
 				<span className="num text-xs text-muted-foreground">
 					{stockCode(server.id)}

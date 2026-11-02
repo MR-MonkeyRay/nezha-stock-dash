@@ -1,19 +1,19 @@
 import { memo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import BillingInfo from "@/components/billingInfo";
 import PlanInfo from "@/components/PlanInfo";
 import ServerFlag from "@/components/ServerFlag";
 import type { SortContextType, SortType } from "@/context/sort-context";
 import { useEntrance } from "@/hooks/use-entrance";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { useOpenServer, useServerLinkClick } from "@/hooks/use-open-server";
 import { formatBytes } from "@/lib/format";
 import {
 	GetFontLogoClass,
 	GetOsName,
 	MageMicrosoftWindows,
 } from "@/lib/logo-class";
-import { saveMainPageScrollPosition } from "@/lib/navigation";
 import { useRuntimeConfig } from "@/lib/runtime-config";
 import { preloadServerDetail } from "@/lib/server-detail-preload";
 import { cn, formatNezhaInfo, parsePublicNote } from "@/lib/utils";
@@ -73,14 +73,6 @@ const SORTABLE: Partial<Record<ColumnKey, SortType>> = {
 	traffic: "up total",
 	uptime: "uptime",
 };
-
-function useOpenServer(id: number) {
-	const navigate = useNavigate();
-	return () => {
-		saveMainPageScrollPosition();
-		navigate(`/server/${id}`);
-	};
-}
 
 function SortHeader({
 	column,
@@ -218,14 +210,15 @@ const WatchlistRow = memo(function WatchlistRow({
 	showNetTransfer: boolean;
 }) {
 	const { t } = useTranslation();
-	const open = useOpenServer(server.id);
+	const open = useOpenServer();
+	const linkClick = useServerLinkClick();
 	const info = formatNezhaInfo(now, server);
 	const halted = quote.direction === "suspended";
 	const note = parsePublicNote(info.public_note);
 	const dash = <span className="text-suspended">--</span>;
 	return (
 		<tr
-			onClick={open}
+			onClick={(event) => open(server.id, event.currentTarget)}
 			onPointerEnter={preloadServerDetail}
 			className={cn(
 				"watchlist-row group cursor-pointer border-b border-border/60 transition-colors duration-(--dur-fast) last:border-0 hover:bg-accent/60 active:bg-accent [content-visibility:auto] [contain-intrinsic-size:auto_48px]",
@@ -240,8 +233,9 @@ const WatchlistRow = memo(function WatchlistRow({
 							to={`/server/${server.id}`}
 							onClick={(event) => {
 								event.stopPropagation();
-								saveMainPageScrollPosition();
+								linkClick(server.id, event, event.currentTarget.closest("tr"));
 							}}
+							data-vt-name
 							className="block truncate font-semibold text-foreground hover:text-highlight focus-visible:text-highlight focus-visible:outline-none"
 						>
 							{info.name}
@@ -403,6 +397,7 @@ const QuoteRow = memo(function QuoteRow({
 	mode: PillMode;
 	onCycle: () => void;
 }) {
+	const linkClick = useServerLinkClick();
 	const info = formatNezhaInfo(now, server);
 	const halted = quote.direction === "suspended";
 	return (
@@ -411,8 +406,9 @@ const QuoteRow = memo(function QuoteRow({
 				{/* Stretched link: the whole row opens the detail page. */}
 				<Link
 					to={`/server/${server.id}`}
-					onClick={saveMainPageScrollPosition}
+					onClick={(event) => linkClick(server.id, event)}
 					onPointerDown={preloadServerDetail}
+					data-vt-name
 					className={cn(
 						"block truncate text-sm font-semibold after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-ring",
 						halted && "text-muted-foreground",

@@ -754,3 +754,107 @@
 		animation: none;
 	}
 }
+
+/* Detail tab panels slide in from the side of the tab that was picked. */
+@keyframes tab-in {
+	from {
+		opacity: 0;
+		translate: calc(var(--tab-dir, 0) * 16px) 4px;
+	}
+}
+.anim-tab {
+	animation: tab-in var(--dur-slow) var(--ease-out) both;
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+}
+.anim-fade {
+	animation: fade-in 420ms var(--ease-out) both;
+}
+
+/* Map / service panels grow open. Height animates where interpolate-size is
+   supported; elsewhere the panel fades and slides in at full height. The clip
+   only lasts as long as the growth, so absolutely placed map tooltips can
+   overflow the panel afterwards. */
+@keyframes expand-clip {
+	from,
+	to {
+		overflow: clip;
+	}
+}
+.anim-expand {
+	interpolate-size: allow-keywords;
+	animation: expand-clip var(--dur-slow) linear;
+	transition:
+		height var(--dur-slow) var(--ease-out),
+		opacity var(--dur-slow) var(--ease-out),
+		translate var(--dur-slow) var(--ease-out);
+	@starting-style {
+		height: 0;
+		opacity: 0;
+		translate: 0 -6px;
+	}
+}
+
+/* ── View Transitions (see src/lib/view-transition.ts) ─────────────────── */
+@keyframes vt-fade-out {
+	to {
+		opacity: 0;
+	}
+}
+@keyframes vt-reveal {
+	from {
+		clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 50%));
+	}
+	to {
+		clip-path: circle(
+			var(--vt-r, 150vmax) at var(--vt-x, 50%) var(--vt-y, 50%)
+		);
+	}
+}
+/* Page change: the old page fades, the new page plays its own entrance, and
+   the clicked server name flies into the detail header. */
+html[data-vt="nav"] .vt-server-name {
+	view-transition-name: server-name;
+}
+html[data-vt="nav"]::view-transition-old(root) {
+	animation: vt-fade-out var(--dur-base) var(--ease-out) both;
+}
+html[data-vt="nav"]::view-transition-new(root) {
+	animation: none;
+}
+::view-transition-group(server-name) {
+	animation-duration: 420ms;
+	animation-timing-function: var(--ease-out);
+}
+::view-transition-old(server-name),
+::view-transition-new(server-name) {
+	height: 100%;
+	object-fit: contain;
+	object-position: left center;
+}
+/* Theme: the new theme grows from the toggle; no crossfade underneath. */
+html[data-vt="theme"]::view-transition-old(root) {
+	animation: none;
+}
+html[data-vt="theme"]::view-transition-new(root) {
+	animation: vt-reveal 560ms var(--ease-in-out);
+}
+/* Price color convention: a quick crossfade so red and green swap together. */
+html[data-vt="fade"]::view-transition-group(root) {
+	animation-duration: 260ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.anim-tab,
+	.anim-fade {
+		animation: none;
+	}
+	.anim-expand {
+		animation: none;
+		transition: none;
+	}
+}

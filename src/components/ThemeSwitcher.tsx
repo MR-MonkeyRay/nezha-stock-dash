@@ -1,5 +1,6 @@
 import { CheckCircleIcon } from "@heroicons/react/20/solid";
 import { Moon, Sun } from "lucide-react";
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import type { Theme } from "@/components/ThemeProvider";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ import { usePriceColor } from "@/hooks/use-price-color";
 import type { PriceColor } from "@/lib/price-color";
 import { useRuntimeConfig } from "@/lib/runtime-config";
 import { cn } from "@/lib/utils";
+import { centerOf, withViewTransition } from "@/lib/view-transition";
 
 import { useTheme } from "../hooks/use-theme";
 
@@ -54,15 +56,22 @@ export function ModeToggle() {
 
 	const { backgroundImage: customBackgroundImage } = useRuntimeConfig();
 
+	const triggerRef = useRef<HTMLButtonElement>(null);
+
+	// The new theme is revealed in a circle growing from the toggle button.
 	const handleSelect = (e: Event, newTheme: Theme) => {
 		e.preventDefault();
-		setTheme(newTheme);
+		if (newTheme === theme) return;
+		withViewTransition(() => setTheme(newTheme), "theme", {
+			origin: centerOf(triggerRef.current),
+		});
 	};
 
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<Button
+					ref={triggerRef}
 					variant="outline"
 					size="sm"
 					className={cn("rounded-sm bg-card px-[9px]", {
@@ -106,7 +115,8 @@ export function ModeToggle() {
 						})}
 						onSelect={(e) => {
 							e.preventDefault();
-							setPriceColor(item);
+							if (item === priceColor) return;
+							withViewTransition(() => setPriceColor(item), "fade");
 						}}
 					>
 						<span className="flex items-center gap-2">

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { type CSSProperties, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Navigate, useParams } from "react-router-dom";
 import OnlineHistorySkeleton from "@/components/loading/OnlineHistorySkeleton";
@@ -36,6 +36,14 @@ export default function ServerDetail() {
 	// Internal values stay stable for custom CSS; labels come from tabSwitch.*.
 	const tabs = ["Detail", "KLine", "Network", "Online"];
 	const [currentTab, setCurrentTab] = useState(tabs[0]);
+	// +1 when moving right, -1 when moving left: the new panel slides in from that side.
+	const [tabDirection, setTabDirection] = useState(0);
+	const changeTab = (next: string) => {
+		setTabDirection(
+			Math.sign(tabs.indexOf(next) - tabs.indexOf(currentTab)) || 0,
+		);
+		setCurrentTab(next);
+	};
 
 	const { id: server_id } = useParams();
 
@@ -44,51 +52,57 @@ export default function ServerDetail() {
 	}
 
 	return (
-		<div className="mx-auto w-full max-w-7xl px-0 flex flex-col gap-3 server-info">
+		<div className="anim-rise mx-auto w-full max-w-7xl px-0 flex flex-col gap-3 server-info">
 			<ServerDetailOverview server_id={server_id} />
 			<TabSwitch
 				tabs={tabs}
 				currentTab={currentTab}
-				setCurrentTab={setCurrentTab}
+				setCurrentTab={changeTab}
 			/>
 
-			{currentTab === tabs[0] && (
-				<RetryableLazy
-					load={loadServerDetailChart}
-					getPreloaded={getPreloadedServerDetailChart}
-					componentProps={{ server_id }}
-					fallback={<ServerDetailChartLoading />}
-					resetKey={server_id}
-					title={t("error.chartFailed")}
-				/>
-			)}
-			{currentTab === tabs[1] && (
-				<RetryableLazy
-					load={loadKLineChart}
-					componentProps={{ server_id: Number(server_id) }}
-					fallback={<ServerDetailChartLoading />}
-					resetKey={server_id}
-					title={t("error.chartFailed")}
-				/>
-			)}
-			{currentTab === tabs[2] && (
-				<RetryableLazy
-					load={loadNetworkChart}
-					componentProps={{ server_id: Number(server_id), show: true }}
-					fallback={<NetworkChartLoading />}
-					resetKey={server_id}
-					title={t("error.chartFailed")}
-				/>
-			)}
-			{currentTab === tabs[3] && (
-				<RetryableLazy
-					load={loadOnlineHistory}
-					componentProps={{ server_id }}
-					fallback={<OnlineHistorySkeleton />}
-					resetKey={server_id}
-					title={t("error.chartFailed")}
-				/>
-			)}
+			<div
+				key={currentTab}
+				className="anim-tab"
+				style={{ "--tab-dir": tabDirection } as CSSProperties}
+			>
+				{currentTab === tabs[0] && (
+					<RetryableLazy
+						load={loadServerDetailChart}
+						getPreloaded={getPreloadedServerDetailChart}
+						componentProps={{ server_id }}
+						fallback={<ServerDetailChartLoading />}
+						resetKey={server_id}
+						title={t("error.chartFailed")}
+					/>
+				)}
+				{currentTab === tabs[1] && (
+					<RetryableLazy
+						load={loadKLineChart}
+						componentProps={{ server_id: Number(server_id) }}
+						fallback={<ServerDetailChartLoading />}
+						resetKey={server_id}
+						title={t("error.chartFailed")}
+					/>
+				)}
+				{currentTab === tabs[2] && (
+					<RetryableLazy
+						load={loadNetworkChart}
+						componentProps={{ server_id: Number(server_id), show: true }}
+						fallback={<NetworkChartLoading />}
+						resetKey={server_id}
+						title={t("error.chartFailed")}
+					/>
+				)}
+				{currentTab === tabs[3] && (
+					<RetryableLazy
+						load={loadOnlineHistory}
+						componentProps={{ server_id }}
+						fallback={<OnlineHistorySkeleton />}
+						resetKey={server_id}
+						title={t("error.chartFailed")}
+					/>
+				)}
+			</div>
 		</div>
 	);
 }
