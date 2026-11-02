@@ -45,9 +45,17 @@ describe("Footer", () => {
 		renderWithProviders(<Footer />);
 
 		expect(screen.getByText("footer.themeBy")).toBeInTheDocument();
+		expect(screen.getByText("nezha-stock-dash")).toHaveAttribute(
+			"href",
+			"https://github.com/MR-MonkeyRay/nezha-stock-dash",
+		);
 		expect(screen.getByText("nezha-dash")).toHaveAttribute(
 			"href",
 			"https://github.com/hamster1963/nezha-dash",
+		);
+		expect(screen.getByText("TradingView")).toHaveAttribute(
+			"href",
+			"https://www.tradingview.com/",
 		);
 		expect(await screen.findByText("9.9.9")).toBeInTheDocument();
 	});

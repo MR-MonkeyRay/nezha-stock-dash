@@ -88,7 +88,9 @@
 		"loginRequired": "请登录后查看"
 	},
 	"footer": {
-		"themeBy": "主题-"
+		"themeBy": "主题-",
+		"basedOn": "基于 ",
+		"chartsBy": "K线图表由 "
 	},
 	"language": {
 		"zh-CN": "简体中文",

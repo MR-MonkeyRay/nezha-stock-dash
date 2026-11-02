@@ -11,6 +11,8 @@ const updateIntervalMs = Number(
 const dayMs = 86_400_000;
 const minuteMs = 60_000;
 const timezoneOffsetMs = 8 * 60 * minuteMs;
+// 注入到 /api/v1/setting 的 custom_code，用于验收 window.Force* 等自定义代码。
+const customCode = process.env.MOCK_NEZHA_CUSTOM_CODE ?? "";
 const startedAt = Math.floor(Date.now() / 1000) * 1000;
 
 // 前几个节点提供固定 UI 场景；其余节点保留每 17 个离线一个的规则。
@@ -73,7 +75,7 @@ function createServer(index) {
 			version: "mock-1.0.0",
 		},
 		state: {
-			cpu: (index * 7) % 100,
+			cpu: mockCpu(id, startedAt),
 			mem_used: memUsed,
 			swap_used: swapUsed,
 			disk_used: diskUsed,
@@ -101,6 +103,28 @@ let onlineCount = servers.filter(
 	(server) => !isServerOffline(server.id),
 ).length;
 
+// 可复现的伪随机抖动 [-1, 1)，同一 (id, 时间片) 总是得到同一值。
+function jitter(id, slot) {
+	const x = Math.sin(id * 12.9898 + slot * 78.233) * 43758.5453;
+	return (x - Math.floor(x)) * 2 - 1;
+}
+
+// 行情化的 CPU：每台节点有自己的基准、振幅和周期，因此同一时刻有涨有跌；
+// 2 号节点保持不变，用于展示“平盘”。
+function mockCpu(id, now) {
+	if (id === 2) return 35;
+	const seconds = now / 1000;
+	const base = 28 + ((id * 37) % 50);
+	const amplitude = 5 + ((id * 11) % 15);
+	const period = 90 + ((id * 53) % 210);
+	const phase = id * 1.7;
+	const value =
+		base +
+		amplitude * Math.sin((2 * Math.PI * seconds) / period + phase) +
+		jitter(id, Math.floor(seconds / 2)) * 1.5;
+	return Number(Math.min(100, Math.max(0, value)).toFixed(2));
+}
+
 function updateServerMetrics() {
 	const now = Date.now();
 	let nextOnlineCount = 0;
@@ -112,8 +136,7 @@ function updateServerMetrics() {
 			nextOnlineCount += 1;
 		}
 
-		const wave = (now / 1000 + server.id) % 100;
-		server.state.cpu = Number(wave.toFixed(2));
+		server.state.cpu = mockCpu(server.id, now);
 		server.state.net_in_speed =
 			1024 * (20 + ((server.id * 13 + now / 1000) % 80_000));
 		server.state.net_out_speed =
@@ -173,7 +196,7 @@ const metricSamplers = {
 	gpu: (server, wave) => (server.host.gpu.length > 0 ? 10 + wave * 60 : 0),
 };
 const metricPeriods = {
-	"1d": { days: 1, stepMs: 15 * minuteMs },
+	"1d": { days: 1, stepMs: 5 * minuteMs },
 	"7d": { days: 7, stepMs: 60 * minuteMs },
 	"30d": { days: 30, stepMs: 6 * 60 * minuteMs },
 };
@@ -190,7 +213,15 @@ function createMetricHistory(server, metric, period) {
 		ts <= windowEnd && ts <= lastActive;
 		ts += stepMs
 	) {
-		const wave = (Math.sin(ts / (60 * minuteMs) + server.id) + 1) / 2;
+		// 平滑波动叠加少量抖动，让 K 线蜡烛有实体和影线。
+		const wave = Math.min(
+			1,
+			Math.max(
+				0,
+				((Math.sin(ts / (60 * minuteMs) + server.id) + 1) / 2) * 0.85 +
+					(jitter(server.id, ts / stepMs) + 1) * 0.075,
+			),
+		);
 		const age = (windowEnd - ts) / 1000;
 		dataPoints.push({
 			ts,
@@ -529,7 +560,7 @@ const httpServer = http.createServer((request, response) => {
 						site_name: `Nezha Mock ${serverCount}`,
 						user_template: "",
 						admin_template: "",
-						custom_code: "",
+						custom_code: customCode,
 					},
 					version: "mock-1.0.0",
 				},

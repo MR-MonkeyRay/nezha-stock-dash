@@ -88,7 +88,9 @@
 		"loginRequired": "Please login to view"
 	},
 	"footer": {
-		"themeBy": "Theme by "
+		"themeBy": "Theme by ",
+		"basedOn": "Based on ",
+		"chartsBy": "K-line charts by "
 	},
 	"language": {
 		"zh-CN": "简体中文",

@@ -39,20 +39,41 @@ const Footer: React.FC = () => {
 						<section>
 							{t("footer.themeBy")}
 							<a
+								href={"https://github.com/MR-MonkeyRay/nezha-stock-dash"}
+								target="_blank"
+								rel="noopener"
+							>
+								nezha-stock-dash
+							</a>
+							{import.meta.env.VITE_GIT_HASH && (
+								<a
+									href={`https://github.com/MR-MonkeyRay/nezha-stock-dash/commit/${import.meta.env.VITE_GIT_HASH}`}
+									target="_blank"
+									rel="noopener"
+									className="ml-1"
+								>
+									({import.meta.env.VITE_GIT_HASH})
+								</a>
+							)}
+						</section>
+						<section className="text-[11px]">
+							{t("footer.basedOn")}
+							<a
 								href={"https://github.com/hamster1963/nezha-dash"}
 								target="_blank"
 								rel="noopener"
 							>
 								nezha-dash
 							</a>
-							{import.meta.env.VITE_GIT_HASH && (
-								<a
-									href={`https://github.com/hamster1963/nezha-dash-v1/commit/${import.meta.env.VITE_GIT_HASH}`}
-									className="ml-1"
-								>
-									({import.meta.env.VITE_GIT_HASH})
-								</a>
-							)}
+							<span className="mx-1">·</span>
+							{t("footer.chartsBy")}
+							<a
+								href={"https://www.tradingview.com/"}
+								target="_blank"
+								rel="noopener"
+							>
+								TradingView
+							</a>
 						</section>
 					</div>
 				</section>

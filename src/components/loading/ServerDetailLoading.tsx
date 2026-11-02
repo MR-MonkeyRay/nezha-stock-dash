@@ -5,12 +5,8 @@ import { cn } from "@/lib/utils";
 
 // Shared critical styles live in index.html so these placeholders also render
 // before the application bundle arrives on a direct /server/:id visit.
-const ROWS = [
-	[48, 76, 55, 50, 58, 58, 50],
-	[120, 190],
-	[145, 95, 95],
-	[145, 145],
-];
+const STATS = Array.from({ length: 12 }, (_, index) => index);
+const TABS = [0, 1, 2, 3];
 
 export function ServerDetailChartLoading() {
 	const { t } = useTranslation();
@@ -31,7 +27,7 @@ export function ServerDetailChartLoading() {
 				</div>
 				<div className="detail-chart-grid">
 					{[0, 1, 2, 3, 4, 5].map((index) => (
-						<div key={index} className="detail-chart-card">
+						<div key={index} className="detail-card detail-chart-card">
 							<div className="detail-chart-title">
 								<span className="detail-bar" />
 								<span className="detail-bar" />
@@ -88,18 +84,25 @@ export function ServerDetailLoading() {
 					<path d="m14 6-6 6 6 6" />
 				</svg>
 				<span aria-hidden="true" className="detail-bar" />
+				<span aria-hidden="true" className="detail-bar" />
 			</button>
-			<div aria-hidden="true" className="detail-metrics">
-				{ROWS.map((widths, row) => (
-					<div key={row} className="detail-metric-row">
-						{widths.map((width, index) => (
-							<div key={index} className="detail-metric" style={{ width }}>
-								<span className="detail-bar" />
-								<span className="detail-bar" />
-							</div>
-						))}
-					</div>
-				))}
+			<div aria-hidden="true" className="detail-card detail-quote">
+				<div className="detail-price">
+					<span className="detail-bar" />
+					<span className="detail-bar" />
+					<span className="detail-bar" />
+				</div>
+				<div className="detail-stats">
+					{STATS.map((index) => (
+						<div key={index} className="detail-stat">
+							<span className="detail-bar" />
+							<span className="detail-bar" />
+						</div>
+					))}
+				</div>
+			</div>
+			<div aria-hidden="true" className="detail-card detail-f10">
+				<span className="detail-bar" />
 			</div>
 		</div>
 	);
@@ -110,9 +113,9 @@ export function ServerDetailPageLoading() {
 		<div className="detail-skeleton detail-page server-info">
 			<ServerDetailLoading />
 			<div aria-hidden="true" className="detail-tabs">
-				<i />
-				<span className="detail-bar" />
-				<i />
+				{TABS.map((index) => (
+					<span key={index} className="detail-bar" />
+				))}
 			</div>
 			<ServerDetailChartLoading />
 		</div>
