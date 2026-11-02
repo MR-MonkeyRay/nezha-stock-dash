@@ -205,5 +205,13 @@
 		"expandMore": "Expand more",
 		"today": "Today"
 	},
-	"retry": "重試"
+	"retry": "重試",
+	"priceColor": {
+		"title": "漲跌顏色",
+		"redUp": "紅漲綠跌",
+		"greenUp": "綠漲紅跌",
+		"forced": "已由站點管理員設定",
+		"useRedUp": "切換為紅漲綠跌",
+		"useGreenUp": "切換為綠漲紅跌"
+	}
 }

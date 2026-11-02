@@ -5,10 +5,12 @@ import {
 	type SortOrder,
 	type SortType,
 } from "@/context/sort-context";
+import { isPriceColor, type PriceColor } from "@/lib/price-color";
 import { safeSessionStorage } from "@/lib/storage";
 
 export interface RuntimeConfig {
 	forceTheme?: "dark" | "light";
+	forceColorConvention?: PriceColor;
 	backgroundImage?: string;
 	mobileBackgroundImage?: string;
 	forceSortType?: SortType;
@@ -32,6 +34,7 @@ const text = (value: unknown) =>
 	typeof value === "string" && value ? value : undefined;
 const defaults: RuntimeConfig = {
 	forceTheme: undefined,
+	forceColorConvention: undefined,
 	backgroundImage: undefined,
 	mobileBackgroundImage: undefined,
 	forceSortType: undefined,
@@ -60,6 +63,9 @@ export function readRuntimeConfig(): RuntimeConfig {
 			window.ForceTheme === "dark" || window.ForceTheme === "light"
 				? window.ForceTheme
 				: undefined,
+		forceColorConvention: isPriceColor(window.ForceColorConvention)
+			? window.ForceColorConvention
+			: undefined,
 		backgroundImage: text(window.CustomBackgroundImage),
 		mobileBackgroundImage: text(window.CustomMobileBackgroundImage),
 		forceShowServices: Boolean(window.ForceShowServices),
@@ -99,6 +105,7 @@ export function refreshRuntimeConfig() {
 
 const observedKeys = [
 	"ForceTheme",
+	"ForceColorConvention",
 	"CustomBackgroundImage",
 	"CustomMobileBackgroundImage",
 	"ForceSortType",

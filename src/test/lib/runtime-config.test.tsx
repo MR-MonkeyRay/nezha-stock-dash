@@ -21,14 +21,23 @@ function Probe() {
 describe("runtime configuration boundary", () => {
 	it("validates legacy globals and keeps stable snapshots", () => {
 		window.ForceTheme = "unsupported";
+		window.ForceColorConvention = "blue-up";
 		window.ForceSortType = "invalid";
 		window.ForceSortOrder = "invalid";
 		expect(readRuntimeConfig()).toMatchObject({
 			forceTheme: undefined,
+			forceColorConvention: undefined,
 			forceSortType: undefined,
 			forceSortOrder: undefined,
 		});
 		expect(readRuntimeConfig()).toBe(readRuntimeConfig());
+	});
+
+	it("accepts both supported up/down color conventions", () => {
+		window.ForceColorConvention = "green-up";
+		expect(readRuntimeConfig().forceColorConvention).toBe("green-up");
+		window.ForceColorConvention = "red-up";
+		expect(readRuntimeConfig().forceColorConvention).toBe("red-up");
 	});
 
 	it("notifies an already-mounted sort provider after delayed injection without polling", () => {

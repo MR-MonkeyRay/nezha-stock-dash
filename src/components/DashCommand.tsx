@@ -1,6 +1,13 @@
 "use client";
 
-import { Home, Moon, Sun, SunMoon } from "lucide-react";
+import {
+	Home,
+	Moon,
+	Sun,
+	SunMoon,
+	TrendingDown,
+	TrendingUp,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +21,7 @@ import {
 	CommandSeparator,
 } from "@/components/ui/command";
 import { useCommand } from "@/hooks/use-command";
+import { usePriceColor } from "@/hooks/use-price-color";
 import { useTheme } from "@/hooks/use-theme";
 import { useWebSocketContext } from "@/hooks/use-websocket-context";
 import { saveMainPageScrollPosition } from "@/lib/navigation";
@@ -25,6 +33,7 @@ export function DashCommand() {
 	const navigate = useNavigate();
 	const { t } = useTranslation();
 	const { setTheme } = useTheme();
+	const { setPriceColor, forced: priceColorForced } = usePriceColor();
 
 	const { lastData, connected } = useWebSocketContext();
 
@@ -69,11 +78,27 @@ export function DashCommand() {
 					label: t("ToggleSystemMode"),
 					action: () => setTheme("system"),
 				},
+				...(priceColorForced
+					? []
+					: [
+							{
+								keywords: ["color", "red", "up", "涨跌", "红涨绿跌"],
+								icon: <TrendingUp />,
+								label: t("priceColor.useRedUp"),
+								action: () => setPriceColor("red-up"),
+							},
+							{
+								keywords: ["color", "green", "up", "涨跌", "绿涨红跌"],
+								icon: <TrendingDown />,
+								label: t("priceColor.useGreenUp"),
+								action: () => setPriceColor("green-up"),
+							},
+						]),
 			].map((item) => ({
 				...item,
 				value: `${item.keywords.join(" ")} ${item.label}`,
 			})),
-		[navigate, setTheme, t],
+		[navigate, setTheme, setPriceColor, priceColorForced, t],
 	);
 
 	const serverCommands = useMemo(() => {

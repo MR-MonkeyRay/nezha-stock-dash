@@ -48,6 +48,16 @@
 
         applyResolvedTheme(resolveTheme(theme))
 
+        // 涨跌颜色: keep in sync with src/lib/price-color.ts.
+        let priceColor = "red-up"
+        try {
+          const storedPriceColor = localStorage.getItem("priceColor")
+          if (storedPriceColor === "red-up" || storedPriceColor === "green-up") {
+            priceColor = storedPriceColor
+          }
+        } catch (_e) {}
+        root.setAttribute("data-price-color", priceColor)
+
         root.toggleAttribute("data-initial-home", location.pathname === "/")
         root.toggleAttribute("data-initial-detail", /^\/server\/[^/]+\/?$/.test(location.pathname))
 

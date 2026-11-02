@@ -211,5 +211,13 @@
 		"expandMore": "Expand more",
 		"today": "Today"
 	},
-	"retry": "Try again"
+	"retry": "Try again",
+	"priceColor": {
+		"title": "Up/down colors",
+		"redUp": "Red up, green down",
+		"greenUp": "Green up, red down",
+		"forced": "Set by site admin",
+		"useRedUp": "Use red up / green down",
+		"useGreenUp": "Use green up / red down"
+	}
 }

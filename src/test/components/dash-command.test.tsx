@@ -13,6 +13,8 @@ const dashMocks = vi.hoisted(() => ({
 	} | null,
 	navigate: vi.fn(),
 	setTheme: vi.fn(),
+	setPriceColor: vi.fn(),
+	priceColorForced: false,
 	toggleCommand: vi.fn(),
 	connected: true,
 }));
@@ -28,6 +30,14 @@ vi.mock("@/hooks/use-command", () => ({
 vi.mock("@/hooks/use-theme", () => ({
 	useTheme: () => ({
 		setTheme: dashMocks.setTheme,
+	}),
+}));
+
+vi.mock("@/hooks/use-price-color", () => ({
+	usePriceColor: () => ({
+		priceColor: "red-up",
+		setPriceColor: dashMocks.setPriceColor,
+		forced: dashMocks.priceColorForced,
 	}),
 }));
 
@@ -65,6 +75,8 @@ describe("DashCommand", () => {
 		dashMocks.closeCommand.mockClear();
 		dashMocks.navigate.mockClear();
 		dashMocks.setTheme.mockClear();
+		dashMocks.setPriceColor.mockClear();
+		dashMocks.priceColorForced = false;
 		dashMocks.toggleCommand.mockClear();
 		dashMocks.isOpen = true;
 		dashMocks.connected = true;
@@ -133,5 +145,21 @@ describe("DashCommand", () => {
 
 		await user.click(screen.getByText("ToggleDarkMode"));
 		expect(dashMocks.setTheme).toHaveBeenCalledWith("dark");
+	});
+
+	it("offers up/down color commands unless the convention is forced", async () => {
+		const user = userEvent.setup();
+		seedWebSocketData();
+		dashMocks.priceColorForced = false;
+
+		const { rerender } = render(<DashCommand />);
+		await user.click(screen.getByText("priceColor.useGreenUp"));
+		expect(dashMocks.setPriceColor).toHaveBeenCalledWith("green-up");
+		await user.click(screen.getByText("priceColor.useRedUp"));
+		expect(dashMocks.setPriceColor).toHaveBeenCalledWith("red-up");
+
+		dashMocks.priceColorForced = true;
+		rerender(<DashCommand />);
+		expect(screen.queryByText("priceColor.useGreenUp")).not.toBeInTheDocument();
 	});
 });

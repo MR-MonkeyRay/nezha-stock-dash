@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { PriceColorProvider } from "@/components/PriceColorProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ModeToggle } from "@/components/ThemeSwitcher";
 import {
@@ -93,10 +94,56 @@ describe("language and theme switchers", () => {
 		);
 
 		await user.click(screen.getByRole("button", { name: "Toggle theme" }));
-		await user.click(await screen.findByText("theme.dark"));
+		await user.click(await screen.findByText("theme.light"));
 
-		expect(document.documentElement).toHaveClass("dark");
-		expect(localStorage.getItem("theme-switcher-test")).toBe("dark");
+		expect(document.documentElement).toHaveClass("light");
+		expect(localStorage.getItem("theme-switcher-test")).toBe("light");
+	});
+
+	it("switches the up/down color convention through the mode menu", async () => {
+		const user = userEvent.setup();
+
+		render(
+			<ThemeProvider storageKey="theme-switcher-test">
+				<PriceColorProvider>
+					<ModeToggle />
+				</PriceColorProvider>
+			</ThemeProvider>,
+		);
+
+		expect(document.documentElement).toHaveAttribute(
+			"data-price-color",
+			"red-up",
+		);
+		await user.click(screen.getByRole("button", { name: "Toggle theme" }));
+		expect(await screen.findByText("priceColor.title")).toBeInTheDocument();
+		await user.click(screen.getByText("priceColor.greenUp"));
+
+		expect(document.documentElement).toHaveAttribute(
+			"data-price-color",
+			"green-up",
+		);
+		expect(localStorage.getItem("priceColor")).toBe("green-up");
+	});
+
+	it("disables convention items while custom code forces one", async () => {
+		const user = userEvent.setup();
+		window.ForceColorConvention = "green-up";
+
+		render(
+			<PriceColorProvider>
+				<ModeToggle />
+			</PriceColorProvider>,
+		);
+
+		await user.click(screen.getByRole("button", { name: "Toggle theme" }));
+		expect(await screen.findByText("priceColor.forced")).toBeInTheDocument();
+		const redUp = screen.getByRole("menuitem", { name: /priceColor.redUp/ });
+		expect(redUp).toHaveAttribute("data-disabled");
+		expect(document.documentElement).toHaveAttribute(
+			"data-price-color",
+			"green-up",
+		);
 	});
 });
 
