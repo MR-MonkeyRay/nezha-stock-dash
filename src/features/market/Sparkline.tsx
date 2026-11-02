@@ -12,6 +12,8 @@ type SparklineProps = {
 	domain?: "percent" | "auto";
 	/** Draws the baseline (first sample) as a dashed reference, like 昨收. */
 	showBase?: boolean;
+	/** Marks the latest sample with a pulsing dot. Keep it to a few instances. */
+	live?: boolean;
 	className?: string;
 };
 
@@ -22,7 +24,7 @@ export function buildSparklinePoints(
 	height: number,
 	domain: "percent" | "auto",
 ) {
-	if (values.length === 0) return { points: "", baseY: height / 2 };
+	if (values.length === 0) return { points: "", baseY: height / 2, last: null };
 	let min = domain === "percent" ? 0 : Math.min(...values);
 	let max = domain === "percent" ? 100 : Math.max(...values);
 	if (domain === "auto") {
@@ -35,14 +37,17 @@ export function buildSparklinePoints(
 	const step = values.length > 1 ? width / (values.length - 1) : 0;
 	const y = (value: number) =>
 		Math.round((height - ((value - min) / span) * height) * 100) / 100;
+	const x = (index: number) =>
+		values.length > 1 ? Math.round(index * step * 100) / 100 : width;
 	const points = values
-		.map((value, index) => {
-			const x =
-				values.length > 1 ? Math.round(index * step * 100) / 100 : width;
-			return `${x},${y(value)}`;
-		})
+		.map((value, index) => `${x(index)},${y(value)}`)
 		.join(" ");
-	return { points, baseY: y(values[0]) };
+	const lastIndex = values.length - 1;
+	return {
+		points,
+		baseY: y(values[0]),
+		last: { x: x(lastIndex), y: y(values[lastIndex]) },
+	};
 }
 
 /** Lightweight inline-SVG 分时 line; no chart library so long lists stay cheap. */
@@ -53,9 +58,10 @@ export const Sparkline = memo(function Sparkline({
 	height = 24,
 	domain = "auto",
 	showBase = true,
+	live = false,
 	className,
 }: SparklineProps) {
-	const { points, baseY } = useMemo(
+	const { points, baseY, last } = useMemo(
 		() => buildSparklinePoints(values, width, height, domain),
 		[values, width, height, domain],
 	);
@@ -94,14 +100,27 @@ export const Sparkline = memo(function Sparkline({
 					)}
 					<polyline
 						points={points}
+						pathLength={1}
 						fill="none"
 						stroke="currentColor"
 						strokeWidth={1.25}
 						strokeLinejoin="round"
 						strokeLinecap="round"
 						vectorEffect="non-scaling-stroke"
-						className={directionTextClass(direction)}
+						className={cn("spark-draw", directionTextClass(direction))}
 					/>
+					{live && last && (
+						<g className={directionTextClass(direction)} data-testid="live-dot">
+							<circle
+								cx={last.x}
+								cy={last.y}
+								r={2.5}
+								fill="currentColor"
+								className="live-ping"
+							/>
+							<circle cx={last.x} cy={last.y} r={2} fill="currentColor" />
+						</g>
+					)}
 				</>
 			)}
 		</svg>

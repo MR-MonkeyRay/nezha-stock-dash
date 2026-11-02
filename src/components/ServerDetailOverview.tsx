@@ -193,7 +193,7 @@ export default function ServerDetailOverview({
 					<QuotePrice
 						quote={quote}
 						suffix="%"
-						className="block text-[2.5rem] font-bold leading-none md:text-5xl"
+						className="block w-fit text-[2.5rem] font-bold leading-none md:text-5xl"
 					/>
 					<p className="mt-2 flex flex-wrap items-center gap-3 text-sm">
 						<QuoteChange quote={quote} />

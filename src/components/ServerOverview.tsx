@@ -85,7 +85,7 @@ export default function ServerOverview({
 							</p>
 							<QuotePrice
 								quote={quote}
-								className="mt-1 block text-[2rem] font-bold leading-none md:text-[2.5rem]"
+								className="mt-1 block w-fit text-[2rem] font-bold leading-none md:text-[2.5rem]"
 							/>
 							<p className="mt-1.5 flex items-center gap-3 text-sm">
 								<QuoteChange quote={quote} />
@@ -100,6 +100,7 @@ export default function ServerOverview({
 							direction={quote.direction}
 							width={140}
 							height={48}
+							live
 							className="hidden sm:block"
 						/>
 					</button>
@@ -219,15 +220,17 @@ function BreadthPanel({
 				className="flex h-1.5 w-full overflow-hidden rounded-full bg-muted"
 				aria-hidden="true"
 			>
-				{segments.map((segment) =>
-					segment.value > 0 ? (
-						<span
-							key={segment.key}
-							className={segment.bar}
-							style={{ width: `${(segment.value / counted) * 100}%` }}
-						/>
-					) : null,
-				)}
+				{segments.map((segment) => (
+					// Always rendered so a segment can grow from 0 instead of popping in.
+					<span
+						key={segment.key}
+						className={cn(
+							"transition-[width] duration-500 ease-(--ease-out) motion-reduce:transition-none",
+							segment.bar,
+						)}
+						style={{ width: `${(segment.value / counted) * 100}%` }}
+					/>
+				))}
 			</div>
 			<div className="grid grid-cols-4 gap-x-2 gap-y-1 sm:grid-cols-2">
 				{items.map((item) => {

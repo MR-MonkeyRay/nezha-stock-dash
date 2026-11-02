@@ -17,10 +17,12 @@ describe("Sparkline", () => {
 		expect(buildSparklinePoints([], 80, 24, "auto")).toEqual({
 			points: "",
 			baseY: 12,
+			last: null,
 		});
 		const percent = buildSparklinePoints([0, 100], 80, 20, "percent");
 		expect(percent.points).toBe("0,20 80,0");
 		expect(percent.baseY).toBe(20);
+		expect(percent.last).toEqual({ x: 80, y: 0 });
 		const single = buildSparklinePoints([5], 80, 20, "auto");
 		expect(single.points).toBe("80,10");
 		const flat = buildSparklinePoints([5, 5], 80, 20, "auto");

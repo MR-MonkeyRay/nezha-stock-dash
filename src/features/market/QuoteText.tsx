@@ -9,6 +9,7 @@ import {
 	formatSignedPct,
 } from "./direction";
 import type { Direction, Quote } from "./quote-series";
+import { useTickFlash } from "./use-tick-flash";
 
 /** Screen-reader text so color and glyphs are never the only cue. */
 export function useDirectionLabel() {
@@ -23,7 +24,7 @@ export function useDirectionLabel() {
 					: t("market.suspended");
 }
 
-/** Price ("现价") colored by direction; "--" while halted. */
+/** Price ("现价") colored by direction; "--" while halted. Flashes on each tick. */
 export function QuotePrice({
 	quote,
 	digits = 2,
@@ -35,8 +36,18 @@ export function QuotePrice({
 	suffix?: string;
 	className?: string;
 }) {
+	const flash = useTickFlash(quote.last);
 	return (
-		<span className={cn("num", directionTextClass(quote.direction), className)}>
+		<span
+			className={cn(
+				"num",
+				flash.direction && "tick-flash",
+				directionTextClass(quote.direction),
+				className,
+			)}
+			data-flash={flash.direction ?? undefined}
+			data-flash-parity={flash.direction ? flash.parity : undefined}
+		>
 			{formatPrice(quote.last, digits)}
 			{quote.last !== null && suffix}
 		</span>
@@ -134,7 +145,7 @@ export function ChangePill({
 		</>
 	);
 	const classes = cn(
-		"num inline-flex min-w-[4.5rem] items-center justify-center rounded-sm px-1.5 py-1 text-[13px] font-semibold leading-none",
+		"num inline-flex min-w-[4.5rem] items-center justify-center rounded-sm px-1.5 py-1 text-[13px] font-semibold leading-none transition-colors duration-(--dur-slow)",
 		mode === "custom" && !halted
 			? "bg-muted text-foreground"
 			: directionPillClass(quote.direction),

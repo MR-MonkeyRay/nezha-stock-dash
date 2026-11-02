@@ -207,6 +207,14 @@
 		--up: var(--red);
 		--down: var(--green);
 		--timing: cubic-bezier(0.4, 0, 0.2, 1);
+
+		/* Motion tokens: short and decisive, like a trading terminal. */
+		--ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+		--ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+		--dur-fast: 120ms;
+		--dur-base: 200ms;
+		--dur-slow: 360ms;
+		--dur-flash: 900ms;
 	}
 
 	/* Dark: black terminal (通达信 / 同花顺 style). */
@@ -544,5 +552,94 @@
 	}
 	.ticker-clone {
 		display: none;
+	}
+}
+
+/* ── Motion ───────────────────────────────────────────────────────────────
+   Data motion (tick flash, bars) conveys information and stays on with
+   reduced motion; movement-based motion (slides, lifts, reveals) is removed. */
+
+/* 跳价闪烁: a fading background behind a price whenever it ticks up or down.
+   Two identical keyframes alternate so every tick restarts the animation. */
+@keyframes tick-flash-a {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+@keyframes tick-flash-b {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+.tick-flash {
+	position: relative;
+	isolation: isolate;
+}
+.tick-flash::after {
+	content: "";
+	position: absolute;
+	inset: -1px -3px;
+	z-index: -1;
+	border-radius: 2px;
+	opacity: 0;
+	pointer-events: none;
+}
+.tick-flash[data-flash="up"]::after {
+	background: hsl(var(--up) / 0.28);
+}
+.tick-flash[data-flash="down"]::after {
+	background: hsl(var(--down) / 0.28);
+}
+.tick-flash[data-flash-parity="0"]::after {
+	animation: tick-flash-a var(--dur-flash) var(--ease-out);
+}
+.tick-flash[data-flash-parity="1"]::after {
+	animation: tick-flash-b var(--dur-flash) var(--ease-out);
+}
+
+/* Sparkline draw-in on first paint (pathLength="1" on the polyline). */
+@keyframes spark-draw {
+	from {
+		stroke-dashoffset: 1;
+	}
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+.spark-draw {
+	stroke-dasharray: 1;
+	animation: spark-draw 700ms var(--ease-out) both;
+}
+
+/* Live price dot with an expanding ring, like the last point of a 分时 line. */
+@keyframes live-ping {
+	from {
+		transform: scale(1);
+		opacity: 0.7;
+	}
+	to {
+		transform: scale(3);
+		opacity: 0;
+	}
+}
+.live-ping {
+	transform-box: fill-box;
+	transform-origin: center;
+	animation: live-ping 1.6s var(--ease-out) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.spark-draw,
+	.live-ping {
+		animation: none;
+	}
+	.live-ping {
+		opacity: 0;
 	}
 }

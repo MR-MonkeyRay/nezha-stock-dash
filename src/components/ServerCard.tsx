@@ -124,7 +124,7 @@ function ServerCard({
 					<QuotePrice
 						quote={effectiveQuote}
 						suffix="%"
-						className="block text-2xl font-bold leading-none"
+						className="block w-fit text-2xl font-bold leading-none"
 					/>
 					{!halted && (
 						<QuoteChange quote={effectiveQuote} className="mt-1 text-xs" />
