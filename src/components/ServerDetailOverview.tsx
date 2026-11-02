@@ -166,9 +166,11 @@ export default function ServerDetailOverview({
 					type="button"
 					onClick={linkClick}
 					aria-label={t("market.back")}
-					className="flex min-w-0 cursor-pointer items-center gap-1 break-all text-xl font-semibold leading-none tracking-tight server-name"
+					className="group flex min-w-0 cursor-pointer items-center gap-1 break-all text-xl font-semibold leading-none tracking-tight server-name"
 				>
-					<BackIcon />
+					<span className="flex transition-[translate] duration-(--dur-base) ease-(--ease-out) motion-safe:group-hover:-translate-x-1">
+						<BackIcon />
+					</span>
 					{name}
 				</button>
 				<span className="num text-xs text-muted-foreground">

@@ -198,12 +198,19 @@ function Header({
 							},
 						)}
 					>
-						<span
-							aria-hidden="true"
-							className={cn("h-1.5 w-1.5 rounded-full bg-status-ok", {
-								"animate-pulse bg-suspended": !connected,
-							})}
-						></span>
+						<span aria-hidden="true" className="relative flex h-1.5 w-1.5">
+							{connected && (
+								<span className="absolute inset-0 rounded-full bg-status-ok opacity-60 motion-safe:animate-ping" />
+							)}
+							<span
+								className={cn(
+									"relative h-1.5 w-1.5 rounded-full bg-status-ok",
+									{
+										"animate-pulse bg-suspended": !connected,
+									},
+								)}
+							/>
+						</span>
 						<span className="hidden text-xs text-status-ok sm:inline">
 							{connected ? t("market.live") : ""}
 						</span>

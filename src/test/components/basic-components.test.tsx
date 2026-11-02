@@ -235,7 +235,10 @@ describe("ui primitives", () => {
 			</>,
 		);
 
-		expect(screen.getByTestId("skeleton")).toHaveClass("animate-pulse", "h-4");
+		expect(screen.getByTestId("skeleton")).toHaveClass(
+			"skeleton-shimmer",
+			"h-4",
+		);
 		expect(screen.getByTestId("horizontal")).toHaveClass("h-px", "w-full");
 		expect(screen.getByTestId("vertical")).toHaveClass("h-full", "w-px");
 		expect(container.querySelectorAll("[data-orientation]")).toHaveLength(2);

@@ -643,3 +643,114 @@
 		opacity: 0;
 	}
 }
+
+/* Press feedback. `scale`/`translate` are separate CSS properties, so these
+   compose with Tailwind's transform utilities. Use with motion-safe:press. */
+@utility transition-press {
+	transition-property:
+		color, background-color, border-color, box-shadow, opacity, scale, translate;
+	transition-timing-function: var(--ease-out);
+	transition-duration: var(--dur-base);
+}
+@utility press {
+	&:active:not(:disabled):not([aria-disabled="true"]) {
+		scale: 0.95;
+		transition-duration: var(--dur-fast);
+	}
+}
+@utility press-soft {
+	&:active:not(:disabled) {
+		scale: 0.99;
+		transition-duration: var(--dur-fast);
+	}
+}
+
+/* Entrance: children rise in with a short stagger (capped at 12 steps).
+   Applied only while a list first mounts (useEntrance), so rows that React
+   moves on later re-sorts do not replay it. */
+@keyframes rise-in {
+	from {
+		opacity: 0;
+		translate: 0 6px;
+	}
+}
+.anim-rise,
+.stagger > * {
+	animation: rise-in var(--dur-slow) var(--ease-out) both;
+	animation-delay: calc(var(--i, 0) * 28ms);
+}
+.stagger > :nth-child(2) {
+	--i: 1;
+}
+.stagger > :nth-child(3) {
+	--i: 2;
+}
+.stagger > :nth-child(4) {
+	--i: 3;
+}
+.stagger > :nth-child(5) {
+	--i: 4;
+}
+.stagger > :nth-child(6) {
+	--i: 5;
+}
+.stagger > :nth-child(7) {
+	--i: 6;
+}
+.stagger > :nth-child(8) {
+	--i: 7;
+}
+.stagger > :nth-child(9) {
+	--i: 8;
+}
+.stagger > :nth-child(10) {
+	--i: 9;
+}
+.stagger > :nth-child(11) {
+	--i: 10;
+}
+.stagger > :nth-child(n + 12) {
+	--i: 11;
+}
+
+/* Value swap (cycling pill text, sort arrow): the new value slides up in. */
+@keyframes swap-in {
+	from {
+		opacity: 0;
+		translate: 0 35%;
+	}
+}
+.anim-swap {
+	display: inline-block;
+	animation: swap-in var(--dur-base) var(--ease-out);
+}
+
+/* Skeleton shimmer: a soft highlight sweeping across the placeholder. */
+@keyframes shimmer {
+	from {
+		background-position: 150% 0;
+	}
+	to {
+		background-position: -50% 0;
+	}
+}
+.skeleton-shimmer {
+	background-image: linear-gradient(
+		100deg,
+		transparent 20%,
+		hsl(var(--foreground) / 0.06) 50%,
+		transparent 80%
+	);
+	background-size: 200% 100%;
+	background-repeat: no-repeat;
+	animation: shimmer 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.anim-rise,
+	.stagger > *,
+	.anim-swap,
+	.skeleton-shimmer {
+		animation: none;
+	}
+}

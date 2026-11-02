@@ -73,7 +73,7 @@ function ServerCard({
 	return (
 		<Card
 			className={cn(
-				"server-card flex cursor-pointer flex-col gap-2 p-3 transition-colors hover:border-highlight/60",
+				"server-card flex cursor-pointer flex-col gap-2 p-3 transition-press hover:border-highlight/60 hover:shadow-[0_8px_24px_-16px_hsl(var(--highlight)/0.55)] motion-safe:hover:-translate-y-0.5 motion-safe:press-soft",
 				{ "bg-card/70": customBackgroundImage, "opacity-80": halted },
 			)}
 			onClick={cardClick}

@@ -640,8 +640,16 @@ describe("Servers page", () => {
 
 		expect(screen.getByTestId("server-card-inline")).toHaveTextContent("alpha");
 		expect(screen.getByTestId("ticker")).toHaveTextContent("1");
+		expect(screen.getByTestId("view-thumb")).toHaveStyle({
+			transform: "translateX(0)",
+		});
 		await user.click(screen.getByRole("button", { name: /market.cardView/ }));
 		expect(screen.getByTestId("server-card")).toHaveTextContent("alpha");
+		expect(screen.getByTestId("view-thumb")).toHaveStyle({
+			transform: "translateX(100%)",
+		});
+		// The card grid staggers in on mount only.
+		expect(document.querySelector(".server-card-list")).toHaveClass("stagger");
 		expect(localStorage.getItem("inline")).toBe("0");
 		await user.click(screen.getByRole("button", { name: /market.listView/ }));
 		expect(screen.getByTestId("server-card-inline")).toBeInTheDocument();

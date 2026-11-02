@@ -62,7 +62,7 @@ export default function ServerOverview({
 			aria-busy={loading}
 			className={cn(
 				"grid grid-cols-2 gap-2 md:gap-3 lg:grid-cols-[1.35fr_1fr_1fr] server-overview",
-				loading && "pointer-events-none",
+				loading ? "pointer-events-none" : "stagger",
 			)}
 		>
 			<Card className={cn(panel, "col-span-2 lg:col-span-1")}>
@@ -72,7 +72,7 @@ export default function ServerOverview({
 					<button
 						type="button"
 						onClick={() => setStatus("all")}
-						className="flex w-full items-end justify-between gap-3 text-left"
+						className="flex w-full items-end justify-between gap-3 text-left transition-press motion-safe:press-soft"
 					>
 						<div className="min-w-0">
 							<p className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -250,7 +250,7 @@ function BreadthPanel({
 							}
 							onClick={() => setStatus(item.target)}
 							className={cn(
-								"flex flex-col items-start gap-x-2 rounded-sm px-1 text-xs hover:bg-accent sm:flex-row sm:items-baseline sm:justify-between",
+								"flex flex-col items-start gap-x-2 rounded-sm px-1 text-xs transition-press hover:bg-accent motion-safe:press sm:flex-row sm:items-baseline sm:justify-between",
 								active && "bg-accent",
 							)}
 						>

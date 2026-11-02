@@ -5,6 +5,7 @@ import BillingInfo from "@/components/billingInfo";
 import PlanInfo from "@/components/PlanInfo";
 import ServerFlag from "@/components/ServerFlag";
 import type { SortContextType, SortType } from "@/context/sort-context";
+import { useEntrance } from "@/hooks/use-entrance";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { formatBytes } from "@/lib/format";
 import {
@@ -118,7 +119,7 @@ function SortHeader({
 			<button
 				type="button"
 				className={cn(
-					"inline-flex items-center gap-0.5 hover:text-foreground",
+					"inline-flex items-center gap-0.5 transition-colors hover:text-foreground",
 					active && "text-highlight",
 				)}
 				onClick={() => {
@@ -131,7 +132,11 @@ function SortHeader({
 				}}
 			>
 				{label}
-				<span aria-hidden="true" className="text-[9px]">
+				<span
+					key={active ? sortOrder : "none"}
+					aria-hidden="true"
+					className="anim-swap text-[9px]"
+				>
 					{active ? (sortOrder === "asc" ? "▲" : "▼") : ""}
 				</span>
 			</button>
@@ -141,6 +146,7 @@ function SortHeader({
 
 function WatchlistTable({ servers, quotes, now, ...sort }: WatchlistProps) {
 	const { t } = useTranslation();
+	const entering = useEntrance();
 	const { showNetTransfer } = useRuntimeConfig();
 	const columns: { key: ColumnKey; label: string; align?: "left" }[] = [
 		{ key: "name", label: t("market.name"), align: "left" },
@@ -173,7 +179,7 @@ function WatchlistTable({ servers, quotes, now, ...sort }: WatchlistProps) {
 						))}
 					</tr>
 				</thead>
-				<tbody>
+				<tbody className={cn(entering && "stagger")}>
 					{servers.map((server) => (
 						<WatchlistRow
 							key={server.id}
@@ -222,11 +228,11 @@ const WatchlistRow = memo(function WatchlistRow({
 			onClick={open}
 			onPointerEnter={preloadServerDetail}
 			className={cn(
-				"watchlist-row cursor-pointer border-b border-border/60 transition-colors last:border-0 hover:bg-accent/60 [content-visibility:auto] [contain-intrinsic-size:auto_48px]",
+				"watchlist-row group cursor-pointer border-b border-border/60 transition-colors duration-(--dur-fast) last:border-0 hover:bg-accent/60 active:bg-accent [content-visibility:auto] [contain-intrinsic-size:auto_48px]",
 				halted && "text-muted-foreground",
 			)}
 		>
-			<td className="max-w-[260px] px-2 py-1.5 text-left">
+			<td className="max-w-[260px] px-2 py-1.5 text-left shadow-[inset_2px_0_0_transparent] transition-shadow duration-(--dur-base) group-hover:shadow-[inset_2px_0_0_hsl(var(--highlight))]">
 				<div className="flex items-center gap-2">
 					<ServerFlag country_code={info.country_code} className="shrink-0" />
 					<div className="min-w-0">
@@ -341,6 +347,7 @@ const NEXT_MODE: Record<PillMode, PillMode> = {
 
 function QuoteRows({ servers, quotes, now }: WatchlistProps) {
 	const { t } = useTranslation();
+	const entering = useEntrance();
 	const [mode, setMode] = useState<PillMode>("pct");
 	const modeLabel =
 		mode === "pct"
@@ -357,14 +364,17 @@ function QuoteRows({ servers, quotes, now }: WatchlistProps) {
 					<button
 						type="button"
 						aria-label={t("market.cycleColumn")}
-						className="min-w-[4.5rem] text-right text-highlight"
+						className="min-w-[4.5rem] text-right text-highlight transition-press motion-safe:press"
 						onClick={() => setMode(NEXT_MODE[mode])}
 					>
-						{modeLabel} ⇄
+						<span key={mode} className="anim-swap">
+							{modeLabel}
+						</span>{" "}
+						⇄
 					</button>
 				</span>
 			</div>
-			<ul>
+			<ul className={cn(entering && "stagger")}>
 				{servers.map((server) => (
 					<QuoteRow
 						key={server.id}
@@ -396,7 +406,7 @@ const QuoteRow = memo(function QuoteRow({
 	const info = formatNezhaInfo(now, server);
 	const halted = quote.direction === "suspended";
 	return (
-		<li className="quote-row relative grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b border-border/60 px-3 py-2 last:border-0 has-[a:active]:bg-accent/60">
+		<li className="quote-row relative grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b border-border/60 px-3 py-2 transition-colors duration-(--dur-fast) last:border-0 has-[a:active]:bg-accent/60">
 			<div className="min-w-0">
 				{/* Stretched link: the whole row opens the detail page. */}
 				<Link

@@ -141,18 +141,29 @@ export function ChangePill({
 	const content = (
 		<>
 			{!halted && <span className="sr-only">{label(quote.direction)} </span>}
-			{text}
+			{/* Re-keyed per mode so cycling 涨跌幅 → 涨跌 → 内存 slides the new value in. */}
+			<span key={mode} className={onClick ? "anim-swap" : undefined}>
+				{text}
+			</span>
 		</>
 	);
 	const classes = cn(
-		"num inline-flex min-w-[4.5rem] items-center justify-center rounded-sm px-1.5 py-1 text-[13px] font-semibold leading-none transition-colors duration-(--dur-slow)",
+		"num inline-flex min-w-[4.5rem] items-center justify-center rounded-sm px-1.5 py-1 text-[13px] font-semibold leading-none",
 		mode === "custom" && !halted
 			? "bg-muted text-foreground"
 			: directionPillClass(quote.direction),
 		className,
 	);
 	return onClick ? (
-		<button type="button" className={classes} onClick={onClick}>
+		<button
+			type="button"
+			className={cn(
+				classes,
+				// Colors snap like a terminal; only the press scale animates.
+				"transition-[scale] duration-(--dur-fast) motion-safe:press",
+			)}
+			onClick={onClick}
+		>
 			{content}
 		</button>
 	) : (
