@@ -5,11 +5,21 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-	--font-sans: var(--font-sans);
+	--font-sans:
+		system-ui, -apple-system, "PingFang SC", "Hiragino Sans GB",
+		"Microsoft YaHei", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	--font-num:
+		"DIN Alternate", "DIN Pro", "Roboto Mono", "SF Mono", ui-monospace,
+		SFMono-Regular, Menlo, Consolas, monospace;
 
+	/* Terminal look: squarer corners everywhere (rounded-full is untouched). */
+	--radius-xs: calc(var(--radius) - 2px);
+	--radius-sm: calc(var(--radius) - 2px);
+	--radius-md: calc(var(--radius) - 1px);
 	--radius-lg: var(--radius);
-	--radius-md: calc(var(--radius) - 2px);
-	--radius-sm: calc(var(--radius) - 4px);
+	--radius-xl: calc(var(--radius) + 2px);
+	--radius-2xl: calc(var(--radius) + 4px);
+	--radius-3xl: calc(var(--radius) + 6px);
 
 	--color-background: hsl(var(--background));
 	--color-foreground: hsl(var(--foreground));
@@ -44,6 +54,27 @@
 	--color-chart-3: hsl(var(--chart-3));
 	--color-chart-4: hsl(var(--chart-4));
 	--color-chart-5: hsl(var(--chart-5));
+
+	/* Market semantics. --up/--down follow html[data-price-color]. */
+	--color-up: hsl(var(--up));
+	--color-down: hsl(var(--down));
+	--color-flat: hsl(var(--flat));
+	--color-suspended: hsl(var(--suspended));
+	--color-highlight: hsl(var(--highlight));
+	--color-highlight-foreground: hsl(var(--highlight-foreground));
+	--color-chart-line: hsl(var(--chart-line));
+	--color-chart-avg: hsl(var(--chart-avg));
+	--color-chart-grid: hsl(var(--chart-grid));
+	--color-chart-axis: hsl(var(--chart-axis));
+	--color-crosshair: hsl(var(--crosshair));
+	--color-status-ok: hsl(var(--status-ok));
+	--color-status-warn: hsl(var(--status-warn));
+	--color-status-bad: hsl(var(--status-bad));
+	--color-ma-1: hsl(var(--ma-1));
+	--color-ma-2: hsl(var(--ma-2));
+	--color-ma-3: hsl(var(--ma-3));
+	--color-ma-4: hsl(var(--ma-4));
+	--color-ma-5: hsl(var(--ma-5));
 
 	--animate-accordion-down: accordion-down 0.2s ease-out;
 	--animate-accordion-up: accordion-up 0.2s ease-out;
@@ -80,7 +111,7 @@
 	::before,
 	::backdrop,
 	::file-selector-button {
-		border-color: var(--color-gray-200, currentcolor);
+		border-color: var(--color-border, currentcolor);
 	}
 }
 
@@ -96,7 +127,7 @@
 
 @layer utilities {
 	:root {
-		font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+		font-family: var(--font-sans);
 		line-height: 1.5;
 		font-weight: 400;
 
@@ -115,70 +146,121 @@
 }
 
 @layer base {
+	/*
+	 * Light: white quote pages (东方财富 web style).
+	 * All values are HSL triplets so `hsl(var(--x))` works in chart props.
+	 */
 	:root {
-		--background: 0 0% 98%;
-		--foreground: 20 14.3% 4.1%;
+		--background: 0 0% 100%;
+		--foreground: 222 20% 12%;
 		--card: 0 0% 100%;
-		--card-foreground: 20 14.3% 4.1%;
+		--card-foreground: 222 20% 12%;
 		--popover: 0 0% 100%;
-		--popover-foreground: 20 14.3% 4.1%;
-		--primary: 24 9.8% 10%;
-		--primary-foreground: 60 9.1% 97.8%;
-		--secondary: 60 4.8% 95.9%;
-		--secondary-foreground: 24 9.8% 10%;
-		--muted: 60 4.8% 95.9%;
-		--muted-foreground: 25 5.3% 44.7%;
-		--accent: 60 4.8% 95.9%;
-		--accent-foreground: 24 9.8% 10%;
-		--destructive: 0 84.2% 60.2%;
-		--destructive-foreground: 60 9.1% 97.8%;
-		--border: 20 5.9% 90%;
-		--input: 20 5.9% 90%;
-		--ring: 20 14.3% 4.1%;
-		--radius: 1rem;
-		--chart-1: 220 70% 50%;
-		--chart-2: 340 75% 55%;
-		--chart-3: 30 80% 55%;
-		--chart-4: 280 65% 60%;
-		--chart-5: 160 60% 45%;
-		--chart-6: 180 50% 50%;
-		--chart-7: 216 50% 50%;
-		--chart-8: 252 50% 50%;
-		--chart-9: 288 50% 50%;
-		--chart-10: 324 50% 50%;
+		--popover-foreground: 222 20% 12%;
+		--primary: 218 100% 50%;
+		--primary-foreground: 0 0% 100%;
+		--secondary: 220 18% 96%;
+		--secondary-foreground: 222 20% 12%;
+		--muted: 220 18% 96%;
+		--muted-foreground: 220 9% 42%;
+		--accent: 220 18% 94%;
+		--accent-foreground: 222 20% 12%;
+		--destructive: 0 70% 51%;
+		--destructive-foreground: 0 0% 100%;
+		--border: 220 13% 90%;
+		--input: 220 13% 90%;
+		--ring: 218 100% 56%;
+		--radius: 0.25rem;
+
+		--red: 0 70% 51%;
+		--green: 140 100% 27%;
+		--flat: 0 0% 40%;
+		--suspended: 0 0% 55%;
+		--highlight: 218 100% 56%;
+		--highlight-foreground: 0 0% 100%;
+		--chart-line: 214 90% 48%;
+		--chart-avg: 38 100% 42%;
+		--chart-grid: 220 13% 88%;
+		--chart-axis: 220 9% 40%;
+		--crosshair: 220 14% 90%;
+		--status-ok: 214 90% 48%;
+		--status-warn: 38 100% 42%;
+		--status-bad: 21 90% 48%;
+		--ma-1: 38 100% 42%;
+		--ma-2: 195 100% 38%;
+		--ma-3: 306 67% 41%;
+		--ma-4: 14 82% 50%;
+		--ma-5: 218 52% 45%;
+
+		--chart-1: var(--chart-line);
+		--chart-2: var(--ma-3);
+		--chart-3: var(--ma-4);
+		--chart-4: var(--ma-1);
+		--chart-5: var(--ma-2);
+		--chart-6: 174 60% 40%;
+		--chart-7: var(--ma-5);
+		--chart-8: 262 60% 55%;
+		--chart-9: 330 70% 50%;
+		--chart-10: 90 50% 40%;
+
+		/* 红涨绿跌 (default). */
+		--up: var(--red);
+		--down: var(--green);
 		--timing: cubic-bezier(0.4, 0, 0.2, 1);
 	}
 
+	/* Dark: black terminal (通达信 / 同花顺 style). */
 	.dark {
-		--background: 30 15% 8%;
-		--foreground: 60 9.1% 97.8%;
-		--card: 20 14.3% 4.1%;
-		--card-foreground: 60 9.1% 97.8%;
-		--popover: 20 14.3% 4.1%;
-		--popover-foreground: 60 9.1% 97.8%;
-		--primary: 60 9.1% 97.8%;
-		--primary-foreground: 24 9.8% 10%;
-		--secondary: 12 6.5% 15.1%;
-		--secondary-foreground: 60 9.1% 97.8%;
-		--muted: 12 6.5% 15.1%;
-		--muted-foreground: 24 5.4% 63.9%;
-		--accent: 12 6.5% 15.1%;
-		--accent-foreground: 60 9.1% 97.8%;
-		--destructive: 0 62.8% 30.6%;
-		--destructive-foreground: 60 9.1% 97.8%;
-		--border: 12 6.5% 15.1%;
-		--input: 12 6.5% 15.1%;
-		--ring: 24 5.7% 82.9%;
-		--chart-1: 220 70% 50%;
-		--chart-2: 340 75% 55%;
-		--chart-3: 30 80% 55%;
-		--chart-4: 280 65% 60%;
-		--chart-5: 160 60% 45%;
-		--chart-6: 180 50% 50%;
-		--chart-7: 216 50% 50%;
-		--chart-8: 252 50% 50%;
-		--chart-9: 288 50% 50%;
-		--chart-10: 324 50% 50%;
+		--background: 0 0% 0%;
+		--foreground: 0 0% 90%;
+		--card: 214 17% 8%;
+		--card-foreground: 0 0% 90%;
+		--popover: 223 14% 10%;
+		--popover-foreground: 0 0% 90%;
+		--primary: 46 91% 49%;
+		--primary-foreground: 0 0% 0%;
+		--secondary: 220 12% 13%;
+		--secondary-foreground: 0 0% 90%;
+		--muted: 220 12% 13%;
+		--muted-foreground: 0 0% 55%;
+		--accent: 220 12% 16%;
+		--accent-foreground: 0 0% 95%;
+		--destructive: 355 70% 45%;
+		--destructive-foreground: 0 0% 100%;
+		--border: 224 14% 21%;
+		--input: 224 14% 21%;
+		--ring: 46 91% 49%;
+
+		--red: 355 88% 58%;
+		--green: 145 74% 43%;
+		--flat: 0 0% 75%;
+		--suspended: 0 0% 50%;
+		--highlight: 46 91% 49%;
+		--highlight-foreground: 0 0% 0%;
+		--chart-line: 195 81% 50%;
+		--chart-avg: 44 100% 52%;
+		--chart-grid: 0 0% 93% / 0.13;
+		--chart-axis: 0 0% 70%;
+		--crosshair: 215 23% 22%;
+		--status-ok: 195 81% 50%;
+		--status-warn: 46 91% 49%;
+		--status-bad: 29 100% 50%;
+		--ma-1: 44 100% 52%;
+		--ma-2: 195 100% 54%;
+		--ma-3: 306 67% 50%;
+		--ma-4: 14 82% 59%;
+		--ma-5: 218 52% 58%;
+
+		--chart-6: 174 60% 45%;
+		--chart-8: 262 70% 66%;
+		--chart-9: 330 80% 62%;
+		--chart-10: 90 55% 50%;
+	}
+
+	/* 绿涨红跌. Both selectors resolve on <html>, next to .dark. */
+	:root[data-price-color="green-up"] {
+		--up: var(--green);
+		--down: var(--red);
 	}
 }
 
@@ -188,11 +270,11 @@
 	}
 	html {
 		@apply scroll-smooth;
-		background-color: hsl(0 0% 98%);
+		background-color: #ffffff;
 		color-scheme: light;
 	}
 	html.dark {
-		background-color: hsl(30 15% 8%);
+		background-color: #000000;
 		color-scheme: dark;
 	}
 	body {
@@ -219,7 +301,14 @@
 }
 
 ::selection {
-	@apply bg-stone-300 dark:bg-stone-800;
+	@apply bg-highlight/30;
+}
+
+/* Tabular figures for every price-like number. */
+@utility num {
+	font-family: var(--font-num);
+	font-variant-numeric: tabular-nums;
+	letter-spacing: -0.01em;
 }
 
 .hamster-loading-wrapper {

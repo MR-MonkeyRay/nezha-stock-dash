@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useTheme } from "@/hooks/use-theme";
+import { THEME_BG } from "@/lib/theme-colors";
 
 export function ThemeColorManager() {
 	const { theme } = useTheme();
@@ -22,10 +23,7 @@ export function ThemeColorManager() {
 				document.head.appendChild(newMeta);
 			}
 
-			const themeColor =
-				currentTheme === "dark"
-					? "hsl(30 15% 8%)" // 深色模式背景色
-					: "hsl(0 0% 98%)"; // 浅色模式背景色
+			const themeColor = THEME_BG[currentTheme];
 
 			document
 				.querySelector('meta[name="theme-color"]')

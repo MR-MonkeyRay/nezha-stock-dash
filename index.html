@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="theme-color" content="hsl(0 0% 98%)" />
+    <meta name="theme-color" content="#000000" />
     <script>
       ;(() => {
         const storageKey = "vite-ui-theme"
@@ -13,7 +13,7 @@
           theme === "system" ? (mediaQuery.matches ? "dark" : "light") : theme
 
         function updateThemeColor(nextTheme) {
-          const themeColor = nextTheme === "dark" ? "hsl(30 15% 8%)" : "hsl(0 0% 98%)"
+          const themeColor = nextTheme === "dark" ? "#000000" : "#ffffff"
           let meta = document.querySelector('meta[name="theme-color"]')
 
           if (!meta) {
@@ -30,11 +30,12 @@
           root.classList.add(resolvedTheme)
           root.style.colorScheme = resolvedTheme
           root.style.backgroundColor =
-            resolvedTheme === "dark" ? "hsl(30 15% 8%)" : "hsl(0 0% 98%)"
+            resolvedTheme === "dark" ? "#000000" : "#ffffff"
           updateThemeColor(resolvedTheme)
         }
 
-        let theme = "system"
+        // Keep in sync with src/lib/theme-colors.ts (DEFAULT_THEME).
+        let theme = "dark"
 
         try {
           const storedTheme = localStorage.getItem(storageKey)
@@ -42,7 +43,7 @@
             theme = storedTheme
           }
         } catch (_e) {
-          theme = "system"
+          theme = "dark"
         }
 
         applyResolvedTheme(resolveTheme(theme))

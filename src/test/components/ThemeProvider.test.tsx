@@ -42,8 +42,16 @@ describe("ThemeProvider", () => {
 			</ThemeProvider>,
 		);
 
-		expect(screen.getByTestId("theme-state")).toHaveTextContent("system");
+		// The stock terminal theme defaults to dark.
+		expect(screen.getByTestId("theme-state")).toHaveTextContent("dark");
+		expect(document.documentElement).toHaveClass("dark");
+
+		await user.click(screen.getByRole("button", { name: "light" }));
 		expect(document.documentElement).toHaveClass("light");
+		expect(document.querySelector('meta[name="theme-color"]')).toHaveAttribute(
+			"content",
+			"#ffffff",
+		);
 
 		await user.click(screen.getByRole("button", { name: "dark" }));
 
@@ -53,7 +61,7 @@ describe("ThemeProvider", () => {
 		expect(document.documentElement.style.colorScheme).toBe("dark");
 		expect(document.querySelector('meta[name="theme-color"]')).toHaveAttribute(
 			"content",
-			"hsl(30 15% 8%)",
+			"#000000",
 		);
 
 		await user.click(screen.getByRole("button", { name: "light" }));
@@ -96,10 +104,10 @@ describe("ThemeProvider", () => {
 					<ThemeProbe />
 				</ThemeProvider>,
 			);
-			expect(screen.getByTestId("theme-state")).toHaveTextContent("system");
-			act(() => screen.getByRole("button", { name: "dark" }).click());
 			expect(screen.getByTestId("theme-state")).toHaveTextContent("dark");
-			expect(document.documentElement).toHaveClass("dark");
+			act(() => screen.getByRole("button", { name: "light" }).click());
+			expect(screen.getByTestId("theme-state")).toHaveTextContent("light");
+			expect(document.documentElement).toHaveClass("light");
 		} finally {
 			storage.mockRestore();
 		}
@@ -127,7 +135,7 @@ describe("ThemeProvider", () => {
 		} as unknown as MediaQueryList);
 
 		const { unmount } = render(
-			<ThemeProvider storageKey="theme-system-test">
+			<ThemeProvider storageKey="theme-system-test" defaultTheme="system">
 				<ThemeProbe />
 			</ThemeProvider>,
 		);
@@ -155,12 +163,20 @@ describe("ThemeProvider", () => {
 		);
 
 		act(() => {
+			screen.getByRole("button", { name: "light" }).click();
+		});
+		expect(document.querySelector('meta[name="theme-color"]')).toHaveAttribute(
+			"content",
+			"#ffffff",
+		);
+
+		act(() => {
 			screen.getByRole("button", { name: "dark" }).click();
 		});
 
 		expect(document.querySelector('meta[name="theme-color"]')).toHaveAttribute(
 			"content",
-			"hsl(30 15% 8%)",
+			"#000000",
 		);
 	});
 
