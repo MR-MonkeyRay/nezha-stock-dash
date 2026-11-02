@@ -62,6 +62,7 @@ export function selectServers({
 			down: 0,
 			downSpeed: 0,
 			filteredServers: EMPTY_SERVER_LIST,
+			groupServers: EMPTY_SERVER_LIST,
 			offlineServers: 0,
 			onlineServers: 0,
 			totalServers: 0,
@@ -105,7 +106,9 @@ export function selectServers({
 		overview.downSpeed += server.state?.net_in_speed ?? 0;
 	}
 
-	// The overview describes the selected group, independently of the status filter.
+	// The overview (and the market index/breadth) describes the selected group,
+	// independently of the status filter.
+	const groupServers = groupFilteredServers.map((item) => item.server);
 	const statusFilteredServers =
 		status === "all"
 			? groupFilteredServers
@@ -129,6 +132,7 @@ export function selectServers({
 		return {
 			...overview,
 			filteredServers: [...onlineServers, ...offlineServers],
+			groupServers,
 			totalServers: groupFilteredServers.length,
 		};
 	}
@@ -203,6 +207,7 @@ export function selectServers({
 	return {
 		...overview,
 		filteredServers: sortedServers.map((item) => item.server),
+		groupServers,
 		totalServers: groupFilteredServers.length,
 	};
 }

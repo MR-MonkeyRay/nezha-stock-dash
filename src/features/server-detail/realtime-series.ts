@@ -1,3 +1,4 @@
+import { orderFrames } from "@/features/market/quote-series";
 import { selectServerMetrics } from "@/lib/server-metrics";
 import type { NezhaWebsocketResponse } from "@/types/nezha-api";
 import type {
@@ -29,16 +30,7 @@ export function projectRealtimeSeries(
 	lastData: NezhaWebsocketResponse | null,
 	serverId: number,
 ): RealtimeSeries {
-	const frames = new Map<number, NezhaWebsocketResponse>();
-	for (const frame of lastData
-		? [lastData, ...messageHistory]
-		: messageHistory) {
-		if (!frames.has(frame.now)) frames.set(frame.now, frame);
-	}
-	const ordered = [...frames.values()]
-		.sort((a, b) => b.now - a.now)
-		.slice(0, 30)
-		.reverse();
+	const ordered = orderFrames(messageHistory, lastData, 30);
 	const series: RealtimeSeries = {
 		cpu: [],
 		gpu: [],
