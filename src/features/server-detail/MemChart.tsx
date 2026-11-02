@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import ChartSkeleton from "@/components/loading/ChartSkeleton";
-import AnimatedCircularProgressBar from "@/components/ui/animated-circular-progress-bar";
 import { Card, CardContent } from "@/components/ui/card";
 import {
 	type ChartConfig,
@@ -20,6 +19,7 @@ import { selectServerMetrics } from "@/lib/server-metrics";
 import { cn, formatRelativeTime, formatTime } from "@/lib/utils";
 import type { NezhaServer } from "@/types/nezha-api";
 import { HistoricalError } from "./HistoricalError";
+import { QUOTE_GRID_PROPS, QUOTE_LINE_COLOR, QUOTE_TICK } from "./quote-chart";
 import type { RealtimeSeries } from "./realtime-series";
 export function MemChart({
 	now,
@@ -67,47 +67,39 @@ export function MemChart({
 				"bg-card/70": customBackgroundImage,
 			})}
 		>
-			<CardContent className="px-6 py-3">
+			<CardContent className="px-3 py-3 md:px-4">
 				<section className="flex flex-col gap-1">
-					<div className="flex items-center justify-between">
-						<section className="flex items-center gap-4">
-							<div className="flex flex-col">
-								<p className=" text-xs text-muted-foreground">
-									{t("serverDetailChart.mem")}
-								</p>
-								<div className="flex items-center gap-2">
-									<AnimatedCircularProgressBar
-										className="size-3 text-[0px]"
-										max={100}
-										min={0}
-										value={mem}
-										primaryColor="hsl(var(--chart-8))"
-									/>
-									<p className="text-xs font-medium">{mem.toFixed(0)}%</p>
-								</div>
-							</div>
-							<div className="flex flex-col">
-								<p className=" text-xs text-muted-foreground">
+					<div className="flex items-center justify-between gap-2">
+						<section className="num flex items-center gap-3 text-xs">
+							<p className="font-sans text-sm font-medium">
+								{t("serverDetailChart.mem")}
+							</p>
+							<span className="flex items-center gap-1">
+								<span
+									aria-hidden="true"
+									className="h-0.5 w-3"
+									style={{ background: QUOTE_LINE_COLOR }}
+								/>
+								<span className="font-semibold">{mem.toFixed(0)}%</span>
+							</span>
+							<span className="flex items-center gap-1">
+								<span
+									aria-hidden="true"
+									className="h-0.5 w-3"
+									style={{ background: "hsl(var(--ma-1))" }}
+								/>
+								<span className="text-muted-foreground">
 									{t("serverDetailChart.swap")}
-								</p>
-								<div className="flex items-center gap-2">
-									<AnimatedCircularProgressBar
-										className="size-3 text-[0px]"
-										max={100}
-										min={0}
-										value={swap}
-										primaryColor="hsl(var(--chart-10))"
-									/>
-									<p className="text-xs font-medium">{swap.toFixed(0)}%</p>
-								</div>
-							</div>
+								</span>
+								<span className="font-semibold">{swap.toFixed(0)}%</span>
+							</span>
 						</section>
-						<section className="flex flex-col items-end gap-0.5">
-							<div className="flex text-[11px] font-medium items-center gap-2">
+						<section className="num flex flex-col items-end text-[11px] text-muted-foreground">
+							<div>
 								{formatBytes(data.state.mem_used)} /{" "}
 								{formatBytes(data.host.mem_total)}
 							</div>
-							<div className="flex text-[11px] font-medium items-center gap-2">
+							<div>
 								{data.host.swap_total ? (
 									<>
 										swap: {formatBytes(data.state.swap_used)} /{" "}
@@ -138,11 +130,38 @@ export function MemChart({
 									right: 12,
 								}}
 							>
-								<CartesianGrid vertical={false} />
+								<defs>
+									<linearGradient id="memFill" x1="0" y1="0" x2="0" y2="1">
+										<stop
+											offset="0%"
+											stopColor={QUOTE_LINE_COLOR}
+											stopOpacity={0.25}
+										/>
+										<stop
+											offset="100%"
+											stopColor={QUOTE_LINE_COLOR}
+											stopOpacity={0.02}
+										/>
+									</linearGradient>
+									<linearGradient id="swapFill" x1="0" y1="0" x2="0" y2="1">
+										<stop
+											offset="0%"
+											stopColor={"hsl(var(--ma-1))"}
+											stopOpacity={0.25}
+										/>
+										<stop
+											offset="100%"
+											stopColor={"hsl(var(--ma-1))"}
+											stopOpacity={0.02}
+										/>
+									</linearGradient>
+								</defs>
+								<CartesianGrid {...QUOTE_GRID_PROPS} />
 								<XAxis
 									dataKey="timeStamp"
 									tickLine={false}
 									axisLine={false}
+									tick={QUOTE_TICK}
 									tickMargin={8}
 									minTickGap={200}
 									interval="preserveStartEnd"
@@ -152,6 +171,7 @@ export function MemChart({
 									tickLine={false}
 									axisLine={false}
 									mirror={true}
+									tick={QUOTE_TICK}
 									tickMargin={-15}
 									domain={[0, 100]}
 									tickFormatter={(value) => `${value}%`}
@@ -188,18 +208,20 @@ export function MemChart({
 								<Area
 									isAnimationActive={false}
 									dataKey="mem"
-									type="step"
-									fill="hsl(var(--chart-8))"
-									fillOpacity={0.3}
-									stroke="hsl(var(--chart-8))"
+									type="linear"
+									fill="url(#memFill)"
+									fillOpacity={1}
+									stroke={QUOTE_LINE_COLOR}
+									strokeWidth={1.25}
 								/>
 								<Area
 									isAnimationActive={false}
 									dataKey="swap"
-									type="step"
-									fill="hsl(var(--chart-10))"
-									fillOpacity={0.3}
-									stroke="hsl(var(--chart-10))"
+									type="linear"
+									fill="url(#swapFill)"
+									fillOpacity={1}
+									stroke={"hsl(var(--ma-1))"}
+									strokeWidth={1.25}
 								/>
 							</AreaChart>
 						)}

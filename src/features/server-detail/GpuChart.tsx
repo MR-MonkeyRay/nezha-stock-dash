@@ -1,7 +1,13 @@
 import { useMemo } from "react";
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import {
+	Area,
+	CartesianGrid,
+	ComposedChart,
+	Line,
+	XAxis,
+	YAxis,
+} from "recharts";
 import ChartSkeleton from "@/components/loading/ChartSkeleton";
-import AnimatedCircularProgressBar from "@/components/ui/animated-circular-progress-bar";
 import { Card, CardContent } from "@/components/ui/card";
 import {
 	type ChartConfig,
@@ -17,6 +23,13 @@ import { cn, formatRelativeTime, formatTime } from "@/lib/utils";
 
 import type { gpuChartData } from "./chart-types";
 import { HistoricalError } from "./HistoricalError";
+import {
+	QUOTE_AVG_COLOR,
+	QUOTE_GRID_PROPS,
+	QUOTE_LINE_COLOR,
+	QUOTE_TICK,
+	withRunningAverage,
+} from "./quote-chart";
 import type { RealtimeSeries } from "./realtime-series";
 export function GpuChart({
 	id,
@@ -55,10 +68,17 @@ export function GpuChart({
 		gpu: {
 			label: "GPU",
 		},
+		avg: {
+			label: "Avg",
+		},
 	} satisfies ChartConfig;
 
-	const displayData =
+	const rawData =
 		period === "realtime" ? (series.gpu[index] ?? []) : gpuHistoricalData;
+	const displayData = useMemo(
+		() => withRunningAverage(rawData, "gpu", "avg"),
+		[rawData],
+	);
 
 	return (
 		<Card
@@ -66,14 +86,16 @@ export function GpuChart({
 				"bg-card/70": customBackgroundImage,
 			})}
 		>
-			<CardContent className="px-6 py-3">
+			<CardContent className="px-3 py-3 md:px-4">
 				<section className="flex flex-col gap-1">
-					<div className="flex items-center justify-between">
-						<section className="flex flex-col items-center gap-2">
-							{!gpuName && <p className="text-md font-medium">GPU</p>}
-							{gpuName && <p className="text-xs mt-1 mb-1.5">GPU: {gpuName}</p>}
+					<div className="flex items-center justify-between gap-2">
+						<section className="flex min-w-0 flex-col">
+							{!gpuName && <p className="text-sm font-medium">GPU</p>}
+							{gpuName && (
+								<p className="truncate text-sm font-medium">GPU: {gpuName}</p>
+							)}
 							{gpuMemory?.memory_total ? (
-								<p className="text-xs text-muted-foreground">
+								<p className="num text-xs text-muted-foreground">
 									{gpuMemory.memory_used != null
 										? formatBytes(gpuMemory.memory_used * 1024 * 1024)
 										: "—"}{" "}
@@ -81,17 +103,26 @@ export function GpuChart({
 								</p>
 							) : null}
 						</section>
-						<section className="flex items-center gap-2">
-							<p className="text-xs text-end w-10 font-medium">
-								{gpuStat.toFixed(2)}%
-							</p>
-							<AnimatedCircularProgressBar
-								className="size-3 text-[0px]"
-								max={100}
-								min={0}
-								value={gpuStat}
-								primaryColor="hsl(var(--chart-3))"
-							/>
+						<section className="num flex shrink-0 items-center gap-3 text-xs">
+							<span className="flex items-center gap-1">
+								<span
+									aria-hidden="true"
+									className="h-0.5 w-3"
+									style={{ background: QUOTE_LINE_COLOR }}
+								/>
+								<span className="font-semibold">{gpuStat.toFixed(2)}%</span>
+							</span>
+							<span className="flex items-center gap-1 text-muted-foreground">
+								<span
+									aria-hidden="true"
+									className="h-0.5 w-3"
+									style={{ background: QUOTE_AVG_COLOR }}
+								/>
+								{displayData.length > 0 &&
+								displayData[displayData.length - 1].avg !== null
+									? `${Number(displayData[displayData.length - 1].avg).toFixed(2)}%`
+									: "--"}
+							</span>
 						</section>
 					</div>
 					<HistoricalError status={status} />
@@ -102,7 +133,7 @@ export function GpuChart({
 						{isLoading ? (
 							<ChartSkeleton />
 						) : (
-							<AreaChart
+							<ComposedChart
 								syncId="serverDetailCharts"
 								syncMethod="value"
 								accessibilityLayer
@@ -113,11 +144,32 @@ export function GpuChart({
 									right: 12,
 								}}
 							>
-								<CartesianGrid vertical={false} />
+								<defs>
+									<linearGradient
+										id={`gpu${index}Fill`}
+										x1="0"
+										y1="0"
+										x2="0"
+										y2="1"
+									>
+										<stop
+											offset="0%"
+											stopColor={QUOTE_LINE_COLOR}
+											stopOpacity={0.25}
+										/>
+										<stop
+											offset="100%"
+											stopColor={QUOTE_LINE_COLOR}
+											stopOpacity={0.02}
+										/>
+									</linearGradient>
+								</defs>
+								<CartesianGrid {...QUOTE_GRID_PROPS} />
 								<XAxis
 									dataKey="timeStamp"
 									tickLine={false}
 									axisLine={false}
+									tick={QUOTE_TICK}
 									tickMargin={8}
 									minTickGap={200}
 									interval="preserveStartEnd"
@@ -127,6 +179,7 @@ export function GpuChart({
 									tickLine={false}
 									axisLine={false}
 									mirror={true}
+									tick={QUOTE_TICK}
 									tickMargin={-15}
 									domain={[0, 100]}
 									tickFormatter={(value) => `${value}%`}
@@ -141,9 +194,11 @@ export function GpuChart({
 													Number(payload[0]?.payload?.timeStamp),
 												);
 											}}
-											formatter={(value) => (
+											formatter={(value, name) => (
 												<div className="flex flex-1 items-center justify-between leading-none">
-													<span className="text-muted-foreground">GPU</span>
+													<span className="text-muted-foreground">
+														{name === "avg" ? "Avg" : "GPU"}
+													</span>
 													<span className="ml-2 font-medium text-foreground tabular-nums">
 														{Number(value).toFixed(1)}%
 													</span>
@@ -155,12 +210,22 @@ export function GpuChart({
 								<Area
 									isAnimationActive={false}
 									dataKey="gpu"
-									type="step"
-									fill="hsl(var(--chart-3))"
-									fillOpacity={0.3}
-									stroke="hsl(var(--chart-3))"
+									type="linear"
+									fill={`url(#gpu${index}Fill)`}
+									fillOpacity={1}
+									stroke={QUOTE_LINE_COLOR}
+									strokeWidth={1.25}
 								/>
-							</AreaChart>
+								<Line
+									isAnimationActive={false}
+									dataKey="avg"
+									type="linear"
+									dot={false}
+									stroke={QUOTE_AVG_COLOR}
+									strokeWidth={1}
+									connectNulls
+								/>
+							</ComposedChart>
 						)}
 					</ChartContainer>
 				</section>

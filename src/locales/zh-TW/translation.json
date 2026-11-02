@@ -118,9 +118,10 @@
 	"tabSwitch": {
 		"detail": "詳細資訊",
 		"network": "網路",
-		"Detail": "詳細資訊",
+		"Detail": "分時",
 		"Network": "網路",
-		"Online": "線上"
+		"Online": "線上",
+		"KLine": "K線"
 	},
 	"monitor": {
 		"noData": "沒有伺服器監控資料，請先新增服務監控",

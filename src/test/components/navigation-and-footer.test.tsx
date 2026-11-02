@@ -71,7 +71,7 @@ describe("Tab and group switches", () => {
 		expect(setCurrentTab).toHaveBeenCalledWith("Network");
 		expect(
 			screen.getByText("tabSwitch.Detail").parentElement?.parentElement,
-		).toHaveClass("text-black");
+		).toHaveClass("text-highlight");
 	});
 
 	it("restores saved groups and hides itself when only All exists", async () => {

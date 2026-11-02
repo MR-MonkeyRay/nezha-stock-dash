@@ -90,14 +90,17 @@ export default function ServerDetailChart({
 				isTsdbEnabled={isTsdbEnabled}
 			/>
 			<section className="grid md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-3 server-charts">
-				<LocalErrorBoundary title="CPU" resetKey={chartResetKey}>
-					<CpuChart
-						now={nezhaWsData.now}
-						data={server}
-						series={series}
-						period={selectedPeriod}
-					/>
-				</LocalErrorBoundary>
+				{/* CPU is the primary 分时 chart, full width like a quote page. */}
+				<div className="md:col-span-2 lg:col-span-3">
+					<LocalErrorBoundary title="CPU" resetKey={chartResetKey}>
+						<CpuChart
+							now={nezhaWsData.now}
+							data={server}
+							series={series}
+							period={selectedPeriod}
+						/>
+					</LocalErrorBoundary>
+				</div>
 				{gpuStats.length >= 1 && gpuList.length === gpuStats.length
 					? gpuList.map((gpu, index) => (
 							<LocalErrorBoundary

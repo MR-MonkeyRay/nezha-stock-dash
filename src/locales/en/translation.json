@@ -125,9 +125,10 @@
 		"chartFailed": "Chart couldn’t be displayed"
 	},
 	"tabSwitch": {
-		"Detail": "Detail",
+		"Detail": "Intraday",
 		"Network": "Network",
-		"Online": "Online"
+		"Online": "Online",
+		"KLine": "K-Line"
 	},
 	"monitor": {
 		"noData": "No server monitor data, please add a service monitor first",

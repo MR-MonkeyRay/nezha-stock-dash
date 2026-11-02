@@ -273,7 +273,20 @@ export const NetworkChartClient = React.memo(function NetworkChart({
 	const getColorByIndex = useCallback(
 		(chart: string) => {
 			const index = chartDataKey.indexOf(chart);
-			return `hsl(var(--chart-${(index % 10) + 1}))`;
+			// Cycle the MA palette first (as in stock charts), then extra chart colors.
+			const palette = [
+				"--chart-line",
+				"--ma-1",
+				"--ma-3",
+				"--ma-4",
+				"--ma-2",
+				"--ma-5",
+				"--chart-6",
+				"--chart-8",
+				"--chart-9",
+				"--chart-10",
+			];
+			return `hsl(var(${palette[index % palette.length]}))`;
 		},
 		[chartDataKey],
 	);
@@ -331,10 +344,10 @@ export const NetworkChartClient = React.memo(function NetworkChart({
 								{lastDelay == null ? "—" : `${lastDelay.toFixed(2)}ms`}
 							</span>
 							<div className="flex items-center gap-2 text-[12px]">
-								<span className="text-green-600 dark:text-green-400">
+								<span className="num text-down">
 									↓{stats.minDelay?.toFixed(0) ?? "—"}
 								</span>
-								<span className="text-red-600 dark:text-red-500">
+								<span className="num text-up">
 									↑{stats.maxDelay?.toFixed(0) ?? "—"}
 								</span>
 								{avgPacketLoss !== null && (
@@ -362,8 +375,8 @@ export const NetworkChartClient = React.memo(function NetworkChart({
 					isAnimationActive={false}
 					dataKey="packet_loss"
 					stroke="none"
-					fill="hsl(45, 100%, 60%)"
-					fillOpacity={0.3}
+					fill="hsl(var(--status-warn))"
+					fillOpacity={0.25}
 					yAxisId="packet-loss"
 				/>,
 				<Line

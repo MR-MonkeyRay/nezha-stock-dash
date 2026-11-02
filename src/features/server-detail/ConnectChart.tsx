@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import ChartSkeleton from "@/components/loading/ChartSkeleton";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,6 +18,7 @@ import { selectServerMetrics } from "@/lib/server-metrics";
 import { cn, formatRelativeTime, formatTime } from "@/lib/utils";
 import type { NezhaServer } from "@/types/nezha-api";
 import { HistoricalError } from "./HistoricalError";
+import { QUOTE_GRID_PROPS, QUOTE_LINE_COLOR, QUOTE_TICK } from "./quote-chart";
 import type { RealtimeSeries } from "./realtime-series";
 export function ConnectChart({
 	now,
@@ -29,6 +31,7 @@ export function ConnectChart({
 	series: RealtimeSeries;
 	period: ChartPeriod;
 }) {
+	const { t } = useTranslation();
 	const { backgroundImage: customBackgroundImage } = useRuntimeConfig();
 
 	const { tcp, udp } = selectServerMetrics(now, data);
@@ -62,24 +65,29 @@ export function ConnectChart({
 				"bg-card/70": customBackgroundImage,
 			})}
 		>
-			<CardContent className="px-6 py-3">
+			<CardContent className="px-3 py-3 md:px-4">
 				<section className="flex flex-col gap-1">
-					<div className="flex items-center">
-						<section className="flex items-center gap-4">
-							<div className="flex flex-col w-12">
-								<p className="text-xs text-muted-foreground">TCP</p>
-								<div className="flex items-center gap-1">
-									<span className="relative inline-flex  size-1.5 rounded-full bg-[hsl(var(--chart-1))]" />
-									<p className="text-xs font-medium">{tcp}</p>
-								</div>
-							</div>
-							<div className="flex flex-col w-12">
-								<p className=" text-xs text-muted-foreground">UDP</p>
-								<div className="flex items-center gap-1">
-									<span className="relative inline-flex  size-1.5 rounded-full bg-[hsl(var(--chart-4))]" />
-									<p className="text-xs font-medium">{udp}</p>
-								</div>
-							</div>
+					<div className="flex items-center justify-between">
+						<p className="text-sm font-medium">{t("market.connections")}</p>
+						<section className="num flex items-center gap-3 text-xs">
+							<span className="flex items-center gap-1">
+								<span
+									aria-hidden="true"
+									className="h-0.5 w-3"
+									style={{ background: QUOTE_LINE_COLOR }}
+								/>
+								<span className="text-muted-foreground">TCP</span>
+								<span className="font-semibold">{tcp}</span>
+							</span>
+							<span className="flex items-center gap-1">
+								<span
+									aria-hidden="true"
+									className="h-0.5 w-3"
+									style={{ background: "hsl(var(--ma-1))" }}
+								/>
+								<span className="text-muted-foreground">UDP</span>
+								<span className="font-semibold">{udp}</span>
+							</span>
 						</section>
 					</div>
 					<HistoricalError status={history.status} />
@@ -101,11 +109,12 @@ export function ConnectChart({
 									right: 12,
 								}}
 							>
-								<CartesianGrid vertical={false} />
+								<CartesianGrid {...QUOTE_GRID_PROPS} />
 								<XAxis
 									dataKey="timeStamp"
 									tickLine={false}
 									axisLine={false}
+									tick={QUOTE_TICK}
 									tickMargin={8}
 									minTickGap={200}
 									interval="preserveStartEnd"
@@ -115,6 +124,7 @@ export function ConnectChart({
 									tickLine={false}
 									axisLine={false}
 									mirror={true}
+									tick={QUOTE_TICK}
 									tickMargin={-15}
 									type="number"
 									interval="preserveStartEnd"
@@ -149,16 +159,16 @@ export function ConnectChart({
 									isAnimationActive={false}
 									dataKey="tcp"
 									type="linear"
-									stroke="hsl(var(--chart-1))"
-									strokeWidth={1}
+									stroke={QUOTE_LINE_COLOR}
+									strokeWidth={1.25}
 									dot={false}
 								/>
 								<Line
 									isAnimationActive={false}
 									dataKey="udp"
 									type="linear"
-									stroke="hsl(var(--chart-4))"
-									strokeWidth={1}
+									stroke="hsl(var(--ma-1))"
+									strokeWidth={1.25}
 									dot={false}
 								/>
 							</LineChart>

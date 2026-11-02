@@ -7,7 +7,6 @@ import NetworkChartLoading from "@/components/NetworkChartLoading";
 import RetryableLazy from "@/components/RetryableLazy";
 import ServerDetailOverview from "@/components/ServerDetailOverview";
 import TabSwitch from "@/components/TabSwitch";
-import { Separator } from "@/components/ui/separator";
 import {
 	getPreloadedServerDetailChart,
 	loadServerDetailChart,
@@ -16,6 +15,11 @@ import {
 const loadNetworkChart = () =>
 	import("@/components/NetworkChart").then((module) => ({
 		default: module.NetworkChart,
+	}));
+
+const loadKLineChart = () =>
+	import("@/features/server-detail/KLineChart").then((module) => ({
+		default: module.KLineChart,
 	}));
 
 const loadOnlineHistory = () =>
@@ -29,7 +33,8 @@ export default function ServerDetail() {
 		window.scrollTo({ top: 0, left: 0, behavior: "instant" });
 	}, []);
 
-	const tabs = ["Detail", "Network", "Online"];
+	// Internal values stay stable for custom CSS; labels come from tabSwitch.*.
+	const tabs = ["Detail", "KLine", "Network", "Online"];
 	const [currentTab, setCurrentTab] = useState(tabs[0]);
 
 	const { id: server_id } = useParams();
@@ -41,21 +46,11 @@ export default function ServerDetail() {
 	return (
 		<div className="mx-auto w-full max-w-7xl px-0 flex flex-col gap-3 server-info">
 			<ServerDetailOverview server_id={server_id} />
-			<section className="flex items-center my-2 w-full">
-				<Separator className="flex-1" />
-				<div className="flex justify-center w-full max-w-50">
-					<TabSwitch
-						tabs={tabs}
-						currentTab={currentTab}
-						setCurrentTab={setCurrentTab}
-					/>
-				</div>
-				<Separator className="flex-1" />
-			</section>
-
-			{/* <section>
-				<ServerDetailSummary server_id={Number(server_id)} />
-			</section> */}
+			<TabSwitch
+				tabs={tabs}
+				currentTab={currentTab}
+				setCurrentTab={setCurrentTab}
+			/>
 
 			{currentTab === tabs[0] && (
 				<RetryableLazy
@@ -69,6 +64,15 @@ export default function ServerDetail() {
 			)}
 			{currentTab === tabs[1] && (
 				<RetryableLazy
+					load={loadKLineChart}
+					componentProps={{ server_id: Number(server_id) }}
+					fallback={<ServerDetailChartLoading />}
+					resetKey={server_id}
+					title={t("error.chartFailed")}
+				/>
+			)}
+			{currentTab === tabs[2] && (
+				<RetryableLazy
 					load={loadNetworkChart}
 					componentProps={{ server_id: Number(server_id), show: true }}
 					fallback={<NetworkChartLoading />}
@@ -76,7 +80,7 @@ export default function ServerDetail() {
 					title={t("error.chartFailed")}
 				/>
 			)}
-			{currentTab === tabs[2] && (
+			{currentTab === tabs[3] && (
 				<RetryableLazy
 					load={loadOnlineHistory}
 					componentProps={{ server_id }}

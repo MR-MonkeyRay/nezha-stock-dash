@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter, useLocation } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import ServerDetailOverview from "@/components/ServerDetailOverview";
-import ServerDetailSummary from "@/components/ServerDetailSummary";
 import { createServer } from "@/test/fixtures";
 
 const websocketMocks = vi.hoisted(() => ({
@@ -12,6 +11,10 @@ const websocketMocks = vi.hoisted(() => ({
 		now: number;
 		servers: ReturnType<typeof createServer>[];
 	} | null,
+	messageHistory: [] as {
+		now: number;
+		servers: ReturnType<typeof createServer>[];
+	}[],
 }));
 
 vi.mock("@/hooks/use-websocket-context", () => ({
@@ -27,44 +30,13 @@ function seedWebSocketData({
 		now,
 		servers: [server],
 	};
+	websocketMocks.messageHistory = [];
 }
 
 function LocationProbe() {
 	const location = useLocation();
 	return <p>{location.pathname}</p>;
 }
-
-describe("ServerDetailSummary", () => {
-	beforeEach(() => {
-		websocketMocks.connected = true;
-		websocketMocks.lastData = null;
-	});
-
-	it("renders nothing until websocket data exists", () => {
-		websocketMocks.connected = false;
-
-		const { container } = render(<ServerDetailSummary server_id={1} />);
-
-		expect(container).toBeEmptyDOMElement();
-	});
-
-	it("renders resource, network, and connection summaries for the selected server", () => {
-		seedWebSocketData();
-
-		render(<ServerDetailSummary server_id={1} />);
-
-		expect(screen.getByText("12.00%")).toBeInTheDocument();
-		expect(screen.getAllByText("25.00%")).toHaveLength(2);
-		expect(screen.getByText("Process")).toBeInTheDocument();
-		expect(screen.getByText("88")).toBeInTheDocument();
-		expect(screen.getByText("TCP")).toBeInTheDocument();
-		expect(screen.getByText("8")).toBeInTheDocument();
-		expect(screen.getByText("UDP")).toBeInTheDocument();
-		expect(screen.getByText("4")).toBeInTheDocument();
-		expect(screen.getByText("1.00M/s")).toBeInTheDocument();
-		expect(screen.getByText("2.00M/s")).toBeInTheDocument();
-	});
-});
 
 describe("ServerDetailOverview", () => {
 	beforeEach(() => {
@@ -118,7 +90,11 @@ describe("ServerDetailOverview", () => {
 		);
 
 		expect(screen.getByText("edge-detail")).toBeInTheDocument();
-		expect(screen.getByText("serverDetail.online")).toBeInTheDocument();
+		expect(screen.getByText("market.trading")).toBeInTheDocument();
+		expect(screen.getByText("000007")).toBeInTheDocument();
+
+		// The 简况 (F10) profile starts collapsed on mobile (matchMedia is false).
+		await user.click(screen.getByRole("button", { name: /market.profile/ }));
 		expect(screen.getByText("1.0.0")).toBeInTheDocument();
 		expect(screen.getByText("amd64")).toBeInTheDocument();
 		expect(screen.getByText("US")).toBeInTheDocument();
@@ -127,17 +103,49 @@ describe("ServerDetailOverview", () => {
 		expect(screen.getByText("NVIDIA T4")).toBeInTheDocument();
 		expect(screen.getByText("2.00 GiB")).toBeInTheDocument();
 		expect(screen.getByText("1.00 GiB")).toBeInTheDocument();
-
-		await user.click(
-			screen.getByRole("button", { name: /serverDetail.temperature/ }),
-		);
 		expect(screen.getByText("CPU Core")).toBeInTheDocument();
 		expect(screen.getByText(/55.50 °C/)).toBeInTheDocument();
 
-		await user.click(screen.getByText("edge-detail"));
+		await user.click(screen.getByRole("button", { name: "market.back" }));
 		expect(screen.getByText("/")).toBeInTheDocument();
 
 		unmount();
 		expect(sessionStorage.getItem("fromMainPage")).toBeNull();
+	});
+
+	it("quotes CPU against the oldest frame in the window", () => {
+		const now = Date.parse("2025-01-01T00:00:20.000Z");
+		seedWebSocketData({ server: createServer({ state: { cpu: 15 } }), now });
+		websocketMocks.messageHistory = [
+			{ now: now - 2000, servers: [createServer({ state: { cpu: 11 } })] },
+			{ now: now - 4000, servers: [createServer({ state: { cpu: 10 } })] },
+		];
+
+		render(
+			<MemoryRouter>
+				<ServerDetailOverview server_id="1" />
+			</MemoryRouter>,
+		);
+
+		expect(screen.getByText("market.trading")).toBeInTheDocument();
+		// 现价 15.00%, change +5.00pp (+50.00%) vs 10%, high 15 / low 10.
+		expect(screen.getAllByText(/15\.00/).length).toBeGreaterThan(0);
+		expect(screen.getByText(/50\.00%/)).toBeInTheDocument();
+		expect(screen.getByText("10.00%")).toBeInTheDocument();
+	});
+
+	it("marks an offline server as 停牌 and blanks live stats", () => {
+		seedWebSocketData({
+			now: Date.parse("2025-01-01T01:00:00.000Z"),
+		});
+
+		render(
+			<MemoryRouter>
+				<ServerDetailOverview server_id="1" />
+			</MemoryRouter>,
+		);
+
+		expect(screen.getAllByText("market.suspended").length).toBeGreaterThan(0);
+		expect(screen.getAllByText("--").length).toBeGreaterThan(4);
 	});
 });

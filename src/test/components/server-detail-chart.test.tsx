@@ -51,8 +51,10 @@ vi.mock("recharts", () => {
 		AreaChart,
 		BarChart: genericChart,
 		CartesianGrid: createElement("grid"),
-		ComposedChart: genericChart,
+		ComposedChart: AreaChart,
 		FunnelChart: genericChart,
+		Bar: createElement("bar"),
+		ReferenceLine: createElement("reference-line"),
 		Legend: ({ content }: { content?: ReactNode }) => (
 			<div data-testid="chart-legend">{content}</div>
 		),
@@ -236,8 +238,8 @@ describe("ServerDetailChart", () => {
 		expect(screen.getByText("serverDetailChart.swap")).toBeInTheDocument();
 		expect(screen.getByText("serverDetailChart.disk")).toBeInTheDocument();
 		expect(screen.getByText("serverDetailChart.process")).toBeInTheDocument();
-		expect(screen.getByText("serverDetailChart.upload")).toBeInTheDocument();
-		expect(screen.getByText("serverDetailChart.download")).toBeInTheDocument();
+		expect(screen.getByText(/serverDetailChart.upload/)).toBeInTheDocument();
+		expect(screen.getByText(/serverDetailChart.download/)).toBeInTheDocument();
 		expect(screen.getByText("TCP")).toBeInTheDocument();
 		expect(screen.getByText("UDP")).toBeInTheDocument();
 		expect(screen.getAllByTestId("area-chart").length).toBeGreaterThan(0);
@@ -328,7 +330,9 @@ describe("ServerDetailChart", () => {
 			udp: 9,
 		};
 		for (const [key, value] of Object.entries(values)) {
-			expect(chartSeries(key).slice(-1)[0]).toMatchObject({
+			// Download bars are mirrored below the axis; their series still carries `download`.
+			const mark = key === "download" ? "downloadNeg" : key;
+			expect(chartSeries(mark).slice(-1)[0]).toMatchObject({
 				timeStamp: String(firstNow),
 				[key]: value,
 			});
@@ -349,11 +353,16 @@ describe("ServerDetailChart", () => {
 			...detailChartMocks.messageHistory,
 		].slice(0, 30);
 		rerender(ui());
+		// The running 均价 line legitimately moves, so compare the raw samples only.
+		const withoutAvg = (points: Record<string, number | string>[]) =>
+			points.map(({ avg: _avg, ...rest }) => rest);
 		for (const [key, points] of Object.entries(previous)) {
-			expect(chartSeries(key)).toEqual([
-				...points,
-				{ ...points[points.length - 1], timeStamp: String(firstNow + 1000) },
-			]);
+			expect(withoutAvg(chartSeries(key))).toEqual(
+				withoutAvg([
+					...points,
+					{ ...points[points.length - 1], timeStamp: String(firstNow + 1000) },
+				]),
+			);
 		}
 	});
 
@@ -384,10 +393,10 @@ describe("ServerDetailChart", () => {
 		expect(chartSeries("cpu").length).toBeGreaterThan(1);
 		rerender(ui("8"));
 		expect(chartSeries("cpu")).toEqual([
-			{ timeStamp: String(current.now), cpu: 88 },
+			{ timeStamp: String(current.now), cpu: 88, avg: 88 },
 		]);
 		expect(chartSeries("gpu")).toEqual([
-			{ timeStamp: String(current.now), gpu: 0 },
+			{ timeStamp: String(current.now), gpu: 0, avg: 0 },
 		]);
 		expect(screen.getByText("GPU: Second GPU")).toBeInTheDocument();
 		const gpuMarks = document.querySelectorAll('[data-key="gpu"]');
@@ -396,7 +405,7 @@ describe("ServerDetailChart", () => {
 				gpuMarks[1].closest("[data-series]")?.getAttribute("data-series") ??
 					"[]",
 			),
-		).toEqual([{ timeStamp: String(current.now), gpu: 75 }]);
+		).toEqual([{ timeStamp: String(current.now), gpu: 75, avg: 75 }]);
 		rerender(ui("7"));
 		expect(chartSeries("cpu").slice(-1)[0].cpu).toBe(45);
 		expect(chartSeries("cpu").some((point) => point.cpu === 88)).toBe(false);
@@ -422,7 +431,9 @@ describe("ServerDetailChart", () => {
 		const newest = JSON.parse(
 			gpuCharts[1]?.getAttribute("data-series") ?? "[]",
 		);
-		expect(newest).toEqual([{ timeStamp: String(payload.now), gpu: 42 }]);
+		expect(newest).toEqual([
+			{ timeStamp: String(payload.now), gpu: 42, avg: 42 },
+		]);
 	});
 	it("renders current samples even when websocket history is empty", () => {
 		seedWebSocketData();
