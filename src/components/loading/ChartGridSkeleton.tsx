@@ -18,7 +18,7 @@ export default function ChartGridSkeleton({
 					{[0, 1, 2].map((tick) => (
 						<div key={tick} className="flex items-center gap-3">
 							<Bar className="h-2 w-5 shrink-0" />
-							<div className="h-px flex-1 bg-stone-100 dark:bg-stone-800" />
+							<div className="h-px flex-1 bg-muted" />
 						</div>
 					))}
 				</div>

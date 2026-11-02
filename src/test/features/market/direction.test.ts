@@ -19,7 +19,7 @@ describe("direction helpers", () => {
 			"text-flat",
 			"text-suspended",
 		]);
-		expect(directions.map(directionGlyph)).toEqual(["▲", "▼", "–", ""]);
+		expect(directions.map(directionGlyph)).toEqual(["▲", "▼", "", ""]);
 		for (const direction of directions) {
 			expect(directionPillClass(direction)).toMatch(/^bg-/);
 		}

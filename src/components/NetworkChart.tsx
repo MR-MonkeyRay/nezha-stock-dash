@@ -139,7 +139,7 @@ export function NetworkChart({
 			{hasError && (
 				<div
 					role="status"
-					className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs"
+					className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-status-warn/40 bg-status-warn/10 px-3 py-2 text-xs"
 				>
 					<p>{t("monitor.staleData")}</p>
 					{retryButton}
@@ -333,7 +333,7 @@ export const NetworkChartClient = React.memo(function NetworkChart({
 					<button
 						key={key}
 						data-active={activeCharts.includes(key)}
-						className={`relative z-30 flex cursor-pointer grow basis-0 flex-col justify-center gap-1 border-b border-neutral-200 dark:border-neutral-800 px-6 py-4 text-left data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 sm:px-6`}
+						className={`relative z-30 flex cursor-pointer grow basis-0 flex-col justify-center gap-1 border-b border-border px-6 py-4 text-left data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 sm:px-6`}
 						onClick={() => handleButtonClick(key)}
 					>
 						<span className="whitespace-nowrap text-xs text-muted-foreground">
@@ -556,7 +556,7 @@ export const NetworkChartClient = React.memo(function NetworkChart({
 					>
 						{indicator && (
 							<div
-								className="active-indicator-fade-in absolute left-0 top-0 z-10 bg-white dark:bg-background rounded-full ring-1 ring-border/60 dark:ring-border/40"
+								className="active-indicator-fade-in absolute left-0 top-0 z-10 bg-background rounded-full ring-1 ring-border/60"
 								style={{
 									height: indicator.height,
 									transform: `translate(${indicator.x}px, ${indicator.y}px)`,
@@ -646,7 +646,7 @@ export const NetworkChartClient = React.memo(function NetworkChart({
 						)}
 						{activeCharts.length > 0 && (
 							<button
-								className="absolute -top-2 right-1 z-10 text-xs px-2 py-1 bg-stone-100/80 dark:bg-stone-800/80 backdrop-blur-xs rounded-[5px] text-muted-foreground hover:text-foreground transition-colors"
+								className="absolute -top-2 right-1 z-10 text-xs px-2 py-1 bg-muted/80 backdrop-blur-xs rounded-sm text-muted-foreground hover:text-foreground transition-colors"
 								onClick={clearAllSelections}
 							>
 								{t("monitor.clearSelections", "Clear")} ({activeCharts.length})

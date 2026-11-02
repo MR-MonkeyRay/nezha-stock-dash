@@ -182,8 +182,8 @@ export function InteractiveMap({
 								d={path(feature) || ""}
 								className={
 									isHighlighted
-										? "fill-green-700 hover:fill-green-600    dark:fill-green-900 dark:hover:fill-green-700 transition-all cursor-pointer"
-										: "fill-neutral-200/50 dark:fill-neutral-800 stroke-neutral-300/40 dark:stroke-neutral-700 stroke-[0.5]"
+										? "fill-chart-line/70 hover:fill-highlight transition-all cursor-pointer"
+										: "fill-muted stroke-border stroke-[0.5]"
 								}
 								onMouseEnter={() => {
 									if (!isHighlighted) {
@@ -237,7 +237,7 @@ export function InteractiveMap({
 									cx={x}
 									cy={y}
 									r={4}
-									className="fill-sky-700 stroke-white hover:fill-sky-600 dark:fill-sky-900 dark:hover:fill-sky-700 transition-all"
+									className="fill-chart-line/70 stroke-border hover:fill-highlight transition-all"
 								/>
 							</g>
 						);

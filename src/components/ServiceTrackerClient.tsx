@@ -35,27 +35,27 @@ export const ServiceTrackerClient: React.FC<ServiceTrackerProps> = ({
 	const { backgroundImage: customBackgroundImage } = useRuntimeConfig();
 
 	const getUptimeColor = (uptime: number) => {
-		if (uptime >= 99) return "text-emerald-500";
-		if (uptime >= 95) return "text-amber-500";
-		return "text-rose-500";
+		if (uptime >= 99) return "text-status-ok";
+		if (uptime >= 95) return "text-status-warn";
+		return "text-status-bad";
 	};
 
 	const getDelayColor = (delay: number) => {
-		if (delay < 100) return "text-emerald-500";
-		if (delay < 300) return "text-amber-500";
-		return "text-rose-500";
+		if (delay < 100) return "text-status-ok";
+		if (delay < 300) return "text-status-warn";
+		return "text-status-bad";
 	};
 
 	const getStatusColor = (uptime: number) => {
-		if (uptime >= 99) return "bg-emerald-500";
-		if (uptime >= 95) return "bg-amber-500";
-		return "bg-rose-500";
+		if (uptime >= 99) return "bg-status-ok";
+		if (uptime >= 95) return "bg-status-warn";
+		return "bg-status-bad";
 	};
 
 	return (
 		<div
 			className={cn(
-				"w-full space-y-3 bg-white px-4 py-4  rounded-lg border bg-card text-card-foreground shadow-lg shadow-neutral-200/40 dark:shadow-none",
+				"w-full space-y-3 px-4 py-4 rounded-md border bg-card text-card-foreground shadow-none",
 				className,
 				{
 					"bg-card/70": customBackgroundImage,
@@ -101,11 +101,9 @@ export const ServiceTrackerClient: React.FC<ServiceTrackerProps> = ({
 								<div
 									className={cn(
 										"relative flex-1 h-7 rounded-[8px] transition-all duration-200 cursor-help",
-										"before:absolute before:inset-0 before:rounded-[4px] before:opacity-0 hover:before:opacity-100 before:bg-white/10 before:transition-opacity",
-										"after:absolute after:inset-0 after:rounded-[4px] after:shadow-[inset_0_1px_--theme(--color-white/10%)]",
-										day.completed
-											? "bg-linear-to-b from-green-500/90 to-green-600 shadow-[0_1px_2px_--theme(--color-green-600/30%)]"
-											: "bg-linear-to-b from-red-500/80 to-red-600/90 shadow-[0_1px_2px_--theme(--color-red-600/30%)]",
+										"before:absolute before:inset-0 before:rounded-[4px] before:opacity-0 hover:before:opacity-100 before:bg-foreground/10 before:transition-opacity",
+										"after:absolute after:inset-0 after:rounded-[4px] after:shadow-[inset_0_1px_0_hsl(var(--foreground)/0.1)]",
+										day.completed ? "bg-status-ok" : "bg-status-bad",
 									)}
 								/>
 							</TooltipTrigger>
@@ -122,7 +120,9 @@ export const ServiceTrackerClient: React.FC<ServiceTrackerProps> = ({
 											<span
 												className={cn(
 													"text-xs font-medium",
-													day.uptime > 95 ? "text-green-500" : "text-red-500",
+													day.uptime > 95
+														? "text-status-ok"
+														: "text-status-bad",
 												)}
 											>
 												{day.uptime.toFixed(1)}%
@@ -136,10 +136,10 @@ export const ServiceTrackerClient: React.FC<ServiceTrackerProps> = ({
 												className={cn(
 													"text-xs font-medium",
 													day.delay < 100
-														? "text-green-500"
+														? "text-status-ok"
 														: day.delay < 300
-															? "text-yellow-500"
-															: "text-red-500",
+															? "text-status-warn"
+															: "text-status-bad",
 												)}
 											>
 												{day.delay.toFixed(0)}ms
@@ -153,7 +153,7 @@ export const ServiceTrackerClient: React.FC<ServiceTrackerProps> = ({
 				))}
 			</div>
 
-			<div className="flex justify-between text-xs text-stone-500 dark:text-stone-400">
+			<div className="flex justify-between text-xs text-muted-foreground">
 				<span>30 {t("serviceTracker.daysAgo")}</span>
 				<span>{t("serviceTracker.today")}</span>
 			</div>

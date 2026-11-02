@@ -10,13 +10,13 @@ describe("RemainPercentBar", () => {
 		const indicator = progress.firstElementChild;
 
 		expect(progress).toHaveClass("w-[70px]");
-		expect(indicator).toHaveClass("bg-red-500");
+		expect(indicator).toHaveClass("bg-status-bad");
 		expect(indicator).toHaveStyle({ transform: "translateX(-71%)" });
 
 		rerender(<RemainPercentBar value={30} />);
-		expect(progress.firstElementChild).toHaveClass("bg-orange-400");
+		expect(progress.firstElementChild).toHaveClass("bg-status-warn");
 
 		rerender(<RemainPercentBar value={70} />);
-		expect(progress.firstElementChild).toHaveClass("bg-green-500");
+		expect(progress.firstElementChild).toHaveClass("bg-status-ok");
 	});
 });

@@ -226,7 +226,7 @@ const ChartTooltipContent = React.forwardRef<
 			<div
 				ref={ref}
 				className={cn(
-					"grid min-w-32 items-start gap-1.5 overflow-hidden rounded-sm border border-border/50 bg-stone-100 text-xs dark:bg-stone-900",
+					"grid min-w-32 items-start gap-1.5 overflow-hidden rounded-sm border border-border/50 bg-popover text-popover-foreground text-xs",
 					className,
 				)}
 			>
@@ -237,7 +237,7 @@ const ChartTooltipContent = React.forwardRef<
 				)}
 
 				<div
-					className={cn("grid gap-1.5 bg-white px-2.5 py-1.5 dark:bg-black", {
+					className={cn("grid gap-1.5 bg-popover px-2.5 py-1.5", {
 						"border-t": !nestLabel,
 					})}
 				>

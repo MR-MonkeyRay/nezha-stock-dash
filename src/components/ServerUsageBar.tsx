@@ -12,10 +12,10 @@ export default function ServerUsageBar({ value }: ServerUsageBarProps) {
 			value={value}
 			indicatorClassName={
 				value > 90
-					? "bg-red-500"
+					? "bg-status-bad"
 					: value > 70
-						? "bg-orange-400"
-						: "bg-green-500"
+						? "bg-status-warn"
+						: "bg-status-ok"
 			}
 			className={"h-[3px] rounded-sm"}
 		/>

@@ -24,7 +24,7 @@ export default function PlanInfo({
 			{parsedData.planDataMod.bandwidth !== "" && (
 				<p
 					className={cn(
-						"text-[9px] bg-blue-600 dark:bg-blue-800 text-blue-200 dark:text-blue-300  w-fit rounded-[5px] px-[3px] py-[1.5px]",
+						"text-[9px] bg-highlight/15 text-highlight w-fit rounded-sm px-[3px] py-[1.5px]",
 					)}
 				>
 					{parsedData.planDataMod.bandwidth}
@@ -33,7 +33,7 @@ export default function PlanInfo({
 			{parsedData.planDataMod.trafficVol !== "" && (
 				<p
 					className={cn(
-						"text-[9px] bg-green-600 text-green-200 dark:bg-green-800 dark:text-green-300  w-fit rounded-[5px] px-[3px] py-[1.5px]",
+						"text-[9px] bg-status-ok/15 text-status-ok w-fit rounded-sm px-[3px] py-[1.5px]",
 					)}
 				>
 					{parsedData.planDataMod.trafficVol}
@@ -42,7 +42,7 @@ export default function PlanInfo({
 			{parsedData.planDataMod.IPv4 === "1" && (
 				<p
 					className={cn(
-						"text-[9px] bg-purple-600 text-purple-200 dark:bg-purple-800 dark:text-purple-300  w-fit rounded-[5px] px-[3px] py-[1.5px]",
+						"text-[9px] bg-highlight/15 text-highlight w-fit rounded-sm px-[3px] py-[1.5px]",
 					)}
 				>
 					IPv4
@@ -51,7 +51,7 @@ export default function PlanInfo({
 			{parsedData.planDataMod.IPv6 === "1" && (
 				<p
 					className={cn(
-						"text-[9px] bg-pink-600 text-pink-200 dark:bg-pink-800 dark:text-pink-300  w-fit rounded-[5px] px-[3px] py-[1.5px]",
+						"text-[9px] bg-highlight/15 text-highlight w-fit rounded-sm px-[3px] py-[1.5px]",
 					)}
 				>
 					IPv6
@@ -60,7 +60,7 @@ export default function PlanInfo({
 			{parsedData.planDataMod.networkRoute && (
 				<p
 					className={cn(
-						"text-[9px] bg-blue-600 text-blue-200 dark:bg-blue-800 dark:text-blue-300  w-fit rounded-[5px] px-[3px] py-[1.5px]",
+						"text-[9px] bg-highlight/15 text-highlight w-fit rounded-sm px-[3px] py-[1.5px]",
 					)}
 				>
 					{networkRoutes.map((route, index) => {
@@ -73,7 +73,7 @@ export default function PlanInfo({
 					<p
 						key={index}
 						className={cn(
-							"text-[9px] bg-stone-600 text-stone-200 dark:bg-stone-800 dark:text-stone-300  w-fit rounded-[5px] px-[3px] py-[1.5px]",
+							"text-[9px] bg-muted text-muted-foreground w-fit rounded-sm px-[3px] py-[1.5px]",
 						)}
 					>
 						{extra}

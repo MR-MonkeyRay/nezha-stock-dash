@@ -39,10 +39,7 @@ const CommandInput = React.forwardRef<
 	React.ElementRef<typeof CommandPrimitive.Input>,
 	React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
 >(({ className, ...props }, ref) => (
-	<div
-		className="flex items-center bg-stone-100 dark:bg-stone-900 px-3"
-		cmdk-input-wrapper=""
-	>
+	<div className="flex items-center bg-muted px-3" cmdk-input-wrapper="">
 		<Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
 		<CommandPrimitive.Input
 			ref={ref}
@@ -121,7 +118,7 @@ const CommandItem = React.forwardRef<
 	<CommandPrimitive.Item
 		ref={ref}
 		className={cn(
-			"relative flex cursor-default gap-2 select-none items-center rounded-[8px] px-2 py-1.5 text-xs outline-hidden data-[disabled=true]:pointer-events-none data-[selected='true']:bg-stone-100 dark:data-[selected='true']:bg-stone-900 data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+			"relative flex cursor-default gap-2 select-none items-center rounded-[8px] px-2 py-1.5 text-xs outline-hidden data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
 			className,
 		)}
 		{...props}

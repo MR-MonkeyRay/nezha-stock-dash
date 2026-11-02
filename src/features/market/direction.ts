@@ -35,9 +35,8 @@ export function directionGlyph(direction: Direction) {
 			return "▲";
 		case "down":
 			return "▼";
-		case "flat":
-			return "–";
 		default:
+			// Flat has no glyph: a dash before "0.00" reads as a minus sign.
 			return "";
 	}
 }

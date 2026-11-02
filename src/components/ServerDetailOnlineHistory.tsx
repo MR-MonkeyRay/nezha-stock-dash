@@ -98,7 +98,7 @@ function WindowShade({
 					aria-label={label}
 					data-testid={striped ? "outside-window" : "unrecorded-window"}
 					className={cn(
-						"absolute inset-y-0 text-stone-300 focus-visible:outline-2 focus-visible:outline-ring dark:text-stone-600",
+						"absolute inset-y-0 text-muted-foreground/50 focus-visible:outline-2 focus-visible:outline-ring",
 						!striped && "bg-background/80",
 					)}
 					style={{
@@ -136,7 +136,7 @@ function DaysSelector({
 		>
 			{indicator && (
 				<div
-					className="active-indicator-fade-in absolute left-0 top-0 z-10 bg-white dark:bg-background rounded-full ring-1 ring-border/60 dark:ring-border/40"
+					className="active-indicator-fade-in absolute left-0 top-0 z-10 bg-background rounded-full ring-1 ring-border/60"
 					style={{
 						height: indicator.height,
 						transform: `translate(${indicator.x}px, ${indicator.y}px)`,
@@ -200,7 +200,7 @@ function PeriodsModeSwitch({
 		>
 			{indicator && (
 				<div
-					className="active-indicator-fade-in absolute left-0 top-0 z-10 bg-white dark:bg-background rounded-[5px] ring-1 ring-border/60 dark:ring-border/40"
+					className="active-indicator-fade-in absolute left-0 top-0 z-10 bg-background rounded-sm ring-1 ring-border/60"
 					style={{
 						height: indicator.height,
 						transform: `translate(${indicator.x}px, ${indicator.y}px)`,
@@ -362,9 +362,7 @@ export default function ServerDetailOnlineHistory({
 						<span
 							className={cn(
 								"size-2 rounded-full",
-								online.currently_online
-									? "bg-green-500"
-									: "bg-stone-400 dark:bg-stone-500",
+								online.currently_online ? "bg-status-ok" : "bg-suspended",
 							)}
 						/>
 						{online.currently_online ? t("online") : t("offline")}
@@ -391,15 +389,15 @@ export default function ServerDetailOnlineHistory({
 						online &&
 						(isDesktop ? (
 							<div
-								className="grid grid-cols-4 divide-x divide-stone-100 dark:divide-stone-800"
+								className="grid grid-cols-4 divide-x divide-border"
 								data-testid="summary-desktop"
 							>
 								<SummaryMetric
 									label={t("serverOnlineHistory.onlineRate")}
 									footer={
-										<div className="h-1 w-20 overflow-hidden rounded-full bg-stone-100 dark:bg-stone-800">
+										<div className="h-1 w-20 overflow-hidden rounded-full bg-muted">
 											<div
-												className="h-full rounded-full bg-green-500"
+												className="h-full rounded-full bg-status-ok"
 												style={{
 													width: `${Math.min(100, Math.max(0, online.online_rate))}%`,
 												}}
@@ -445,9 +443,9 @@ export default function ServerDetailOnlineHistory({
 											<span className="shrink-0 text-2xl font-medium leading-7 tracking-tight tabular-nums">
 												{online.online_rate.toFixed(1)}%
 											</span>
-											<div className="h-1 w-20 overflow-hidden rounded-full bg-stone-100 dark:bg-stone-800">
+											<div className="h-1 w-20 overflow-hidden rounded-full bg-muted">
 												<div
-													className="h-full rounded-full bg-green-500"
+													className="h-full rounded-full bg-status-ok"
 													style={{
 														width: `${Math.min(100, Math.max(0, online.online_rate))}%`,
 													}}
@@ -474,7 +472,7 @@ export default function ServerDetailOnlineHistory({
 										)}
 									</div>
 								</div>
-								<div className="grid grid-cols-2 gap-4 border-t border-stone-100 pt-3 dark:border-stone-800">
+								<div className="grid grid-cols-2 gap-4 border-t border-border pt-3">
 									<SummaryBox label={t("serverOnlineHistory.totalOnline")}>
 										<span className="text-lg font-medium leading-6 tracking-tight tabular-nums text-foreground">
 											{formatDuration(online.total_online_seconds)}
@@ -523,7 +521,7 @@ export default function ServerDetailOnlineHistory({
 											</span>
 										</div>
 										<div className="relative">
-											<div className="relative h-2 overflow-hidden rounded-full bg-stone-200/70 dark:bg-stone-700">
+											<div className="relative h-2 overflow-hidden rounded-full bg-muted">
 												<WindowShade
 													left={0}
 													width={day.window.leftPct}
@@ -543,8 +541,8 @@ export default function ServerDetailOnlineHistory({
 															<div
 																data-testid="online-segment"
 																className={cn(
-																	"absolute inset-y-0 cursor-pointer rounded-full bg-green-500/90 transition-colors hover:bg-green-600",
-																	segment.live && "bg-green-500",
+																	"absolute inset-y-0 cursor-pointer rounded-full bg-status-ok/90 transition-colors hover:bg-status-ok",
+																	segment.live && "bg-status-ok",
 																)}
 																style={{
 																	left: `${segment.leftPct}%`,
@@ -592,10 +590,10 @@ export default function ServerDetailOnlineHistory({
 																type="button"
 																data-testid="data-cutoff"
 																aria-label={`${t("serverOnlineHistory.dataCutoff")} ${day.window.end.format("HH:mm:ss")}`}
-																className="absolute -top-0.5 -bottom-0.5 w-px bg-stone-500 dark:bg-stone-400"
+																className="absolute -top-0.5 -bottom-0.5 w-px bg-muted-foreground"
 																style={{ left: `${day.window.rightPct}%` }}
 															>
-																<span className="absolute -top-0.5 left-1/2 size-1.5 -translate-x-1/2 rounded-full bg-stone-500 dark:bg-stone-400" />
+																<span className="absolute -top-0.5 left-1/2 size-1.5 -translate-x-1/2 rounded-full bg-muted-foreground" />
 															</button>
 														</TooltipTrigger>
 														<TooltipContent>
@@ -705,9 +703,9 @@ export default function ServerDetailOnlineHistory({
 																		"inline-flex max-w-full items-center gap-1.5 rounded-[6px] px-2 py-1.5 text-xs tabular-nums transition-colors cursor-default",
 																		chip.ongoing
 																			? periodMode === "online"
-																				? "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400"
-																				: "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400"
-																			: "bg-stone-100 text-stone-600 hover:bg-stone-200/70 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700",
+																				? "bg-status-ok/15 text-status-ok"
+																				: "bg-status-warn/15 text-status-warn"
+																			: "bg-muted text-muted-foreground hover:bg-accent",
 																	)}
 																>
 																	{chip.ongoing && (

@@ -49,7 +49,7 @@ ReactDOM.createRoot(rootElement).render(
 										toastOptions={{
 											classNames: {
 												default:
-													"w-fit rounded-full px-2.5 py-1.5 bg-neutral-100 border border-neutral-200 backdrop-blur-xl shadow-none",
+													"w-fit rounded-full px-2.5 py-1.5 bg-popover text-popover-foreground border border-border backdrop-blur-xl shadow-none",
 											},
 										}}
 										position="top-center"
