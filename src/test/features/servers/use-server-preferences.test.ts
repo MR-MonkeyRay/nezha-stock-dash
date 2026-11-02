@@ -30,7 +30,7 @@ describe("server preferences", () => {
 			expect(result.current).toMatchObject({
 				showMap: "1",
 				showServices: "1",
-				inline: "1",
+				inline: "0",
 				currentGroup: "Asia",
 			});
 		} finally {
@@ -38,7 +38,7 @@ describe("server preferences", () => {
 			session.mockRestore();
 		}
 	});
-	it("keeps an unsaved inline choice across resize without overriding forced defaults", () => {
+	it("keeps an unsaved inline choice across rerenders without overriding forced defaults", () => {
 		localStorage.setItem("inline", "0");
 		const write = vi
 			.spyOn(Storage.prototype, "setItem")
@@ -46,10 +46,13 @@ describe("server preferences", () => {
 				throw new DOMException("Quota exceeded", "QuotaExceededError");
 			});
 		try {
-			const { result } = renderHook(() => useServerPreferences(true, data));
+			const { result, rerender } = renderHook(() =>
+				useServerPreferences(true, data),
+			);
+			expect(result.current.inline).toBe("0");
 			act(() => result.current.toggleInline());
 			expect(result.current.inline).toBe("1");
-			act(() => window.dispatchEvent(new Event("resize")));
+			rerender();
 			expect(result.current.inline).toBe("1");
 			expect(localStorage.getItem("inline")).toBe("0");
 			act(() => result.current.toggleInline());
@@ -66,7 +69,6 @@ describe("server preferences", () => {
 		for (const [key, toggle] of [
 			["showMap", "toggleMap"],
 			["showServices", "toggleServices"],
-			["inline", "toggleInline"],
 		] as const) {
 			expect(result.current[key]).toBe("0");
 			act(() => result.current[toggle]());
@@ -75,6 +77,13 @@ describe("server preferences", () => {
 			act(() => result.current[toggle]());
 			expect(localStorage.getItem(key)).toBe("0");
 		}
+		// The watchlist is the default view; toggling switches to cards.
+		expect(result.current.inline).toBe("1");
+		act(() => result.current.toggleInline());
+		expect(result.current.inline).toBe("0");
+		expect(localStorage.getItem("inline")).toBe("0");
+		act(() => result.current.toggleInline());
+		expect(localStorage.getItem("inline")).toBe("1");
 	});
 	it("restores stored preferences and group selection", () => {
 		for (const key of ["showMap", "showServices", "inline"])
@@ -152,22 +161,19 @@ describe("server preferences", () => {
 		expect(result.current.showServices).toBe("1");
 		expect(localStorage.getItem("showServices")).toBe(forced ? "0" : "1");
 	});
-	it("does not apply desktop inline defaults until width reaches 768, nor reset them on shrinking", () => {
-		vi.stubGlobal("innerWidth", 767);
-		window.ForceCardInline = true;
+	it("honors the saved view on narrow screens and ignores invalid values", () => {
+		vi.stubGlobal("innerWidth", 390);
+		localStorage.setItem("inline", "0");
 		const { result, unmount } = renderHook(() =>
 			useServerPreferences(true, null),
 		);
 		expect(result.current.inline).toBe("0");
-		vi.stubGlobal("innerWidth", 768);
-		act(() => window.dispatchEvent(new Event("resize")));
-		expect(result.current.inline).toBe("1");
-		vi.stubGlobal("innerWidth", 767);
-		act(() => window.dispatchEvent(new Event("resize")));
-		expect(result.current.inline).toBe("1");
-		const remove = vi.spyOn(window, "removeEventListener");
 		unmount();
-		expect(remove).toHaveBeenCalledWith("resize", expect.any(Function));
+		localStorage.setItem("inline", "garbage");
+		const { result: fresh } = renderHook(() =>
+			useServerPreferences(true, null),
+		);
+		expect(fresh.current.inline).toBe("1");
 	});
 	it("waits for data and two frames, then restores scroll only once", () => {
 		sessionStorage.setItem("fromMainPage", "true");

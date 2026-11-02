@@ -94,7 +94,7 @@ function Header({
 	}, [customLogo]);
 
 	useEffect(() => {
-		document.title = siteName || "哪吒监控 Nezha Monitoring";
+		document.title = siteName || "哪吒行情 Nezha Stock Dash";
 	}, [siteName]);
 
 	const handleBackgroundToggle = () => {
@@ -114,15 +114,15 @@ function Header({
 	const customBackgroundImage = backgroundImage;
 
 	return (
-		<div className="mx-auto w-full max-w-5xl">
-			<section className="flex items-center justify-between header-top">
+		<div className="mx-auto w-full max-w-7xl">
+			<section className="flex items-center justify-between gap-2 header-top">
 				<section
 					onClick={() => {
 						safeSessionStorage.removeItem("selectedGroup");
 						navigate("/");
 					}}
 					aria-busy={brandingLoading}
-					className="cursor-pointer flex items-center sm:text-base text-sm font-medium"
+					className="flex min-w-0 cursor-pointer items-center text-sm font-semibold sm:text-base"
 				>
 					<div className="mr-1 flex flex-row items-center justify-start header-logo">
 						{brandingLoading ? (
@@ -143,8 +143,11 @@ function Header({
 					{brandingLoading ? (
 						<Skeleton className="h-6 w-20 rounded-[5px] bg-muted-foreground/10 motion-reduce:animate-none" />
 					) : (
-						siteName || "NEZHA"
+						<span className="truncate">{siteName || "NEZHA"}</span>
 					)}
+					<span className="ml-1.5 shrink-0 rounded-sm bg-highlight px-1 py-px text-[10px] font-bold leading-4 text-highlight-foreground">
+						{t("market.brand")}
+					</span>
 					<Separator
 						orientation="vertical"
 						className="mx-2 hidden h-4 w-px md:block"
@@ -174,8 +177,8 @@ function Header({
 							variant="outline"
 							size="sm"
 							onClick={handleBackgroundToggle}
-							className={cn("rounded-full px-[9px] bg-white dark:bg-black", {
-								"bg-white/70 dark:bg-black/70": customBackgroundImage,
+							className={cn("rounded-sm bg-card px-[9px]", {
+								"bg-card/70": customBackgroundImage,
 								"hidden sm:block": customMobileBackgroundImage,
 							})}
 						>
@@ -188,31 +191,36 @@ function Header({
 						onClick={connected ? undefined : reconnect}
 						aria-label={connected ? undefined : t("retry")}
 						className={cn(
-							"hover:bg-white dark:hover:bg-black cursor-default rounded-full flex items-center px-[9px] bg-white dark:bg-black",
+							"flex cursor-default items-center gap-1.5 rounded-sm bg-card px-2 hover:bg-card",
 							{
-								"bg-white/70 dark:bg-black/70": customBackgroundImage,
+								"bg-card/70": customBackgroundImage,
+								"cursor-pointer": !connected,
 							},
 						)}
 					>
+						<span
+							aria-hidden="true"
+							className={cn("h-1.5 w-1.5 rounded-full bg-status-ok", {
+								"animate-pulse bg-suspended": !connected,
+							})}
+						></span>
+						<span className="hidden text-xs text-status-ok sm:inline">
+							{connected ? t("market.live") : ""}
+						</span>
 						{connected && !lastData ? (
 							<SkeletonBar className="h-4 w-4" />
 						) : connected ? (
-							<NumericText value={onlineCount} />
+							<NumericText value={onlineCount} className="num" />
 						) : (
 							<Loader visible={true} />
 						)}
-						<p className="text-muted-foreground">
-							{connected ? t("online") : t("offline")}
+						<p className="text-xs text-muted-foreground">
+							{connected ? t("online") : t("market.reconnecting")}
 						</p>
-						<span
-							className={cn("h-2 w-2 rounded-full bg-green-500", {
-								"bg-red-500": !connected,
-							})}
-						></span>
 					</Button>
 				</section>
 			</section>
-			<div className="w-full flex justify-between sm:hidden mt-1">
+			<div className="mt-1 flex w-full justify-between sm:hidden">
 				<DashboardLink />
 				<Links />
 			</div>
@@ -287,7 +295,7 @@ export function RefreshToast() {
 	if (!needReconnect) return null;
 
 	return (
-		<div className="refresh-toast-animate fixed left-1/2 -translate-x-1/2 top-8 z-999 flex items-center justify-between gap-4 rounded-[50px] border border-solid bg-white px-2 py-1.5 shadow-xl shadow-black/5 dark:border-stone-700 dark:bg-stone-800 dark:shadow-none">
+		<div className="refresh-toast-animate fixed left-1/2 -translate-x-1/2 top-8 z-999 flex items-center justify-between gap-4 rounded-sm border border-border bg-popover px-2 py-1.5 text-popover-foreground shadow-xl shadow-black/10">
 			<section className="flex items-center gap-1.5">
 				<LoadingSpinner />
 				<p className="text-[12.5px] font-medium">{t("refreshing")}...</p>
@@ -340,39 +348,29 @@ function Overview({ loading }: { loading: boolean }) {
 		return (
 			<section
 				aria-hidden="true"
-				className="mt-10 flex h-[45px] flex-col justify-center gap-2 md:mt-16 header-timer"
+				className="mt-3 flex h-6 items-center justify-between header-timer"
 			>
-				<SkeletonBar className="h-5 w-28" />
-				<SkeletonBar className="h-4 w-48" />
+				<SkeletonBar className="h-4 w-28" />
+				<SkeletonBar className="h-4 w-16" />
 			</section>
 		);
 	}
 
 	return (
-		<section className={"mt-10 flex flex-col md:mt-16 header-timer"}>
-			<p className="text-base font-semibold">👋 {t("overview")}</p>
-			<div className="flex items-center gap-1">
-				<p className="text-sm font-medium opacity-50">{t("whereTheTimeIs")}</p>
-				{mounted ? (
-					<div className="flex items-center font-medium text-sm">
-						<span className="tabular-nums">
-							{String(time.hh).padStart(2, "0")}
-						</span>
-						<span className="mb-px font-medium text-sm opacity-50">:</span>
-						<span className="tabular-nums">
-							{String(time.mm).padStart(2, "0")}
-						</span>
-						<span className="mb-px font-medium text-sm opacity-50">:</span>
-						<span className="font-medium text-sm">
-							<span className="tabular-nums">
-								{String(time.ss).padStart(2, "0")}
-							</span>
-						</span>
-					</div>
-				) : (
-					<Skeleton className="h-[21px] w-16 animate-none rounded-[5px] bg-muted-foreground/10" />
-				)}
-			</div>
+		<section className="mt-3 flex h-6 items-center justify-between text-xs text-muted-foreground header-timer">
+			<p className="flex items-center gap-2">
+				<span className="font-medium text-foreground">{t("overview")}</span>
+				<span className="num">{DateTime.now().toFormat("yyyy-LL-dd")}</span>
+				<span className="hidden sm:inline">{t("whereTheTimeIs")}</span>
+			</p>
+			{mounted ? (
+				<p className="num text-sm font-semibold text-foreground">
+					{String(time.hh).padStart(2, "0")}:{String(time.mm).padStart(2, "0")}:
+					{String(time.ss).padStart(2, "0")}
+				</p>
+			) : (
+				<Skeleton className="h-[21px] w-16 animate-none rounded-[5px] bg-muted-foreground/10" />
+			)}
 		</section>
 	);
 }

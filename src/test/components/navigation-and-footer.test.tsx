@@ -129,7 +129,7 @@ describe("Tab and group switches", () => {
 		expect(scrollIntoView).not.toHaveBeenCalled();
 		expect(
 			container.querySelector(".relative.flex.items-center")?.className,
-		).toContain("bg-stone-100/70");
+		).toContain("bg-card/70");
 	});
 });
 

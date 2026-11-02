@@ -65,8 +65,8 @@ export function ModeToggle() {
 				<Button
 					variant="outline"
 					size="sm"
-					className={cn("rounded-full px-[9px] bg-white dark:bg-black", {
-						"bg-white/70 dark:bg-black/70": customBackgroundImage,
+					className={cn("rounded-sm bg-card px-[9px]", {
+						"bg-card/70": customBackgroundImage,
 					})}
 				>
 					<Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />

@@ -180,7 +180,7 @@ const MainApp: React.FC = () => {
 					"bg-background": !customBackgroundImage,
 				})}
 			>
-				<main className="flex z-20 min-h-0 flex-1 flex-col gap-4 p-4 md:p-10 md:pt-8">
+				<main className="flex z-20 min-h-0 flex-1 flex-col gap-3 p-3 md:gap-4 md:p-6">
 					<RefreshToast />
 					<Header configurationLoading={configurationLoading} />
 					<DashCommand />

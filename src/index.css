@@ -519,3 +519,30 @@
 		filter: blur(2px);
 	}
 }
+
+/* Ticker tape (行情滚动条). One list plus an aria-hidden clone, shifted by half. */
+@keyframes ticker-scroll {
+	to {
+		transform: translateX(-50%);
+	}
+}
+.ticker-track.is-animated {
+	animation-name: ticker-scroll;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+}
+.ticker:hover .ticker-track,
+.ticker:focus-within .ticker-track {
+	animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+	.ticker {
+		overflow-x: auto;
+	}
+	.ticker-track.is-animated {
+		animation: none;
+	}
+	.ticker-clone {
+		display: none;
+	}
+}

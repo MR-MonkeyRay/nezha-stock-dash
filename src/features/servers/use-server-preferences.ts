@@ -12,7 +12,8 @@ export function useServerPreferences(
 		useRuntimeConfig();
 	const [desiredShowServices, setShowServices] = useState<string>("0");
 	const [showMap, setShowMap] = useState<string>("0");
-	const [inline, setInline] = useState<string>("0");
+	// The watchlist ("1") is this theme's default view; "0" is the card grid.
+	const [inline, setInline] = useState<string>("1");
 	const unsavedInline = useRef<string | null>(null);
 	const hasRestoredScroll = useRef(false);
 	const [currentGroup, setCurrentGroup] = useState<string>("All");
@@ -56,30 +57,16 @@ export function useServerPreferences(
 	const showServices = hasServices ? desiredShowServices : "0";
 
 	useEffect(() => {
-		const checkInlineSettings = () => {
-			const isMobile = window.innerWidth < 768;
-
-			// Mobile skips desktop defaults; shrinking does not reset an explicit choice.
-			if (!isMobile) {
-				const inlineState = safeLocalStorage.getItem("inline");
-				if (forceCardInline) {
-					setInline("1");
-				} else if (unsavedInline.current !== null) {
-					// A failed write must not let an older stored value undo this session.
-					setInline(unsavedInline.current);
-				} else if (inlineState !== null) {
-					setInline(inlineState);
-				}
-			}
-		};
-
-		checkInlineSettings();
-
-		window.addEventListener("resize", checkInlineSettings);
-
-		return () => {
-			window.removeEventListener("resize", checkInlineSettings);
-		};
+		// Both views are responsive, so the saved choice applies on every width.
+		const inlineState = safeLocalStorage.getItem("inline");
+		if (forceCardInline) {
+			setInline("1");
+		} else if (unsavedInline.current !== null) {
+			// A failed write must not let an older stored value undo this session.
+			setInline(unsavedInline.current);
+		} else if (inlineState === "0" || inlineState === "1") {
+			setInline(inlineState);
+		}
 	}, [forceCardInline]);
 
 	useEffect(() => {

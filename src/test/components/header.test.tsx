@@ -223,7 +223,7 @@ describe("Header", () => {
 		const { container } = renderHeader();
 
 		expect(await screen.findAllByText("login")).toHaveLength(2);
-		expect(screen.getByText("offline")).toBeInTheDocument();
+		expect(screen.getByText("market.reconnecting")).toBeInTheDocument();
 		expect(
 			container.querySelector("[data-visible='true']"),
 		).toBeInTheDocument();

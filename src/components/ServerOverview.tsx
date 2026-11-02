@@ -1,15 +1,21 @@
-import {
-	ArrowDownCircleIcon,
-	ArrowUpCircleIcon,
-} from "@heroicons/react/20/solid";
 import { useTranslation } from "react-i18next";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import {
+	QuoteChange,
+	QuoteChangePct,
+	QuotePrice,
+} from "@/features/market/QuoteText";
+import {
+	type Breadth,
+	type MarketIndex,
+	SUSPENDED_QUOTE,
+} from "@/features/market/quote-series";
+import { Sparkline } from "@/features/market/Sparkline";
 import { useStatus } from "@/hooks/use-status";
 import { formatBytes } from "@/lib/format";
 import { useRuntimeConfig } from "@/lib/runtime-config";
 import { cn } from "@/lib/utils";
 import SkeletonBar from "./loading/SkeletonBar";
-import NumericText from "./NumericText";
 
 type ServerOverviewProps = {
 	loading?: boolean;
@@ -20,8 +26,13 @@ type ServerOverviewProps = {
 	down: number;
 	upSpeed: number;
 	downSpeed: number;
+	index?: MarketIndex;
+	breadth?: Breadth;
 };
 
+const EMPTY_BREADTH: Breadth = { rising: 0, falling: 0, flat: 0, suspended: 0 };
+
+/** Market overview: 综合负载指数, 涨跌分布 and network "turnover". */
 export default function ServerOverview({
 	loading = false,
 	online,
@@ -31,208 +42,239 @@ export default function ServerOverview({
 	down,
 	upSpeed,
 	downSpeed,
+	index,
+	breadth = EMPTY_BREADTH,
 }: ServerOverviewProps) {
 	const { t } = useTranslation();
 	const { status, setStatus } = useStatus();
-
 	const {
 		backgroundImage: customBackgroundImage,
 		disableAnimatedMan,
-		customIllustration = "/animated-man.webp",
+		customIllustration,
 	} = useRuntimeConfig();
+	const quote = index?.quote ?? SUSPENDED_QUOTE;
+	const panel = cn("relative overflow-hidden p-3 md:p-4", {
+		"bg-card/70": customBackgroundImage,
+	});
 
 	return (
 		<section
 			aria-busy={loading}
 			className={cn(
-				"grid grid-cols-2 gap-4 lg:grid-cols-4 server-overview",
+				"grid grid-cols-2 gap-2 md:gap-3 lg:grid-cols-[1.35fr_1fr_1fr] server-overview",
 				loading && "pointer-events-none",
 			)}
 		>
-			<Card
-				onClick={() => {
-					setStatus("all");
-				}}
-				className={cn(
-					"group cursor-pointer transition-all hover:ring-blue-500 dark:hover:ring-blue-600",
-					{
-						"bg-card/70": customBackgroundImage,
-					},
-				)}
-			>
-				<CardContent
-					className={cn(
-						"relative flex h-full items-center px-6 py-3",
-						loading && "[&>section]:invisible",
-					)}
-				>
-					{loading && <OverviewPlaceholder />}
-					<section className="flex flex-col gap-1">
-						<p className="text-sm font-medium md:text-base">
-							{t("serverOverview.totalServers")}
-						</p>
-						<div className="flex items-center gap-2">
-							<span className="relative flex h-2 w-2">
-								<span className="relative inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
-							</span>
-							<NumericText value={total} className="text-lg font-semibold" />
-						</div>
-					</section>
-				</CardContent>
-			</Card>
-			<Card
-				onClick={() => {
-					setStatus("online");
-				}}
-				className={cn(
-					"cursor-pointer ring-1 transition-all hover:ring-green-500 dark:hover:ring-green-600",
-					{
-						"bg-card/70": customBackgroundImage,
-					},
-					{
-						"border-transparent ring-2 ring-green-500 dark:ring-green-600":
-							status === "online",
-					},
-				)}
-			>
-				<CardContent
-					className={cn(
-						"relative flex h-full items-center px-6 py-3",
-						loading && "[&>section]:invisible",
-					)}
-				>
-					{loading && <OverviewPlaceholder />}
-					<section className="flex flex-col gap-1">
-						<p className="text-sm font-medium md:text-base">
-							{t("serverOverview.onlineServers")}
-						</p>
-						<div className="flex items-center gap-2">
-							<span className="relative flex h-2 w-2">
-								<span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
-							</span>
-							<NumericText value={online} className="text-lg font-semibold" />
-						</div>
-					</section>
-				</CardContent>
-			</Card>
-			<Card
-				onClick={() => {
-					setStatus("offline");
-				}}
-				className={cn(
-					"cursor-pointer ring-1 transition-all hover:ring-red-500 dark:hover:ring-red-600",
-					{
-						"bg-card/70": customBackgroundImage,
-					},
-					{
-						"border-transparent ring-2 ring-red-500 dark:ring-red-600":
-							status === "offline",
-					},
-				)}
-			>
-				<CardContent
-					className={cn(
-						"relative flex h-full items-center px-6 py-3",
-						loading && "[&>section]:invisible",
-					)}
-				>
-					{loading && <OverviewPlaceholder />}
-					<section className="flex flex-col gap-1">
-						<p className="text-sm font-medium md:text-base">
-							{t("serverOverview.offlineServers")}
-						</p>
-						<div className="flex items-center gap-2">
-							<span className="relative flex h-2 w-2">
-								<span className="relative inline-flex h-2 w-2 rounded-full bg-red-500"></span>
-							</span>
-							<NumericText value={offline} className="text-lg font-semibold" />
-						</div>
-					</section>
-				</CardContent>
-			</Card>
-			<Card
-				className={cn(
-					"group ring-1 hover:ring-purple-500 dark:hover:ring-purple-600",
-					{
-						"bg-card/70": customBackgroundImage,
-					},
-				)}
-			>
-				<CardContent
-					className={cn(
-						"flex h-full items-center relative px-6 py-3",
-						loading && "[&>section]:invisible",
-					)}
-				>
-					{loading && <OverviewPlaceholder network />}
-					<section className="flex flex-col gap-1 w-full">
-						<div className="flex items-center w-full justify-between">
-							<p className="text-sm font-medium md:text-base">
-								{t("serverOverview.network")}
+			<Card className={cn(panel, "col-span-2 lg:col-span-1")}>
+				{loading ? (
+					<PanelPlaceholder rows={3} />
+				) : (
+					<button
+						type="button"
+						onClick={() => setStatus("all")}
+						className="flex w-full items-end justify-between gap-3 text-left"
+					>
+						<div className="min-w-0">
+							<p className="flex items-center gap-2 text-xs text-muted-foreground">
+								<span className="font-medium text-foreground">
+									{t("market.index")}
+								</span>
+								<span className="hidden sm:inline">
+									{t("market.indexHint")}
+								</span>
 							</p>
-						</div>
-						<section className="flex items-start flex-row z-10 pr-0 gap-1">
-							<NumericText
-								value={`↑${formatBytes(up)}`}
-								className="sm:text-[12px] text-[10px] text-blue-800 dark:text-blue-400  text-nowrap font-medium"
+							<QuotePrice
+								quote={quote}
+								className="mt-1 block text-[2rem] font-bold leading-none md:text-[2.5rem]"
 							/>
-							<NumericText
-								value={`↓${formatBytes(down)}`}
-								className="sm:text-[12px] text-[10px]  text-purple-800 dark:text-purple-400  text-nowrap font-medium"
-							/>
-						</section>
-						<section className="flex flex-col sm:flex-row -mr-1 sm:items-center items-start gap-1">
-							<p className="text-[11px] flex items-center text-nowrap font-semibold">
-								<ArrowUpCircleIcon className="size-3 mr-0.5 sm:mb-px" />
-								{formatBytes(upSpeed)}/s
+							<p className="mt-1.5 flex items-center gap-3 text-sm">
+								<QuoteChange quote={quote} />
+								<QuoteChangePct quote={quote} />
+								<span className="text-[11px] text-muted-foreground">
+									{t("market.vsOneMinute")}
+								</span>
 							</p>
-							<p className="text-[11px] flex items-center  text-nowrap font-semibold">
-								<ArrowDownCircleIcon className="size-3 mr-0.5" />
-								{formatBytes(downSpeed)}/s
-							</p>
-						</section>
-					</section>
-					{!loading && !disableAnimatedMan && (
-						<img
-							className="absolute right-3 top-[-85px] z-50 w-20 scale-90 group-hover:opacity-50 md:scale-100 transition-all"
-							alt={"animated-man"}
-							src={customIllustration}
-							loading="eager"
+						</div>
+						<Sparkline
+							values={quote.series}
+							direction={quote.direction}
+							width={140}
+							height={48}
+							className="hidden sm:block"
 						/>
-					)}
-				</CardContent>
+					</button>
+				)}
+				{!loading && customIllustration && !disableAnimatedMan && (
+					<img
+						className="pointer-events-none absolute right-2 top-1 w-14 opacity-80"
+						alt="illustration"
+						src={customIllustration}
+						loading="eager"
+					/>
+				)}
+			</Card>
+
+			<Card className={cn(panel, "col-span-2 sm:col-span-1")}>
+				{loading ? (
+					<PanelPlaceholder rows={3} />
+				) : (
+					<BreadthPanel
+						breadth={breadth}
+						total={total}
+						online={online}
+						offline={offline}
+						status={status}
+						setStatus={setStatus}
+					/>
+				)}
+			</Card>
+
+			<Card className={cn(panel, "col-span-2 sm:col-span-1")}>
+				{loading ? (
+					<PanelPlaceholder rows={3} />
+				) : (
+					<div className="grid h-full grid-cols-2 items-center gap-x-3 gap-y-1 sm:flex sm:flex-col sm:items-stretch sm:gap-1.5">
+						<p className="col-span-2 text-xs font-medium">
+							{t("market.turnover")}
+						</p>
+						<p className="num flex items-baseline gap-1 text-sm font-semibold text-up md:text-base">
+							<span aria-hidden="true">↑</span>
+							<span className="sr-only">{t("market.upSpeed")}</span>
+							{formatBytes(upSpeed)}/s
+						</p>
+						<p className="num flex items-baseline gap-1 text-sm font-semibold text-down md:text-base">
+							<span aria-hidden="true">↓</span>
+							<span className="sr-only">{t("market.downSpeed")}</span>
+							{formatBytes(downSpeed)}/s
+						</p>
+						<p className="num col-span-2 mt-auto flex flex-wrap gap-x-2 text-[11px] text-muted-foreground">
+							<span>
+								{t("market.traffic")} ↑{formatBytes(up)}
+							</span>
+							<span>↓{formatBytes(down)}</span>
+						</p>
+					</div>
+				)}
 			</Card>
 		</section>
 	);
 }
 
-function OverviewPlaceholder({ network = false }: { network?: boolean }) {
+function BreadthPanel({
+	breadth,
+	total,
+	online,
+	offline,
+	status,
+	setStatus,
+}: {
+	breadth: Breadth;
+	total: number;
+	online: number;
+	offline: number;
+	status: string;
+	setStatus: (status: "all" | "online" | "offline") => void;
+}) {
+	const { t } = useTranslation();
+	const counted =
+		breadth.rising + breadth.flat + breadth.falling + breadth.suspended || 1;
+	const segments = [
+		{ key: "rising", value: breadth.rising, bar: "bg-up" },
+		{ key: "flat", value: breadth.flat, bar: "bg-flat/60" },
+		{ key: "falling", value: breadth.falling, bar: "bg-down" },
+		{ key: "suspended", value: breadth.suspended, bar: "bg-suspended/40" },
+	] as const;
+	const items = [
+		{ key: "rising", value: breadth.rising, text: "text-up", target: "online" },
+		{
+			key: "falling",
+			value: breadth.falling,
+			text: "text-down",
+			target: "online",
+		},
+		{ key: "flat", value: breadth.flat, text: "text-flat", target: "online" },
+		{
+			key: "suspended",
+			value: breadth.suspended,
+			text: "text-suspended",
+			target: "offline",
+		},
+	] as const;
 	return (
-		<div
-			aria-hidden="true"
-			className="absolute inset-x-6 inset-y-3 flex flex-col justify-center gap-1"
-		>
-			<div className="flex h-5 items-center md:h-6">
-				<SkeletonBar className="h-4 w-20 max-w-full" />
+		<div className="flex h-full flex-col gap-2">
+			<div className="flex items-center justify-between text-xs">
+				<span className="font-medium">{t("market.breadth")}</span>
+				<button
+					type="button"
+					onClick={() => setStatus("all")}
+					className={cn(
+						"num rounded-sm px-1 text-muted-foreground hover:text-foreground",
+						status === "all" && "text-foreground",
+					)}
+				>
+					{t("market.total")} {total}
+				</button>
 			</div>
-			{network ? (
-				<>
-					<div className="flex h-[15px] items-center sm:h-[18px]">
-						<SkeletonBar className="h-3 w-28 max-w-full" />
-					</div>
-					<div className="flex flex-col gap-1 sm:flex-row">
-						{[0, 1].map((key) => (
-							<div key={key} className="flex h-[16.5px] items-center">
-								<SkeletonBar className="h-3 w-14" />
-							</div>
-						))}
-					</div>
-				</>
-			) : (
-				<div className="flex h-7 items-center">
-					<SkeletonBar className="h-5 w-12" />
-				</div>
-			)}
+			<div
+				className="flex h-1.5 w-full overflow-hidden rounded-full bg-muted"
+				aria-hidden="true"
+			>
+				{segments.map((segment) =>
+					segment.value > 0 ? (
+						<span
+							key={segment.key}
+							className={segment.bar}
+							style={{ width: `${(segment.value / counted) * 100}%` }}
+						/>
+					) : null,
+				)}
+			</div>
+			<div className="grid grid-cols-4 gap-x-2 gap-y-1 sm:grid-cols-2">
+				{items.map((item) => {
+					const active =
+						item.target === "offline"
+							? status === "offline"
+							: status === "online";
+					return (
+						<button
+							key={item.key}
+							type="button"
+							aria-pressed={active}
+							title={
+								item.target === "offline"
+									? `${t("offline")} ${offline}`
+									: `${t("online")} ${online}`
+							}
+							onClick={() => setStatus(item.target)}
+							className={cn(
+								"flex flex-col items-start gap-x-2 rounded-sm px-1 text-xs hover:bg-accent sm:flex-row sm:items-baseline sm:justify-between",
+								active && "bg-accent",
+							)}
+						>
+							<span className="truncate text-muted-foreground">
+								{t(`market.${item.key}`)}
+							</span>
+							<span className={cn("num text-sm font-semibold", item.text)}>
+								{item.value}
+							</span>
+						</button>
+					);
+				})}
+			</div>
+		</div>
+	);
+}
+
+function PanelPlaceholder({ rows }: { rows: number }) {
+	return (
+		<div aria-hidden="true" className="flex flex-col gap-2">
+			<SkeletonBar className="h-3 w-20" />
+			{Array.from({ length: rows - 1 }, (_, key) => (
+				<SkeletonBar
+					key={key}
+					className={key === 0 ? "h-7 w-28" : "h-3 w-36"}
+				/>
+			))}
 		</div>
 	);
 }

@@ -17,8 +17,8 @@ export function SearchButton() {
 		<Button
 			variant="outline"
 			size="sm"
-			className={cn("rounded-full px-[9px] bg-white dark:bg-black", {
-				"bg-white/70 dark:bg-black/70": customBackgroundImage,
+			className={cn("rounded-sm bg-card px-[9px]", {
+				"bg-card/70": customBackgroundImage,
 			})}
 			onClick={openCommand}
 			title="Search"

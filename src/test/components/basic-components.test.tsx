@@ -130,12 +130,75 @@ describe("interactive app controls", () => {
 		);
 
 		expect(screen.getByText("status:all")).toBeInTheDocument();
-		fireEvent.click(screen.getByText("serverOverview.onlineServers"));
+		fireEvent.click(screen.getByText("market.rising"));
 		expect(screen.getByText("status:online")).toBeInTheDocument();
-		fireEvent.click(screen.getByText("serverOverview.offlineServers"));
+		fireEvent.click(screen.getByText("market.suspended"));
 		expect(screen.getByText("status:offline")).toBeInTheDocument();
-		fireEvent.click(screen.getByText("serverOverview.totalServers"));
+		fireEvent.click(screen.getByText(/market.total/));
 		expect(screen.getByText("status:all")).toBeInTheDocument();
+		fireEvent.click(screen.getByText("market.falling"));
+		fireEvent.click(screen.getByText("market.index"));
+		expect(screen.getByText("status:all")).toBeInTheDocument();
+	});
+
+	it("shows the market index, breadth counts and an optional illustration", () => {
+		window.CustomIllustration = "/custom.webp";
+		render(
+			<StatusProvider>
+				<ServerOverview
+					total={4}
+					online={3}
+					offline={1}
+					up={1024}
+					down={2048}
+					upSpeed={512}
+					downSpeed={256}
+					index={{
+						members: 3,
+						quote: {
+							last: 42.5,
+							base: 40,
+							change: 2.5,
+							changePct: 6.25,
+							high: 42.5,
+							low: 40,
+							direction: "up",
+							series: [40, 42.5],
+						},
+					}}
+					breadth={{ rising: 2, falling: 1, flat: 0, suspended: 1 }}
+				/>
+			</StatusProvider>,
+		);
+		expect(screen.getByText("42.50")).toHaveClass("text-up");
+		expect(screen.getByText("+6.25%")).toBeInTheDocument();
+		expect(screen.getByAltText("illustration")).toHaveAttribute(
+			"src",
+			"/custom.webp",
+		);
+		expect(screen.getAllByTestId("sparkline").length).toBeGreaterThan(0);
+	});
+
+	it("renders placeholders while loading", () => {
+		const { container } = render(
+			<StatusProvider>
+				<ServerOverview
+					loading
+					total={0}
+					online={0}
+					offline={0}
+					up={0}
+					down={0}
+					upSpeed={0}
+					downSpeed={0}
+				/>
+			</StatusProvider>,
+		);
+		expect(container.querySelector(".server-overview")).toHaveAttribute(
+			"aria-busy",
+			"true",
+		);
+		expect(screen.queryByText("market.index")).not.toBeInTheDocument();
 	});
 });
 

@@ -75,9 +75,21 @@ vi.mock("@/components/ServerCard", () => ({
 	),
 }));
 
-vi.mock("@/components/ServerCardInline", () => ({
-	default: ({ serverInfo }: { serverInfo: NezhaServer }) => (
-		<article data-testid="server-card-inline">{serverInfo.name}</article>
+vi.mock("@/features/market/Watchlist", () => ({
+	Watchlist: ({ servers }: { servers: NezhaServer[] }) => (
+		<div>
+			{servers.map((server) => (
+				<article key={server.id} data-testid="server-card-inline">
+					{server.name}
+				</article>
+			))}
+		</div>
+	),
+}));
+
+vi.mock("@/features/market/TickerTape", () => ({
+	TickerTape: ({ items }: { items: { id: number }[] }) => (
+		<div data-testid="ticker">{items.length}</div>
 	),
 }));
 
@@ -144,6 +156,8 @@ function websocketPayload(servers: NezhaServer[]) {
 
 describe("Servers page", () => {
 	beforeEach(() => {
+		// Most cases assert on the card grid; the watchlist is the theme default.
+		localStorage.setItem("inline", "0");
 		apiMocks.fetchServerGroup.mockResolvedValue({
 			success: true,
 			data: [
@@ -599,7 +613,7 @@ describe("Servers page", () => {
 				container.querySelectorAll(
 					".server-overview-controls section > button",
 				),
-			).toHaveLength(3);
+			).toHaveLength(2);
 		});
 
 		const controls = container.querySelectorAll(
@@ -614,12 +628,9 @@ describe("Servers page", () => {
 		expect(localStorage.getItem("showServices")).toBe("1");
 	});
 
-	it("does not enable inline cards from storage on mobile widths", () => {
-		localStorage.setItem("inline", "1");
-		Object.defineProperty(window, "innerWidth", {
-			configurable: true,
-			value: 500,
-		});
+	it("defaults to the watchlist and switches to cards from the view control", async () => {
+		localStorage.removeItem("inline");
+		const user = userEvent.setup();
 		const online = createServer({ id: 1, name: "alpha" });
 
 		renderServerPage({
@@ -627,8 +638,13 @@ describe("Servers page", () => {
 			lastData: websocketPayload([online]),
 		});
 
+		expect(screen.getByTestId("server-card-inline")).toHaveTextContent("alpha");
+		expect(screen.getByTestId("ticker")).toHaveTextContent("1");
+		await user.click(screen.getByRole("button", { name: /market.cardView/ }));
 		expect(screen.getByTestId("server-card")).toHaveTextContent("alpha");
-		expect(screen.queryByTestId("server-card-inline")).not.toBeInTheDocument();
+		expect(localStorage.getItem("inline")).toBe("0");
+		await user.click(screen.getByRole("button", { name: /market.listView/ }));
+		expect(screen.getByTestId("server-card-inline")).toBeInTheDocument();
 	});
 
 	it("applies external status filters and inline card preferences", async () => {

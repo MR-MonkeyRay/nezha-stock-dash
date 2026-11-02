@@ -4,6 +4,8 @@ import GlobalMap from "@/components/GlobalMap";
 import HomeSkeleton from "@/components/loading/HomeSkeleton";
 import ServerOverview from "@/components/ServerOverview";
 import { ServiceTracker } from "@/components/ServiceTracker";
+import { TickerTape } from "@/features/market/TickerTape";
+import { useMarket } from "@/features/market/use-market";
 import {
 	selectGroupServerIds,
 	selectGroupTabs,
@@ -68,6 +70,7 @@ export default function Servers({
 		down,
 		downSpeed,
 		filteredServers,
+		groupServers,
 		offlineServers,
 		onlineServers,
 		totalServers,
@@ -86,6 +89,8 @@ export default function Servers({
 		[nezhaWsData, currentGroup, groupServerIdSets, status, sortType, sortOrder],
 	);
 
+	const market = useMarket(groupServers);
+
 	const currentBackendError = backendError || groupError || serviceError;
 
 	if (!nezhaWsData && currentBackendError) {
@@ -99,7 +104,8 @@ export default function Servers({
 	const hasServers = nezhaWsData.servers.length > 0;
 
 	return (
-		<div className="mx-auto w-full max-w-5xl px-0">
+		<div className="mx-auto w-full max-w-7xl px-0">
+			<TickerTape items={market.ticker} className="-mx-3 mb-3 md:mx-0" />
 			<ServerOverview
 				total={totalServers}
 				online={onlineServers}
@@ -108,6 +114,8 @@ export default function Servers({
 				down={down}
 				upSpeed={upSpeed}
 				downSpeed={downSpeed}
+				index={market.index}
+				breadth={market.breadth}
 			/>
 			<ServerControls
 				{...preferences}
@@ -128,6 +136,8 @@ export default function Servers({
 				filteredServers={filteredServers}
 				inline={inline}
 				now={nezhaWsData.now}
+				quotes={market.quotes}
+				sort={sort}
 			/>
 		</div>
 	);
