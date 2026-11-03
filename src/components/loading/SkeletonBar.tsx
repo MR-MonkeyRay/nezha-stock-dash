@@ -5,7 +5,7 @@ export default function SkeletonBar({ className }: { className: string }) {
 	return (
 		<Skeleton
 			className={cn(
-				"rounded-[5px] bg-stone-200/70 motion-reduce:animate-none dark:bg-stone-700/60",
+				"rounded-[5px] bg-muted motion-reduce:animate-none",
 				className,
 			)}
 		/>

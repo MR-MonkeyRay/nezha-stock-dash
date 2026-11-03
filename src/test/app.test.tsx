@@ -60,7 +60,7 @@ vi.mock("../hooks/use-theme", () => ({
 	useTheme: () => ({ setTheme: appMocks.setTheme }),
 }));
 
-vi.mock("../lib/inject", () => ({
+vi.mock("@/features/runtime-config/inject", () => ({
 	InjectContext: appMocks.injectContext,
 }));
 

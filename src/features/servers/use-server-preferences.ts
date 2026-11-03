@@ -1,7 +1,20 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useRuntimeConfig } from "@/lib/runtime-config";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { safeLocalStorage, safeSessionStorage } from "@/lib/storage";
 import type { NezhaWebsocketResponse } from "@/types/nezha-api";
+
+/** `list` is the 行情列表 watchlist (default); `grid` is the quote-tile grid. */
+export type ServerView = "list" | "grid";
+
+export const SERVER_VIEW_KEY = "serverView";
+export const SHOW_MAP_KEY = "showMap";
+export const SHOW_SERVICES_KEY = "showServices";
+
+const readFlag = (key: string) => safeLocalStorage.getItem(key) === "true";
+
+function readView(): ServerView {
+	return safeLocalStorage.getItem(SERVER_VIEW_KEY) === "grid" ? "grid" : "list";
+}
 
 export function useServerPreferences(
 	hasServices: boolean,
@@ -10,10 +23,10 @@ export function useServerPreferences(
 ) {
 	const { forceShowServices, forceShowMap, forceCardInline } =
 		useRuntimeConfig();
-	const [desiredShowServices, setShowServices] = useState<string>("0");
-	const [showMap, setShowMap] = useState<string>("0");
-	const [inline, setInline] = useState<string>("0");
-	const unsavedInline = useRef<string | null>(null);
+	const [desiredShowServices, setShowServices] = useState(false);
+	const [showMap, setShowMap] = useState(false);
+	const [view, setViewState] = useState<ServerView>("list");
+	const unsavedView = useRef<ServerView | null>(null);
 	const hasRestoredScroll = useRef(false);
 	const [currentGroup, setCurrentGroup] = useState<string>("All");
 	const restoreScrollPosition = useCallback(() => {
@@ -45,50 +58,20 @@ export function useServerPreferences(
 	};
 
 	useEffect(() => {
-		const showServicesState = safeLocalStorage.getItem("showServices");
-		if (forceShowServices) {
-			setShowServices("1");
-		} else if (showServicesState !== null) {
-			setShowServices(showServicesState);
-		}
+		setShowServices(forceShowServices || readFlag(SHOW_SERVICES_KEY));
 	}, [forceShowServices]);
 
-	const showServices = hasServices ? desiredShowServices : "0";
+	const showServices = hasServices && desiredShowServices;
 
 	useEffect(() => {
-		const checkInlineSettings = () => {
-			const isMobile = window.innerWidth < 768;
-
-			// Mobile skips desktop defaults; shrinking does not reset an explicit choice.
-			if (!isMobile) {
-				const inlineState = safeLocalStorage.getItem("inline");
-				if (forceCardInline) {
-					setInline("1");
-				} else if (unsavedInline.current !== null) {
-					// A failed write must not let an older stored value undo this session.
-					setInline(unsavedInline.current);
-				} else if (inlineState !== null) {
-					setInline(inlineState);
-				}
-			}
-		};
-
-		checkInlineSettings();
-
-		window.addEventListener("resize", checkInlineSettings);
-
-		return () => {
-			window.removeEventListener("resize", checkInlineSettings);
-		};
+		// Both views are responsive, so the saved choice applies on every width.
+		if (forceCardInline) setViewState("list");
+		// A failed write must not let an older stored value undo this session.
+		else setViewState(unsavedView.current ?? readView());
 	}, [forceCardInline]);
 
 	useEffect(() => {
-		const showMapState = safeLocalStorage.getItem("showMap");
-		if (forceShowMap) {
-			setShowMap("1");
-		} else if (showMapState !== null) {
-			setShowMap(showMapState);
-		}
+		setShowMap(forceShowMap || readFlag(SHOW_MAP_KEY));
 	}, [forceShowMap]);
 
 	useEffect(() => {
@@ -103,30 +86,29 @@ export function useServerPreferences(
 	}, [data, canRestoreScroll, restoreScrollPosition]);
 
 	const toggleMap = () => {
-		const value = showMap === "0" ? "1" : "0";
+		const value = !showMap;
 		setShowMap(value);
-		safeLocalStorage.setItem("showMap", value);
+		safeLocalStorage.setItem(SHOW_MAP_KEY, String(value));
 	};
 	const toggleServices = () => {
-		const value = desiredShowServices === "0" ? "1" : "0";
+		const value = !desiredShowServices;
 		setShowServices(value);
-		safeLocalStorage.setItem("showServices", value);
+		safeLocalStorage.setItem(SHOW_SERVICES_KEY, String(value));
 	};
-	const toggleInline = () => {
-		const value = inline === "0" ? "1" : "0";
-		setInline(value);
-		unsavedInline.current = safeLocalStorage.setItem("inline", value)
+	const setView = (value: ServerView) => {
+		setViewState(value);
+		unsavedView.current = safeLocalStorage.setItem(SERVER_VIEW_KEY, value)
 			? null
 			: value;
 	};
 	return {
 		showServices,
 		showMap,
-		inline,
+		view,
 		currentGroup,
 		handleTagChange,
 		toggleMap,
 		toggleServices,
-		toggleInline,
+		setView,
 	};
 }

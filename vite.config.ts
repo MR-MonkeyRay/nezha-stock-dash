@@ -96,7 +96,6 @@ export default defineConfig({
 				"src/test/**",
 				"src/types/**",
 				"src/main.tsx",
-				"src/i18n.js",
 				"src/vite-env.d.ts",
 			],
 		},

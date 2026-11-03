@@ -38,7 +38,7 @@ export default function BillingInfo({
 			} catch (error) {
 				console.error(error);
 				return (
-					<div className={cn("text-[10px] text-muted-foreground text-red-600")}>
+					<div className={"text-[10px] text-status-bad"}>
 						{t("billingInfo.remaining")}: {t("billingInfo.error")}
 					</div>
 				);
@@ -56,11 +56,11 @@ export default function BillingInfo({
 					{parsedData.billingDataMod.cycle}
 				</p>
 			) : parsedData.billingDataMod.amount === "0" ? (
-				<p className={cn("text-[10px] text-green-600 ")}>
+				<p className={cn("text-[10px] text-status-ok ")}>
 					{t("billingInfo.free")}
 				</p>
 			) : parsedData.billingDataMod.amount === "-1" ? (
-				<p className={cn("text-[10px] text-pink-600 ")}>
+				<p className={cn("text-[10px] text-highlight ")}>
 					{t("billingInfo.usage-baseed")}
 				</p>
 			) : null}
@@ -89,15 +89,15 @@ export default function BillingInfo({
 					{parsedData.billingDataMod.cycle}
 				</p>
 			) : parsedData.billingDataMod.amount === "0" ? (
-				<p className={cn("text-[10px] text-green-600 ")}>
+				<p className={cn("text-[10px] text-status-ok ")}>
 					{t("billingInfo.free")}
 				</p>
 			) : parsedData.billingDataMod.amount === "-1" ? (
-				<p className={cn("text-[10px] text-pink-600 ")}>
+				<p className={cn("text-[10px] text-highlight ")}>
 					{t("billingInfo.usage-baseed")}
 				</p>
 			) : null}
-			<p className={cn("text-[10px] text-muted-foreground text-red-600")}>
+			<p className={"text-[10px] text-status-bad"}>
 				{t("billingInfo.expired")}: {daysLeftObject.days * -1}{" "}
 				{t("billingInfo.days")}
 			</p>

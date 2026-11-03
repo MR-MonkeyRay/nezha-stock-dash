@@ -2,18 +2,9 @@ import { type ClassValue, clsx } from "clsx";
 import dayjs from "dayjs";
 import { twMerge } from "tailwind-merge";
 import { requestJson } from "@/lib/http";
-import { selectServerMetrics } from "@/lib/server-metrics";
-
-export { handlePublicNote } from "@/lib/public-note-cache";
-
-import type { NezhaServer } from "@/types/nezha-api";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
-}
-
-export function formatNezhaInfo(now: number, serverInfo: NezhaServer) {
-	return selectServerMetrics(now, serverInfo);
 }
 
 export function getDaysBetweenDatesWithAutoRenewal({
@@ -220,7 +211,22 @@ export interface PublicNoteData {
 	planDataMod?: PlanData;
 }
 
+// Every row calls this on every websocket tick with the same few note
+// strings; parse each distinct note once (and log a bad one once).
+const publicNoteCache = new Map<string, PublicNoteData | null>();
+const PUBLIC_NOTE_CACHE_LIMIT = 1000;
+
 export function parsePublicNote(publicNote: string): PublicNoteData | null {
+	if (!publicNote) return null;
+	const cached = publicNoteCache.get(publicNote);
+	if (cached !== undefined) return cached;
+	if (publicNoteCache.size >= PUBLIC_NOTE_CACHE_LIMIT) publicNoteCache.clear();
+	const parsed = parsePublicNoteUncached(publicNote);
+	publicNoteCache.set(publicNote, parsed);
+	return parsed;
+}
+
+function parsePublicNoteUncached(publicNote: string): PublicNoteData | null {
 	try {
 		if (!publicNote) {
 			return null;

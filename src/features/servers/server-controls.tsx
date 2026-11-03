@@ -4,7 +4,8 @@ import {
 	ArrowUpIcon,
 	ChartBarSquareIcon,
 	MapIcon,
-	ViewColumnsIcon,
+	QueueListIcon,
+	Squares2X2Icon,
 } from "@heroicons/react/20/solid";
 import { useTranslation } from "react-i18next";
 import GroupSwitch from "@/components/GroupSwitch";
@@ -27,96 +28,117 @@ export function ServerControls({
 	customBackgroundImage,
 	showMap,
 	showServices,
-	inline,
+	view,
 	currentGroup,
 	handleTagChange,
 	toggleMap,
 	toggleServices,
-	toggleInline,
+	setView,
 	sortType,
 	sortOrder,
 	setSortType,
 	setSortOrder,
 }: Props) {
 	const { t } = useTranslation();
+	const toggleClass = (active: boolean) =>
+		cn(
+			"flex h-8 shrink-0 cursor-pointer items-center gap-1 rounded-sm border px-2 text-xs transition-press motion-safe:press",
+			active
+				? "border-highlight bg-highlight text-highlight-foreground"
+				: "border-border bg-card text-muted-foreground hover:text-foreground",
+			{ "bg-card/70": customBackgroundImage && !active },
+		);
 	return (
 		<div
 			hidden={!hasServers}
-			className="flex mt-6 items-center justify-between gap-2 server-overview-controls"
+			className="mt-3 flex flex-wrap items-center gap-2 server-overview-controls"
 		>
-			<section className="flex items-center gap-2 w-full overflow-hidden">
+			<section className="flex shrink-0 items-center gap-2">
+				<fieldset className="relative m-0 grid h-8 min-w-0 shrink-0 grid-cols-2 overflow-hidden rounded-sm border border-border bg-card p-0 text-xs">
+					<legend className="sr-only">{t("market.viewMode")}</legend>
+					{/* Sliding thumb under the active segment. */}
+					<span
+						aria-hidden="true"
+						data-testid="view-thumb"
+						className="absolute inset-y-0 left-0 w-1/2 bg-highlight transition-transform duration-(--dur-base) ease-(--ease-out) motion-reduce:transition-none"
+						style={{
+							transform: view === "list" ? "translateX(0)" : "translateX(100%)",
+						}}
+					/>
+					{(
+						[
+							["list", t("market.listView"), QueueListIcon],
+							["grid", t("market.cardView"), Squares2X2Icon],
+						] as const
+					).map(([value, label, Icon]) => (
+						<button
+							key={value}
+							type="button"
+							aria-pressed={view === value}
+							onClick={() => setView(value)}
+							className={cn(
+								"relative flex items-center justify-center gap-1 px-2 transition-press motion-safe:press",
+								view === value
+									? "text-highlight-foreground"
+									: "text-muted-foreground hover:text-foreground",
+							)}
+						>
+							<Icon className="size-3.5" />
+							<span className="hidden sm:inline">{label}</span>
+							<span className="sr-only sm:hidden">{label}</span>
+						</button>
+					))}
+				</fieldset>
 				<button
+					type="button"
+					aria-pressed={showMap}
 					onClick={toggleMap}
-					className={cn(
-						"inset-shadow-2xs inset-shadow-white/20 flex cursor-pointer flex-col items-center gap-0 rounded-[50px] bg-blue-100 p-2.5 text-blue-600 transition-all dark:bg-blue-900 dark:text-blue-100",
-						{
-							"inset-shadow-black/20 bg-blue-600 text-white dark:bg-blue-100 dark:text-blue-600":
-								showMap === "1",
-						},
-						{
-							"bg-opacity-70 dark:bg-opacity-70": customBackgroundImage,
-						},
-					)}
+					className={toggleClass(showMap)}
 				>
-					<MapIcon className="size-[13px]" />
+					<MapIcon className="size-3.5" />
+					<span className="hidden sm:inline">{t("market.showMap")}</span>
+					<span className="sr-only sm:hidden">{t("market.showMap")}</span>
 				</button>
 				{hasServices && (
 					<button
+						type="button"
+						aria-pressed={showServices}
 						onClick={toggleServices}
-						className={cn(
-							"inset-shadow-2xs inset-shadow-white/20 flex cursor-pointer flex-col items-center gap-0 rounded-[50px] bg-blue-100 p-2.5 text-blue-600 transition-all dark:bg-blue-900 dark:text-blue-100",
-							{
-								"inset-shadow-black/20 bg-blue-600 text-white dark:bg-blue-100 dark:text-blue-600":
-									showServices === "1",
-							},
-							{
-								"bg-opacity-70 dark:bg-opacity-70": customBackgroundImage,
-							},
-						)}
+						className={toggleClass(showServices)}
 					>
-						<ChartBarSquareIcon className="size-[13px]" />
+						<ChartBarSquareIcon className="size-3.5" />
+						<span className="hidden sm:inline">{t("market.showServices")}</span>
+						<span className="sr-only sm:hidden">
+							{t("market.showServices")}
+						</span>
 					</button>
 				)}
-				<button
-					onClick={toggleInline}
-					className={cn(
-						"inset-shadow-2xs inset-shadow-white/20 flex cursor-pointer flex-col items-center gap-0 rounded-[50px] bg-blue-100 p-2.5 text-blue-600 transition-all dark:bg-blue-900 dark:text-blue-100",
-						{
-							"inset-shadow-black/20 bg-blue-600 text-white dark:bg-blue-100 dark:text-blue-600":
-								inline === "1",
-						},
-						{
-							"bg-opacity-70 dark:bg-opacity-70": customBackgroundImage,
-						},
-					)}
-				>
-					<ViewColumnsIcon className="size-[13px]" />
-				</button>
-				<GroupSwitch
-					tabs={groupTabs}
-					currentTab={currentGroup}
-					setCurrentTab={handleTagChange}
-				/>
 			</section>
+			{/* Phones give the tabs their own row; wider screens fit one line. */}
+			<GroupSwitch
+				tabs={groupTabs}
+				currentTab={currentGroup}
+				setCurrentTab={handleTagChange}
+				className="order-last w-full sm:order-none sm:w-auto sm:flex-1"
+			/>
 			<div
 				className={cn(
-					"flex h-8 items-center rounded-full border border-stone-200 bg-white text-sm text-stone-600 shadow-xs transition-all dark:border-stone-800 dark:bg-stone-800 dark:text-stone-300 dark:shadow-none shrink-0",
+					"ml-auto flex h-8 shrink-0 items-center rounded-sm border border-border bg-card text-xs text-muted-foreground transition-colors",
 					{
-						"dark:border-stone-600/80 dark:bg-stone-800/80 bg-white/75":
-							customBackgroundImage,
+						"bg-card/70": customBackgroundImage,
 					},
 					{
-						" text-blue-600  dark:text-blue-400": sortType !== "default",
+						"border-highlight/60 text-highlight": sortType !== "default",
 					},
 				)}
 			>
 				<button
-					aria-label="Toggle sort direction"
+					aria-label={t("a11y.toggleSortDirection")}
 					onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
 					disabled={sortType === "default"}
-					className="flex h-full cursor-pointer items-center gap-1.5 px-3 disabled:cursor-not-allowed disabled:opacity-40"
+					className="flex h-full cursor-pointer items-center gap-1.5 px-2.5 disabled:cursor-not-allowed disabled:opacity-40"
 				>
-					<div className="text-stone-900 dark:text-stone-100">
+					<div className="text-foreground">
 						{sortOrder === "asc" && sortType !== "default" ? (
 							<ArrowUpIcon className="size-3.5 shrink-0" />
 						) : sortOrder === "desc" && sortType !== "default" ? (
@@ -126,27 +148,27 @@ export function ServerControls({
 						)}
 					</div>
 
-					<span className="font-medium text-stone-900 dark:text-stone-100">
+					<span className="hidden font-medium text-foreground sm:inline">
 						{t("sort.label")}
 					</span>
 				</button>
-				<span className="text-stone-300 dark:text-stone-600 mb-0.5">|</span>
-				<span className="relative ml-2 mr-3.25 inline-flex items-center">
+				<span className="mb-0.5 text-border">|</span>
+				<span className="relative ml-2 mr-3 inline-flex items-center">
 					<span
-						className="pointer-events-none select-none opacity-0 text-sm font-medium whitespace-nowrap"
+						className="pointer-events-none select-none whitespace-nowrap text-xs font-medium opacity-0"
 						aria-hidden
 					>
 						{t(`sort.types.${sortType.replace(/ /g, "_")}`)}
 					</span>
 					<select
-						aria-label="Sort metric"
+						aria-label={t("a11y.sortMetric")}
 						value={sortType}
 						onChange={(e) => {
 							const val = e.target.value as typeof sortType;
 							setSortType(val);
 							if (val === "default") setSortOrder("desc");
 						}}
-						className="absolute inset-0 cursor-pointer appearance-none bg-transparent text-sm font-medium outline-none"
+						className="absolute inset-0 cursor-pointer appearance-none bg-transparent text-xs font-medium outline-none [&>option]:bg-popover [&>option]:text-popover-foreground"
 					>
 						{SORT_TYPES.map((type) => (
 							<option key={type} value={type}>

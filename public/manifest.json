@@ -1,6 +1,6 @@
 {
-	"name": "Nezha Monitoring",
-	"short_name": "Nezha Monitoring",
+	"name": "哪吒行情 Nezha Stock Dash",
+	"short_name": "哪吒行情",
 	"icons": [
 		{
 			"src": "/android-chrome-192x192.png",
@@ -9,8 +9,8 @@
 			"purpose": "any maskable"
 		}
 	],
-	"theme_color": "hsl(0 0% 98%)",
-	"background_color": "hsl(0 0% 98%)",
+	"theme_color": "#000000",
+	"background_color": "#000000",
 	"start_url": "/",
 	"display": "standalone",
 	"orientation": "portrait"

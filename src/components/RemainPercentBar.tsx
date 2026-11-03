@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 
 import { Progress } from "./ui/progress";
@@ -9,17 +10,17 @@ export default function RemainPercentBar({
 	value: number;
 	className?: string;
 }) {
+	const { t } = useTranslation();
 	return (
 		<Progress
-			aria-label={"Server Usage Bar"}
-			aria-labelledby={"Server Usage Bar"}
+			aria-label={t("a11y.usageBar")}
 			value={value}
 			indicatorClassName={
 				value < 30
-					? "bg-red-500"
+					? "bg-status-bad"
 					: value < 70
-						? "bg-orange-400"
-						: "bg-green-500"
+						? "bg-status-warn"
+						: "bg-status-ok"
 			}
 			className={cn("h-[3px] rounded-sm w-[70px]", className)}
 		/>

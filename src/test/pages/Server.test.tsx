@@ -6,6 +6,7 @@ import { StatusProvider } from "@/context/status-provider";
 import type { WebSocketContextType } from "@/context/websocket-context";
 import { WebSocketContext } from "@/context/websocket-context";
 import { useStatus } from "@/hooks/use-status";
+import { VIRTUALIZE_FROM } from "@/hooks/use-window-list";
 import Servers from "@/pages/Server";
 import { createServer } from "@/test/fixtures";
 import { renderWithProviders } from "@/test/utils";
@@ -75,14 +76,26 @@ vi.mock("@/components/ServerCard", () => ({
 	),
 }));
 
-vi.mock("@/components/ServerCardInline", () => ({
-	default: ({ serverInfo }: { serverInfo: NezhaServer }) => (
-		<article data-testid="server-card-inline">{serverInfo.name}</article>
+vi.mock("@/features/market/Watchlist", () => ({
+	Watchlist: ({ servers }: { servers: NezhaServer[] }) => (
+		<div>
+			{servers.map((server) => (
+				<article key={server.id} data-testid="server-card-inline">
+					{server.name}
+				</article>
+			))}
+		</div>
+	),
+}));
+
+vi.mock("@/features/market/TickerTape", () => ({
+	TickerTape: ({ items }: { items: { id: number }[] }) => (
+		<div data-testid="ticker">{items.length}</div>
 	),
 }));
 
 vi.mock("@/components/ServiceTracker", () => ({
-	ServiceTracker: ({ serverList }: { serverList: NezhaServer[] }) => (
+	default: ({ serverList }: { serverList: NezhaServer[] }) => (
 		<div data-testid="service-tracker">{serverList.length}</div>
 	),
 }));
@@ -144,6 +157,8 @@ function websocketPayload(servers: NezhaServer[]) {
 
 describe("Servers page", () => {
 	beforeEach(() => {
+		// Most cases assert on the card grid; the watchlist is the theme default.
+		localStorage.setItem("serverView", "grid");
 		apiMocks.fetchServerGroup.mockResolvedValue({
 			success: true,
 			data: [
@@ -384,10 +399,10 @@ describe("Servers page", () => {
 			lastData: websocketPayload([lowCpu, highCpu]),
 		});
 
-		await user.selectOptions(screen.getByLabelText("Sort metric"), "cpu");
+		await user.selectOptions(screen.getByLabelText("a11y.sortMetric"), "cpu");
 		expect(screen.getAllByTestId("server-card")[0]).toHaveTextContent("beta");
 
-		await user.click(screen.getByLabelText("Toggle sort direction"));
+		await user.click(screen.getByLabelText("a11y.toggleSortDirection"));
 		expect(screen.getAllByTestId("server-card")[0]).toHaveTextContent("alpha");
 	});
 
@@ -408,13 +423,13 @@ describe("Servers page", () => {
 			lastData: websocketPayload([onlineAlpha, offlineZeta]),
 		});
 
-		expect(screen.getByLabelText("Toggle sort direction")).toBeDisabled();
+		expect(screen.getByLabelText("a11y.toggleSortDirection")).toBeDisabled();
 
-		await user.selectOptions(screen.getByLabelText("Sort metric"), "name");
+		await user.selectOptions(screen.getByLabelText("a11y.sortMetric"), "name");
 
 		expect(screen.getAllByTestId("server-card")[0]).toHaveTextContent("zeta");
 
-		await user.click(screen.getByLabelText("Toggle sort direction"));
+		await user.click(screen.getByLabelText("a11y.toggleSortDirection"));
 		expect(screen.getAllByTestId("server-card")[0]).toHaveTextContent("alpha");
 	});
 
@@ -436,7 +451,10 @@ describe("Servers page", () => {
 			lastData: websocketPayload([missingPlatform, linux]),
 		});
 
-		await user.selectOptions(screen.getByLabelText("Sort metric"), "system");
+		await user.selectOptions(
+			screen.getByLabelText("a11y.sortMetric"),
+			"system",
+		);
 
 		const cards = screen.getAllByTestId("server-card");
 		expect(cards).toHaveLength(2);
@@ -545,7 +563,8 @@ describe("Servers page", () => {
 		});
 	});
 
-	it("renders every card in large server lists without virtualization", () => {
+	it("renders only the visible window of large server lists", () => {
+		localStorage.setItem("serverView", "grid");
 		const servers = Array.from({ length: 2000 }, (_, index) =>
 			createServer({ id: index + 1, name: `server-${index + 1}` }),
 		);
@@ -558,7 +577,47 @@ describe("Servers page", () => {
 		expect(screen.getByTestId("server-overview")).toHaveTextContent(
 			"2000:2000:0",
 		);
-		expect(screen.getAllByTestId("server-card")).toHaveLength(2000);
+		const rendered = screen.getAllByTestId("server-card").length;
+		expect(rendered).toBeGreaterThan(0);
+		expect(rendered).toBeLessThan(200);
+		localStorage.removeItem("serverView");
+	});
+
+	it("renders every card of lists below the virtualization threshold", () => {
+		localStorage.setItem("serverView", "grid");
+		const servers = Array.from({ length: VIRTUALIZE_FROM - 1 }, (_, index) =>
+			createServer({ id: index + 1, name: `server-${index + 1}` }),
+		);
+
+		renderServerPage({
+			connected: true,
+			lastData: websocketPayload(servers),
+		});
+
+		expect(screen.getAllByTestId("server-card")).toHaveLength(
+			VIRTUALIZE_FROM - 1,
+		);
+		localStorage.removeItem("serverView");
+	});
+
+	it("never moves the window when a virtualized list mounts", () => {
+		localStorage.setItem("serverView", "grid");
+		const scrollTo = vi.fn();
+		vi.stubGlobal("scrollTo", scrollTo);
+		const servers = Array.from({ length: 500 }, (_, index) =>
+			createServer({ id: index + 1, name: `server-${index + 1}` }),
+		);
+
+		renderServerPage({
+			connected: true,
+			lastData: websocketPayload(servers),
+		});
+
+		expect(screen.getAllByTestId("server-card").length).toBeLessThan(100);
+		// It may re-assert the current offset, but never scrolls elsewhere.
+		for (const [options] of scrollTo.mock.calls)
+			expect(options).toMatchObject({ top: window.scrollY });
+		localStorage.removeItem("serverView");
 	});
 
 	it("toggles map and service tracker controls when service data exists", async () => {
@@ -599,27 +658,24 @@ describe("Servers page", () => {
 				container.querySelectorAll(
 					".server-overview-controls section > button",
 				),
-			).toHaveLength(3);
+			).toHaveLength(2);
 		});
 
 		const controls = container.querySelectorAll(
 			".server-overview-controls section > button",
 		);
 		await user.click(controls[0]);
-		expect(screen.getByTestId("global-map")).toHaveTextContent("2");
-		expect(localStorage.getItem("showMap")).toBe("1");
+		expect(await screen.findByTestId("global-map")).toHaveTextContent("2");
+		expect(localStorage.getItem("showMap")).toBe("true");
 
 		await user.click(controls[1]);
-		expect(screen.getByTestId("service-tracker")).toHaveTextContent("2");
-		expect(localStorage.getItem("showServices")).toBe("1");
+		expect(await screen.findByTestId("service-tracker")).toHaveTextContent("2");
+		expect(localStorage.getItem("showServices")).toBe("true");
 	});
 
-	it("does not enable inline cards from storage on mobile widths", () => {
-		localStorage.setItem("inline", "1");
-		Object.defineProperty(window, "innerWidth", {
-			configurable: true,
-			value: 500,
-		});
+	it("defaults to the watchlist and switches to cards from the view control", async () => {
+		localStorage.removeItem("serverView");
+		const user = userEvent.setup();
 		const online = createServer({ id: 1, name: "alpha" });
 
 		renderServerPage({
@@ -627,12 +683,25 @@ describe("Servers page", () => {
 			lastData: websocketPayload([online]),
 		});
 
+		expect(screen.getByTestId("server-card-inline")).toHaveTextContent("alpha");
+		expect(screen.getByTestId("ticker")).toHaveTextContent("1");
+		expect(screen.getByTestId("view-thumb")).toHaveStyle({
+			transform: "translateX(0)",
+		});
+		await user.click(screen.getByRole("button", { name: /market.cardView/ }));
 		expect(screen.getByTestId("server-card")).toHaveTextContent("alpha");
-		expect(screen.queryByTestId("server-card-inline")).not.toBeInTheDocument();
+		expect(screen.getByTestId("view-thumb")).toHaveStyle({
+			transform: "translateX(100%)",
+		});
+		// The card grid staggers in on mount only.
+		expect(document.querySelector(".server-card-list")).toHaveClass("stagger");
+		expect(localStorage.getItem("serverView")).toBe("grid");
+		await user.click(screen.getByRole("button", { name: /market.listView/ }));
+		expect(screen.getByTestId("server-card-inline")).toBeInTheDocument();
 	});
 
-	it("applies external status filters and inline card preferences", async () => {
-		localStorage.setItem("inline", "1");
+	it("applies external status filters and the saved list view", async () => {
+		localStorage.setItem("serverView", "list");
 		Object.defineProperty(window, "innerWidth", {
 			configurable: true,
 			value: 1024,

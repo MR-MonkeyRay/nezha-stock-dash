@@ -47,3 +47,18 @@ export function preloadServerDetail() {
 		() => undefined,
 	);
 }
+
+/** Runs `task` once the browser is idle, so prefetching never competes with
+ * the current page's first render. Returns a canceller. */
+export function whenIdle(task: () => void): () => void {
+	if (typeof window.requestIdleCallback === "function") {
+		const handle = window.requestIdleCallback(task, { timeout: 4000 });
+		return () => window.cancelIdleCallback(handle);
+	}
+	// Safari has no requestIdleCallback; wait past first paint and data.
+	const timer = window.setTimeout(task, 2000);
+	return () => window.clearTimeout(timer);
+}
+
+/** Preload the detail route's code while the home page is idle. */
+export const preloadServerDetailWhenIdle = () => whenIdle(preloadServerDetail);

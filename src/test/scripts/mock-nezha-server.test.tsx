@@ -26,6 +26,8 @@ const chartMetrics: MetricType[] = [
 	"gpu",
 ];
 
+const customCode = '<script>window.ForceColorConvention="green-up"</script>';
+
 describe.each([false, true])("mock metrics (guest=%s)", (guest) => {
 	let child: ChildProcess;
 	let baseUrl: string;
@@ -40,6 +42,7 @@ describe.each([false, true])("mock metrics (guest=%s)", (guest) => {
 					MOCK_NEZHA_PORT: "0",
 					MOCK_NEZHA_COUNT: "6",
 					MOCK_NEZHA_INTERVAL_MS: "0",
+					MOCK_NEZHA_CUSTOM_CODE: customCode,
 				},
 				stdio: ["ignore", "pipe", "pipe"],
 			},
@@ -179,5 +182,12 @@ describe.each([false, true])("mock metrics (guest=%s)", (guest) => {
 					.status,
 			).toBe(400);
 		}
+	});
+
+	it("serves MOCK_NEZHA_CUSTOM_CODE as the dashboard custom_code", async () => {
+		const response = await request("/api/v1/setting");
+		expect(response.status).toBe(200);
+		const body = await response.json();
+		expect(body.data.config.custom_code).toBe(customCode);
 	});
 });

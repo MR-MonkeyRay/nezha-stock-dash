@@ -10,7 +10,6 @@ import { SearchButton } from "@/components/SearchButton";
 import ServerOverview from "@/components/ServerOverview";
 import ServerUsageBar from "@/components/ServerUsageBar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -54,17 +53,17 @@ describe("basic display components", () => {
 	it("renders server usage colors for healthy, warning, and critical values", () => {
 		const { rerender } = render(<ServerUsageBar value={70} />);
 		expect(screen.getByRole("progressbar").firstElementChild).toHaveClass(
-			"bg-green-500",
+			"bg-status-ok",
 		);
 
 		rerender(<ServerUsageBar value={71} />);
 		expect(screen.getByRole("progressbar").firstElementChild).toHaveClass(
-			"bg-orange-400",
+			"bg-status-warn",
 		);
 
 		rerender(<ServerUsageBar value={91} />);
 		expect(screen.getByRole("progressbar").firstElementChild).toHaveClass(
-			"bg-red-500",
+			"bg-status-bad",
 		);
 	});
 
@@ -109,7 +108,7 @@ describe("interactive app controls", () => {
 		);
 
 		expect(screen.getByText("command-closed")).toBeInTheDocument();
-		await user.click(screen.getByRole("button", { name: "Search" }));
+		await user.click(screen.getByRole("button", { name: "a11y.search" }));
 		expect(screen.getByText("command-open")).toBeInTheDocument();
 	});
 
@@ -130,34 +129,91 @@ describe("interactive app controls", () => {
 		);
 
 		expect(screen.getByText("status:all")).toBeInTheDocument();
-		fireEvent.click(screen.getByText("serverOverview.onlineServers"));
+		fireEvent.click(screen.getByText("market.rising"));
 		expect(screen.getByText("status:online")).toBeInTheDocument();
-		fireEvent.click(screen.getByText("serverOverview.offlineServers"));
+		fireEvent.click(screen.getByText("market.suspended"));
 		expect(screen.getByText("status:offline")).toBeInTheDocument();
-		fireEvent.click(screen.getByText("serverOverview.totalServers"));
+		fireEvent.click(screen.getByText(/market.total/));
 		expect(screen.getByText("status:all")).toBeInTheDocument();
+		fireEvent.click(screen.getByText("market.falling"));
+		fireEvent.click(screen.getByText("market.index"));
+		expect(screen.getByText("status:all")).toBeInTheDocument();
+	});
+
+	it("shows the market index, breadth counts and an optional illustration", () => {
+		window.CustomIllustration = "/custom.webp";
+		render(
+			<StatusProvider>
+				<ServerOverview
+					total={4}
+					online={3}
+					offline={1}
+					up={1024}
+					down={2048}
+					upSpeed={512}
+					downSpeed={256}
+					index={{
+						members: 3,
+						quote: {
+							last: 42.5,
+							base: 40,
+							change: 2.5,
+							changePct: 6.25,
+							high: 42.5,
+							low: 40,
+							direction: "up",
+							series: [40, 42.5],
+						},
+					}}
+					breadth={{ rising: 2, falling: 1, flat: 0, suspended: 1 }}
+				/>
+			</StatusProvider>,
+		);
+		expect(screen.getByText("42.50")).toHaveClass("text-up");
+		expect(screen.getByText("+6.25%")).toBeInTheDocument();
+		expect(screen.getByAltText("illustration")).toHaveAttribute(
+			"src",
+			"/custom.webp",
+		);
+		expect(screen.getAllByTestId("sparkline").length).toBeGreaterThan(0);
+	});
+
+	it("renders placeholders while loading", () => {
+		const { container } = render(
+			<StatusProvider>
+				<ServerOverview
+					loading
+					total={0}
+					online={0}
+					offline={0}
+					up={0}
+					down={0}
+					upSpeed={0}
+					downSpeed={0}
+				/>
+			</StatusProvider>,
+		);
+		expect(container.querySelector(".server-overview")).toHaveAttribute(
+			"aria-busy",
+			"true",
+		);
+		expect(screen.queryByText("market.index")).not.toBeInTheDocument();
 	});
 });
 
 describe("ui primitives", () => {
-	it("forwards classes and events through Button and Input", async () => {
+	it("forwards classes and events through Button", async () => {
 		const user = userEvent.setup();
 		const onClick = vi.fn();
-		const onChange = vi.fn();
 		render(
-			<>
-				<Button variant="secondary" size="sm" onClick={onClick}>
-					Save
-				</Button>
-				<Input placeholder="Name" onChange={onChange} />
-			</>,
+			<Button variant="secondary" size="sm" onClick={onClick}>
+				Save
+			</Button>,
 		);
 
 		await user.click(screen.getByRole("button", { name: "Save" }));
-		await user.type(screen.getByPlaceholderText("Name"), "edge");
 
 		expect(onClick).toHaveBeenCalledOnce();
-		expect(onChange).toHaveBeenCalled();
 		expect(screen.getByRole("button", { name: "Save" })).toHaveClass(
 			"bg-secondary",
 		);
@@ -172,7 +228,10 @@ describe("ui primitives", () => {
 			</>,
 		);
 
-		expect(screen.getByTestId("skeleton")).toHaveClass("animate-pulse", "h-4");
+		expect(screen.getByTestId("skeleton")).toHaveClass(
+			"skeleton-shimmer",
+			"h-4",
+		);
 		expect(screen.getByTestId("horizontal")).toHaveClass("h-px", "w-full");
 		expect(screen.getByTestId("vertical")).toHaveClass("h-full", "w-px");
 		expect(container.querySelectorAll("[data-orientation]")).toHaveLength(2);

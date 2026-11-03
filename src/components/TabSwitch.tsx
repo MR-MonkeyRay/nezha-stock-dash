@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { useActiveIndicator } from "@/hooks/use-active-indicator";
-import { useRuntimeConfig } from "@/lib/runtime-config";
 import { cn } from "@/lib/utils";
 
 export default function TabSwitch({
@@ -17,23 +17,23 @@ export default function TabSwitch({
 		useActiveIndicator(tabs, currentTab);
 	const { backgroundImage: customBackgroundImage } = useRuntimeConfig();
 	return (
-		<div className="z-50 flex flex-col items-start rounded-[50px] server-info-tab">
+		<div className="z-10 flex w-full flex-col items-start overflow-x-auto scrollbar-hidden server-info-tab">
 			<div
 				ref={containerRef}
+				role="tablist"
 				className={cn(
-					"relative flex items-center gap-1 rounded-[50px] bg-stone-100 p-[3px] dark:bg-stone-800",
+					"relative flex w-full items-center gap-1 border-b border-border",
 					{
-						"bg-stone-100/70 dark:bg-stone-800/70": customBackgroundImage,
+						"bg-card/70": customBackgroundImage,
 					},
 				)}
 			>
 				{indicator && (
 					<div
-						className="active-indicator-fade-in absolute left-0 top-0 z-10 content-center bg-white shadow-lg shadow-black/5 dark:bg-stone-700 dark:shadow-white/5"
+						className="active-indicator-fade-in absolute left-0 top-0 z-10 bg-highlight"
 						style={{
-							borderRadius: 46,
-							height: indicator.height,
-							transform: `translate(${indicator.x}px, ${indicator.y}px)`,
+							height: 2,
+							transform: `translate(${indicator.x}px, ${indicator.y + indicator.height - 2}px)`,
 							transition: indicator.shouldAnimate
 								? "transform 0.5s var(--timing), width 0.5s var(--timing), height 0.5s var(--timing)"
 								: "none",
@@ -45,6 +45,15 @@ export default function TabSwitch({
 					<div
 						key={tab}
 						ref={setItemRef(index)}
+						role="tab"
+						tabIndex={0}
+						aria-selected={currentTab === tab}
+						onKeyDown={(event) => {
+							if (event.key === "Enter" || event.key === " ") {
+								event.preventDefault();
+								setCurrentTab(tab);
+							}
+						}}
 						onClick={() => {
 							if (currentTab !== tab) {
 								enableIndicatorAnimation();
@@ -52,10 +61,8 @@ export default function TabSwitch({
 							setCurrentTab(tab);
 						}}
 						className={cn(
-							"relative cursor-pointer rounded-3xl px-2.5 py-2 text-[13px] font-semibold transition-all duration-500   ease-in-out hover:text-stone-950  hover:dark:text-stone-50",
-							currentTab === tab
-								? "text-black dark:text-white"
-								: "text-stone-400 dark:text-stone-500",
+							"relative cursor-pointer px-3 py-2 text-sm font-medium transition-colors hover:text-foreground focus-visible:outline-none focus-visible:text-highlight",
+							currentTab === tab ? "text-highlight" : "text-muted-foreground",
 						)}
 					>
 						<div className="relative z-20 flex items-center gap-1">

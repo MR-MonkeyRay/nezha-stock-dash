@@ -1,5 +1,13 @@
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import {
+	Bar,
+	BarChart,
+	CartesianGrid,
+	ReferenceLine,
+	XAxis,
+	YAxis,
+} from "recharts";
 import ChartSkeleton from "@/components/loading/ChartSkeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -8,16 +16,18 @@ import {
 	ChartTooltip,
 	ChartTooltipContent,
 } from "@/components/ui/chart";
+import { formatSpeed } from "@/features/market/format";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import type { ChartPeriod } from "@/hooks/use-metric-history";
 import {
 	combineMetricHistory,
 	useMetricHistory,
 } from "@/hooks/use-metric-history";
-import { useRuntimeConfig } from "@/lib/runtime-config";
 import { selectServerMetrics } from "@/lib/server-metrics";
 import { cn, formatRelativeTime, formatTime } from "@/lib/utils";
 import type { NezhaServer } from "@/types/nezha-api";
 import { HistoricalError } from "./HistoricalError";
+import { QUOTE_GRID_PROPS, QUOTE_TICK } from "./quote-chart";
 import type { RealtimeSeries } from "./realtime-series";
 export function NetworkChart({
 	now,
@@ -54,11 +64,24 @@ export function NetworkChart({
 		period === "realtime" ? series.network : networkHistoricalData;
 	const isNetworkLoading = history.isLoading;
 
-	let maxDownload = Math.max(...displayData.map((item) => item.download));
-	maxDownload = Math.ceil(maxDownload);
-	if (maxDownload < 1) {
-		maxDownload = 1;
-	}
+	// 成交量-style mirrored bars: upload above the axis, download below it.
+	const mirrored = useMemo(
+		() =>
+			displayData.map((item) => ({
+				...item,
+				downloadNeg: -item.download,
+			})),
+		[displayData],
+	);
+	const peak = Math.max(
+		1,
+		Math.ceil(
+			Math.max(
+				0,
+				...displayData.map((item) => Math.max(item.upload, item.download)),
+			),
+		),
+	);
 
 	const chartConfig = {
 		upload: {
@@ -75,40 +98,25 @@ export function NetworkChart({
 				"bg-card/70": customBackgroundImage,
 			})}
 		>
-			<CardContent className="px-6 py-3">
+			<CardContent className="px-3 py-3 md:px-4">
 				<section className="flex flex-col gap-1">
-					<div className="flex items-center">
-						<section className="flex items-center gap-4">
-							<div className="flex flex-col w-20">
-								<p className="text-xs text-muted-foreground">
-									{t("serverDetailChart.upload")}
-								</p>
-								<div className="flex items-center gap-1">
-									<span className="relative inline-flex  size-1.5 rounded-full bg-[hsl(var(--chart-1))]" />
-									<p className="text-xs font-medium">
-										{up >= 1024
-											? `${(up / 1024).toFixed(2)}G/s`
-											: up >= 1
-												? `${up.toFixed(2)}M/s`
-												: `${(up * 1024).toFixed(2)}K/s`}
-									</p>
-								</div>
-							</div>
-							<div className="flex flex-col w-20">
-								<p className=" text-xs text-muted-foreground">
-									{t("serverDetailChart.download")}
-								</p>
-								<div className="flex items-center gap-1">
-									<span className="relative inline-flex  size-1.5 rounded-full bg-[hsl(var(--chart-4))]" />
-									<p className="text-xs font-medium">
-										{down >= 1024
-											? `${(down / 1024).toFixed(2)}G/s`
-											: down >= 1
-												? `${down.toFixed(2)}M/s`
-												: `${(down * 1024).toFixed(2)}K/s`}
-									</p>
-								</div>
-							</div>
+					<div className="flex items-center justify-between">
+						<p className="text-sm font-medium">{t("market.volume")}</p>
+						<section className="num flex items-center gap-3 text-xs">
+							<span className="flex items-center gap-1">
+								<span className="text-muted-foreground">
+									↑{t("serverDetailChart.upload")}
+								</span>
+								<span className="font-semibold text-up">{formatSpeed(up)}</span>
+							</span>
+							<span className="flex items-center gap-1">
+								<span className="text-muted-foreground">
+									↓{t("serverDetailChart.download")}
+								</span>
+								<span className="font-semibold text-down">
+									{formatSpeed(down)}
+								</span>
+							</span>
 						</section>
 					</div>
 					<HistoricalError status={history.status} />
@@ -119,22 +127,25 @@ export function NetworkChart({
 						{isNetworkLoading ? (
 							<ChartSkeleton />
 						) : (
-							<LineChart
+							<BarChart
 								syncId="serverDetailCharts"
 								syncMethod="value"
 								accessibilityLayer
-								data={displayData}
+								data={mirrored}
+								stackOffset="sign"
+								barCategoryGap={1}
 								margin={{
 									top: 12,
 									left: 12,
 									right: 12,
 								}}
 							>
-								<CartesianGrid vertical={false} />
+								<CartesianGrid {...QUOTE_GRID_PROPS} />
 								<XAxis
 									dataKey="timeStamp"
 									tickLine={false}
 									axisLine={false}
+									tick={QUOTE_TICK}
 									tickMargin={8}
 									minTickGap={200}
 									interval="preserveStartEnd"
@@ -144,13 +155,15 @@ export function NetworkChart({
 									tickLine={false}
 									axisLine={false}
 									mirror={true}
+									tick={QUOTE_TICK}
 									tickMargin={-15}
 									type="number"
-									minTickGap={50}
+									minTickGap={30}
 									interval="preserveStartEnd"
-									domain={[1, maxDownload]}
-									tickFormatter={(value) => `${value.toFixed(0)}M/s`}
+									domain={[-peak, peak]}
+									tickFormatter={(value) => `${Math.abs(value).toFixed(0)}M/s`}
 								/>
+								<ReferenceLine y={0} stroke="hsl(var(--border))" />
 								<ChartTooltip
 									isAnimationActive={false}
 									content={
@@ -172,7 +185,7 @@ export function NetworkChart({
 															{label}
 														</span>
 														<span className="ml-2 font-medium text-foreground tabular-nums">
-															{Number(value).toFixed(2)} MB/s
+															{Math.abs(Number(value)).toFixed(2)} MB/s
 														</span>
 													</div>
 												);
@@ -180,23 +193,24 @@ export function NetworkChart({
 										/>
 									}
 								/>
-								<Line
+								<Bar
 									isAnimationActive={false}
 									dataKey="upload"
-									type="linear"
-									stroke="hsl(var(--chart-1))"
-									strokeWidth={1}
-									dot={false}
+									stackId="net"
+									fill="hsl(var(--up))"
+									fillOpacity={0.85}
+									maxBarSize={6}
 								/>
-								<Line
+								<Bar
 									isAnimationActive={false}
-									dataKey="download"
-									type="linear"
-									stroke="hsl(var(--chart-4))"
-									strokeWidth={1}
-									dot={false}
+									dataKey="downloadNeg"
+									name="download"
+									stackId="net"
+									fill="hsl(var(--down))"
+									fillOpacity={0.85}
+									maxBarSize={6}
 								/>
-							</LineChart>
+							</BarChart>
 						)}
 					</ChartContainer>
 				</section>

@@ -8,7 +8,11 @@ import {
 	Routes,
 	useLocation,
 } from "react-router-dom";
-
+import { InjectContext } from "@/features/runtime-config/inject";
+import {
+	refreshRuntimeConfig,
+	useRuntimeConfig,
+} from "@/features/runtime-config/runtime-config";
 import { DashCommand } from "./components/DashCommand";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Footer from "./components/Footer";
@@ -18,15 +22,13 @@ import { ServerDetailPageLoading } from "./components/loading/ServerDetailLoadin
 import RetryableLazy from "./components/RetryableLazy";
 import { useBackground } from "./hooks/use-background";
 import { useTheme } from "./hooks/use-theme";
-import { InjectContext } from "./lib/inject";
+import { resolveLanguage, shouldApplySiteLanguage } from "./lib/language";
 import { fetchSetting } from "./lib/nezha-api";
-import { refreshRuntimeConfig, useRuntimeConfig } from "./lib/runtime-config";
 import {
 	getPreloadedServerDetail,
 	loadServerDetail,
-	preloadServerDetail,
+	preloadServerDetailWhenIdle,
 } from "./lib/server-detail-preload";
-import { safeLocalStorage } from "./lib/storage";
 import { cn } from "./lib/utils";
 import ErrorPage from "./pages/ErrorPage";
 import Server from "./pages/Server";
@@ -86,10 +88,8 @@ const MainApp: React.FC = () => {
 		useRuntimeConfig();
 	const { backgroundImage: customBackgroundImage } = useBackground();
 
-	useEffect(() => {
-		// Preloading is optional; lazy routing retains its normal error boundary.
-		preloadServerDetail();
-	}, []);
+	// Preloading is optional; lazy routing retains its normal error boundary.
+	useEffect(() => preloadServerDetailWhenIdle(), []);
 
 	useEffect(() => {
 		if (settingsPending) return;
@@ -128,9 +128,9 @@ const MainApp: React.FC = () => {
 
 	const language = settingData?.data?.config?.language;
 	useEffect(() => {
-		const savedLanguage = safeLocalStorage.getItem("language");
-		if (language && !savedLanguage)
-			void Promise.resolve(i18n.changeLanguage(language)).catch(
+		const siteLanguage = resolveLanguage(language);
+		if (siteLanguage && shouldApplySiteLanguage())
+			void Promise.resolve(i18n.changeLanguage(siteLanguage)).catch(
 				() => undefined,
 			);
 	}, [language, i18n]);
@@ -180,7 +180,7 @@ const MainApp: React.FC = () => {
 					"bg-background": !customBackgroundImage,
 				})}
 			>
-				<main className="flex z-20 min-h-0 flex-1 flex-col gap-4 p-4 md:p-10 md:pt-8">
+				<main className="flex z-20 min-h-0 flex-1 flex-col gap-3 p-3 md:gap-4 md:p-6">
 					<RefreshToast />
 					<Header configurationLoading={configurationLoading} />
 					<DashCommand />

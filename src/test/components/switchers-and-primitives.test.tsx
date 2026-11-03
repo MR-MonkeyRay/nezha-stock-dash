@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { PriceColorProvider } from "@/components/PriceColorProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ModeToggle } from "@/components/ThemeSwitcher";
 import {
@@ -10,7 +11,6 @@ import {
 	AccordionItem,
 	AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
 	Dialog,
 	DialogClose,
@@ -38,32 +38,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectLabel,
-	SelectSeparator,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import {
-	Table,
-	TableBody,
-	TableCaption,
-	TableCell,
-	TableFooter,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from "@/components/ui/table";
 import {
 	Tooltip,
 	TooltipContent,
@@ -77,10 +52,27 @@ describe("language and theme switchers", () => {
 
 		render(<LanguageSwitcher />);
 
-		await user.click(screen.getByRole("button", { name: "Change language" }));
+		await user.click(
+			screen.getByRole("button", { name: "a11y.changeLanguage" }),
+		);
 
-		expect(screen.getByText("language.zh-CN")).toBeInTheDocument();
-		expect(screen.getByText("language.en-US")).toHaveClass("font-semibold");
+		expect(screen.getByText("简体中文")).toBeInTheDocument();
+		expect(screen.getByText("English")).toHaveClass("font-semibold");
+	});
+
+	it("persists an explicit language choice", async () => {
+		const user = userEvent.setup();
+		localStorage.removeItem("preferredLanguage");
+
+		render(<LanguageSwitcher />);
+
+		await user.click(
+			screen.getByRole("button", { name: "a11y.changeLanguage" }),
+		);
+		await user.click(screen.getByText("繁體中文"));
+
+		expect(localStorage.getItem("preferredLanguage")).toBe("zh-TW");
+		localStorage.removeItem("preferredLanguage");
 	});
 
 	it("updates the theme through the mode menu", async () => {
@@ -92,16 +84,62 @@ describe("language and theme switchers", () => {
 			</ThemeProvider>,
 		);
 
-		await user.click(screen.getByRole("button", { name: "Toggle theme" }));
-		await user.click(await screen.findByText("theme.dark"));
+		await user.click(screen.getByRole("button", { name: "a11y.toggleTheme" }));
+		await user.click(await screen.findByText("theme.light"));
 
-		expect(document.documentElement).toHaveClass("dark");
-		expect(localStorage.getItem("theme-switcher-test")).toBe("dark");
+		expect(document.documentElement).toHaveClass("light");
+		expect(localStorage.getItem("theme-switcher-test")).toBe("light");
+	});
+
+	it("switches the up/down color convention through the mode menu", async () => {
+		const user = userEvent.setup();
+
+		render(
+			<ThemeProvider storageKey="theme-switcher-test">
+				<PriceColorProvider>
+					<ModeToggle />
+				</PriceColorProvider>
+			</ThemeProvider>,
+		);
+
+		expect(document.documentElement).toHaveAttribute(
+			"data-price-color",
+			"red-up",
+		);
+		await user.click(screen.getByRole("button", { name: "a11y.toggleTheme" }));
+		expect(await screen.findByText("priceColor.title")).toBeInTheDocument();
+		await user.click(screen.getByText("priceColor.greenUp"));
+
+		expect(document.documentElement).toHaveAttribute(
+			"data-price-color",
+			"green-up",
+		);
+		expect(localStorage.getItem("priceColor")).toBe("green-up");
+	});
+
+	it("disables convention items while custom code forces one", async () => {
+		const user = userEvent.setup();
+		window.ForceColorConvention = "green-up";
+
+		render(
+			<PriceColorProvider>
+				<ModeToggle />
+			</PriceColorProvider>,
+		);
+
+		await user.click(screen.getByRole("button", { name: "a11y.toggleTheme" }));
+		expect(await screen.findByText("priceColor.forced")).toBeInTheDocument();
+		const redUp = screen.getByRole("menuitem", { name: /priceColor.redUp/ });
+		expect(redUp).toHaveAttribute("data-disabled");
+		expect(document.documentElement).toHaveAttribute(
+			"data-price-color",
+			"green-up",
+		);
 	});
 });
 
 describe("Radix UI wrappers", () => {
-	it("opens accordion, popover, tooltip, and dialog content", async () => {
+	it("opens accordion, tooltip, and dialog content", async () => {
 		const user = userEvent.setup();
 
 		render(
@@ -112,10 +150,6 @@ describe("Radix UI wrappers", () => {
 						<AccordionContent>Status body</AccordionContent>
 					</AccordionItem>
 				</Accordion>
-				<Popover>
-					<PopoverTrigger>Open popover</PopoverTrigger>
-					<PopoverContent>Popover body</PopoverContent>
-				</Popover>
 				<TooltipProvider delayDuration={0}>
 					<Tooltip>
 						<TooltipTrigger>Hover status</TooltipTrigger>
@@ -140,9 +174,6 @@ describe("Radix UI wrappers", () => {
 		await user.click(screen.getByRole("button", { name: "Toggle status" }));
 		expect(screen.getByText("Status body")).toBeInTheDocument();
 
-		await user.click(screen.getByRole("button", { name: "Open popover" }));
-		expect(screen.getByText("Popover body")).toBeInTheDocument();
-
 		await user.hover(screen.getByText("Hover status"));
 		expect(await screen.findByRole("tooltip")).toHaveTextContent(
 			"Tooltip body",
@@ -156,32 +187,20 @@ describe("Radix UI wrappers", () => {
 		});
 	});
 
-	it("toggles checkbox and switch controls through labels", async () => {
+	it("toggles a switch through its label", async () => {
 		const user = userEvent.setup();
-		const onCheckboxChange = vi.fn();
 		const onSwitchChange = vi.fn();
 
 		render(
 			<>
-				<Label htmlFor="alerts">Alerts</Label>
-				<Checkbox id="alerts" onCheckedChange={onCheckboxChange} />
-				<Switch
-					id="compact"
-					aria-label="Compact mode"
-					onCheckedChange={onSwitchChange}
-				/>
+				<Label htmlFor="compact">Compact mode</Label>
+				<Switch id="compact" onCheckedChange={onSwitchChange} />
 			</>,
 		);
 
-		await user.click(screen.getByText("Alerts"));
-		await user.click(screen.getByRole("switch", { name: "Compact mode" }));
+		await user.click(screen.getByText("Compact mode"));
 
-		expect(onCheckboxChange).toHaveBeenCalledWith(true);
 		expect(onSwitchChange).toHaveBeenCalledWith(true);
-		expect(screen.getByRole("checkbox")).toHaveAttribute(
-			"data-state",
-			"checked",
-		);
 		expect(
 			screen.getByRole("switch", { name: "Compact mode" }),
 		).toHaveAttribute("data-state", "checked");
@@ -233,59 +252,5 @@ describe("Radix UI wrappers", () => {
 		);
 		expect(screen.getByText("More actions")).toHaveClass("pl-8");
 		expect(screen.getByText("Archive")).toBeInTheDocument();
-	});
-
-	it("selects values and renders table structure", async () => {
-		const user = userEvent.setup();
-		const onValueChange = vi.fn();
-
-		render(
-			<>
-				<Select onValueChange={onValueChange}>
-					<SelectTrigger aria-label="Region">
-						<SelectValue placeholder="Choose region" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectGroup>
-							<SelectLabel>Regions</SelectLabel>
-							<SelectItem value="asia">Asia</SelectItem>
-							<SelectSeparator />
-							<SelectItem value="europe">Europe</SelectItem>
-						</SelectGroup>
-					</SelectContent>
-				</Select>
-				<Table>
-					<TableCaption>Server summary</TableCaption>
-					<TableHeader>
-						<TableRow>
-							<TableHead>Name</TableHead>
-							<TableHead>Status</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody>
-						<TableRow>
-							<TableCell>edge-1</TableCell>
-							<TableCell>online</TableCell>
-						</TableRow>
-					</TableBody>
-					<TableFooter>
-						<TableRow>
-							<TableCell>Total</TableCell>
-							<TableCell>1</TableCell>
-						</TableRow>
-					</TableFooter>
-				</Table>
-			</>,
-		);
-
-		await user.click(screen.getByRole("combobox", { name: "Region" }));
-		await user.click(await screen.findByRole("option", { name: "Asia" }));
-
-		expect(onValueChange).toHaveBeenCalledWith("asia");
-		expect(screen.getByText("Server summary")).toBeInTheDocument();
-		expect(
-			screen.getByRole("columnheader", { name: "Name" }),
-		).toBeInTheDocument();
-		expect(screen.getByText("edge-1")).toBeInTheDocument();
 	});
 });

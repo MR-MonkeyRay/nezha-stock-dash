@@ -42,11 +42,11 @@ export function PeriodSelector({
 		<TooltipProvider delayDuration={120}>
 			<div
 				ref={containerRef}
-				className="relative flex gap-0.5 mb-3 flex-wrap sm:-mt-5 -mt-3 p-0.5 bg-muted dark:bg-muted/40 rounded-full w-fit border border-border/60 dark:border-border"
+				className="relative mb-3 flex w-fit flex-wrap gap-0.5 rounded-sm border border-border bg-card p-0.5"
 			>
 				{indicator && (
 					<div
-						className="active-indicator-fade-in absolute left-0 top-0 z-10 bg-white dark:bg-background rounded-full ring-1 ring-border/60 dark:ring-border/40"
+						className="active-indicator-fade-in absolute left-0 top-0 z-10 rounded-sm bg-highlight"
 						style={{
 							height: indicator.height,
 							transform: `translate(${indicator.x}px, ${indicator.y}px)`,
@@ -80,16 +80,16 @@ export function PeriodSelector({
 								}
 							}}
 							className={cn(
-								"relative cursor-pointer rounded-full px-3 py-1.5 text-xs font-medium transition-colors duration-300",
+								"relative cursor-pointer rounded-sm px-3 py-1 text-xs font-medium transition-colors duration-300",
 								selectedPeriod === period.value
-									? "text-foreground"
+									? "text-highlight-foreground"
 									: "text-muted-foreground hover:text-foreground",
 								isLocked && "cursor-not-allowed opacity-40 grayscale",
 							)}
 						>
 							<div className="relative z-20 flex items-center gap-1.5">
 								{period.value === "realtime" && (
-									<span className="inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500 dark:bg-emerald-400"></span>
+									<span className="inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-status-ok motion-reduce:animate-none"></span>
 								)}
 								{period.label}
 							</div>

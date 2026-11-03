@@ -1,5 +1,3 @@
-"use client";
-
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import * as React from "react";
 import { useCallback, useMemo } from "react";
@@ -38,10 +36,10 @@ import {
 	buildMonitorSeries,
 	type MonitorChartPoint,
 } from "@/features/network-monitor/monitor-series";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { useActiveIndicator } from "@/hooks/use-active-indicator";
 import { useLoginUser } from "@/hooks/use-login-user";
 import { fetchMonitor, type MonitorPeriod } from "@/lib/nezha-api";
-import { useRuntimeConfig } from "@/lib/runtime-config";
 import { cn, formatTime } from "@/lib/utils";
 import type { NezhaMonitor, ServerMonitorChart } from "@/types/nezha-api";
 import NetworkChartLoading from "./NetworkChartLoading";
@@ -139,7 +137,7 @@ export function NetworkChart({
 			{hasError && (
 				<div
 					role="status"
-					className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs"
+					className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-status-warn/40 bg-status-warn/10 px-3 py-2 text-xs"
 				>
 					<p>{t("monitor.staleData")}</p>
 					{retryButton}
@@ -273,7 +271,20 @@ export const NetworkChartClient = React.memo(function NetworkChart({
 	const getColorByIndex = useCallback(
 		(chart: string) => {
 			const index = chartDataKey.indexOf(chart);
-			return `hsl(var(--chart-${(index % 10) + 1}))`;
+			// Cycle the MA palette first (as in stock charts), then extra chart colors.
+			const palette = [
+				"--chart-line",
+				"--ma-1",
+				"--ma-3",
+				"--ma-4",
+				"--ma-2",
+				"--ma-5",
+				"--chart-6",
+				"--chart-8",
+				"--chart-9",
+				"--chart-10",
+			];
+			return `hsl(var(${palette[index % palette.length]}))`;
 		},
 		[chartDataKey],
 	);
@@ -320,7 +331,7 @@ export const NetworkChartClient = React.memo(function NetworkChart({
 					<button
 						key={key}
 						data-active={activeCharts.includes(key)}
-						className={`relative z-30 flex cursor-pointer grow basis-0 flex-col justify-center gap-1 border-b border-neutral-200 dark:border-neutral-800 px-6 py-4 text-left data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 sm:px-6`}
+						className={`relative z-30 flex cursor-pointer grow basis-0 flex-col justify-center gap-1 border-b border-border px-6 py-4 text-left data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 sm:px-6`}
 						onClick={() => handleButtonClick(key)}
 					>
 						<span className="whitespace-nowrap text-xs text-muted-foreground">
@@ -331,10 +342,10 @@ export const NetworkChartClient = React.memo(function NetworkChart({
 								{lastDelay == null ? "—" : `${lastDelay.toFixed(2)}ms`}
 							</span>
 							<div className="flex items-center gap-2 text-[12px]">
-								<span className="text-green-600 dark:text-green-400">
+								<span className="num text-down">
 									↓{stats.minDelay?.toFixed(0) ?? "—"}
 								</span>
-								<span className="text-red-600 dark:text-red-500">
+								<span className="num text-up">
 									↑{stats.maxDelay?.toFixed(0) ?? "—"}
 								</span>
 								{avgPacketLoss !== null && (
@@ -362,8 +373,8 @@ export const NetworkChartClient = React.memo(function NetworkChart({
 					isAnimationActive={false}
 					dataKey="packet_loss"
 					stroke="none"
-					fill="hsl(45, 100%, 60%)"
-					fillOpacity={0.3}
+					fill="hsl(var(--status-warn))"
+					fillOpacity={0.25}
 					yAxisId="packet-loss"
 				/>,
 				<Line
@@ -543,7 +554,7 @@ export const NetworkChartClient = React.memo(function NetworkChart({
 					>
 						{indicator && (
 							<div
-								className="active-indicator-fade-in absolute left-0 top-0 z-10 bg-white dark:bg-background rounded-full ring-1 ring-border/60 dark:ring-border/40"
+								className="active-indicator-fade-in absolute left-0 top-0 z-10 bg-background rounded-full ring-1 ring-border/60"
 								style={{
 									height: indicator.height,
 									transform: `translate(${indicator.x}px, ${indicator.y}px)`,
@@ -633,7 +644,7 @@ export const NetworkChartClient = React.memo(function NetworkChart({
 						)}
 						{activeCharts.length > 0 && (
 							<button
-								className="absolute -top-2 right-1 z-10 text-xs px-2 py-1 bg-stone-100/80 dark:bg-stone-800/80 backdrop-blur-xs rounded-[5px] text-muted-foreground hover:text-foreground transition-colors"
+								className="absolute -top-2 right-1 z-10 text-xs px-2 py-1 bg-muted/80 backdrop-blur-xs rounded-sm text-muted-foreground hover:text-foreground transition-colors"
 								onClick={clearAllSelections}
 							>
 								{t("monitor.clearSelections", "Clear")} ({activeCharts.length})

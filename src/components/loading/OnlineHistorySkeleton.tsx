@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import Bar from "@/components/loading/SkeletonBar";
 import { Card, CardContent } from "@/components/ui/card";
-import { useRuntimeConfig } from "@/lib/runtime-config";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { cn } from "@/lib/utils";
 
 function Metric({ footer = true }: { footer?: boolean }) {
@@ -45,7 +45,7 @@ export default function OnlineHistorySkeleton({ days = 1 }: { days?: number }) {
 				</div>
 
 				<div className="px-0 py-2 md:px-6 md:py-4">
-					<div className="hidden grid-cols-4 divide-x divide-stone-100 dark:divide-stone-800 md:grid">
+					<div className="hidden grid-cols-4 divide-x divide-border md:grid">
 						{Array.from({ length: 4 }, (_, index) => (
 							<Metric key={index} />
 						))}
@@ -55,7 +55,7 @@ export default function OnlineHistorySkeleton({ days = 1 }: { days?: number }) {
 							<Metric />
 							<Metric />
 						</div>
-						<div className="grid grid-cols-2 gap-4 border-t border-stone-100 pt-3 dark:border-stone-800">
+						<div className="grid grid-cols-2 gap-4 border-t border-border pt-3">
 							<Metric footer={false} />
 							<Metric footer={false} />
 						</div>

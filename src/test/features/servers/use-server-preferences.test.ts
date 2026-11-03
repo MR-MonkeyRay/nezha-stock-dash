@@ -24,13 +24,13 @@ describe("server preferences", () => {
 			act(() => {
 				result.current.toggleMap();
 				result.current.toggleServices();
-				result.current.toggleInline();
+				result.current.setView("grid");
 				result.current.handleTagChange("Asia");
 			});
 			expect(result.current).toMatchObject({
-				showMap: "1",
-				showServices: "1",
-				inline: "1",
+				showMap: true,
+				showServices: true,
+				view: "grid",
 				currentGroup: "Asia",
 			});
 		} finally {
@@ -38,53 +38,63 @@ describe("server preferences", () => {
 			session.mockRestore();
 		}
 	});
-	it("keeps an unsaved inline choice across resize without overriding forced defaults", () => {
-		localStorage.setItem("inline", "0");
+	it("keeps an unsaved view choice across rerenders without overriding forced defaults", () => {
+		localStorage.setItem("serverView", "grid");
 		const write = vi
 			.spyOn(Storage.prototype, "setItem")
 			.mockImplementation(() => {
 				throw new DOMException("Quota exceeded", "QuotaExceededError");
 			});
 		try {
-			const { result } = renderHook(() => useServerPreferences(true, data));
-			act(() => result.current.toggleInline());
-			expect(result.current.inline).toBe("1");
-			act(() => window.dispatchEvent(new Event("resize")));
-			expect(result.current.inline).toBe("1");
-			expect(localStorage.getItem("inline")).toBe("0");
-			act(() => result.current.toggleInline());
+			const { result, rerender } = renderHook(() =>
+				useServerPreferences(true, data),
+			);
+			expect(result.current.view).toBe("grid");
+			act(() => result.current.setView("list"));
+			expect(result.current.view).toBe("list");
+			rerender();
+			expect(result.current.view).toBe("list");
+			expect(localStorage.getItem("serverView")).toBe("grid");
+			act(() => result.current.setView("grid"));
 			act(() => {
 				window.ForceCardInline = true;
 			});
-			expect(result.current.inline).toBe("1");
+			expect(result.current.view).toBe("list");
 		} finally {
 			write.mockRestore();
 		}
 	});
-	it("round trips the existing local storage keys as string flags", () => {
+	it("round trips preferences through local storage", () => {
 		const { result } = renderHook(() => useServerPreferences(true, null));
 		for (const [key, toggle] of [
 			["showMap", "toggleMap"],
 			["showServices", "toggleServices"],
-			["inline", "toggleInline"],
 		] as const) {
-			expect(result.current[key]).toBe("0");
+			expect(result.current[key]).toBe(false);
 			act(() => result.current[toggle]());
-			expect(result.current[key]).toBe("1");
-			expect(localStorage.getItem(key)).toBe("1");
+			expect(result.current[key]).toBe(true);
+			expect(localStorage.getItem(key)).toBe("true");
 			act(() => result.current[toggle]());
-			expect(localStorage.getItem(key)).toBe("0");
+			expect(localStorage.getItem(key)).toBe("false");
 		}
+		// The watchlist is the default view.
+		expect(result.current.view).toBe("list");
+		act(() => result.current.setView("grid"));
+		expect(result.current.view).toBe("grid");
+		expect(localStorage.getItem("serverView")).toBe("grid");
+		act(() => result.current.setView("list"));
+		expect(localStorage.getItem("serverView")).toBe("list");
 	});
 	it("restores stored preferences and group selection", () => {
-		for (const key of ["showMap", "showServices", "inline"])
-			localStorage.setItem(key, "1");
+		localStorage.setItem("showMap", "true");
+		localStorage.setItem("showServices", "true");
+		localStorage.setItem("serverView", "grid");
 		sessionStorage.setItem("selectedGroup", "Europe");
 		const { result } = renderHook(() => useServerPreferences(true, null));
 		expect(result.current).toMatchObject({
-			showMap: "1",
-			showServices: "1",
-			inline: "1",
+			showMap: true,
+			showServices: true,
+			view: "grid",
 			currentGroup: "Europe",
 		});
 		vi.stubGlobal("scrollY", 123);
@@ -97,18 +107,20 @@ describe("server preferences", () => {
 		window.ForceShowServices = true;
 		window.ForceShowMap = true;
 		window.ForceCardInline = true;
-		for (const key of ["showMap", "showServices", "inline"])
-			localStorage.setItem(key, "0");
+		localStorage.setItem("showMap", "false");
+		localStorage.setItem("showServices", "false");
+		localStorage.setItem("serverView", "grid");
 		const { result } = renderHook(() => useServerPreferences(true, null));
 		expect(result.current).toMatchObject({
-			showMap: "1",
-			showServices: "1",
-			inline: "1",
+			showMap: true,
+			showServices: true,
+			view: "list",
 		});
 	});
 	it("observes delayed custom-code preferences without overwriting saved flags", () => {
-		for (const key of ["showMap", "showServices", "inline"])
-			localStorage.setItem(key, "0");
+		localStorage.setItem("showMap", "false");
+		localStorage.setItem("showServices", "false");
+		localStorage.setItem("serverView", "grid");
 		const { result } = renderHook(() => useServerPreferences(true, null));
 		act(() => {
 			window.ForceShowServices = true;
@@ -116,58 +128,56 @@ describe("server preferences", () => {
 			window.ForceCardInline = true;
 		});
 		expect(result.current).toMatchObject({
-			showMap: "1",
-			showServices: "1",
-			inline: "1",
+			showMap: true,
+			showServices: true,
+			view: "list",
 		});
-		for (const key of ["showMap", "showServices", "inline"])
-			expect(localStorage.getItem(key)).toBe("0");
+		expect(localStorage.getItem("showMap")).toBe("false");
+		expect(localStorage.getItem("showServices")).toBe("false");
+		expect(localStorage.getItem("serverView")).toBe("grid");
 	});
 	it("hides unavailable services without overwriting the saved preference", () => {
-		localStorage.setItem("showServices", "1");
+		localStorage.setItem("showServices", "true");
 		const { result, rerender } = renderHook(
 			({ hasServices }) => useServerPreferences(hasServices, null),
 			{ initialProps: { hasServices: true } },
 		);
-		expect(result.current.showServices).toBe("1");
+		expect(result.current.showServices).toBe(true);
 		rerender({ hasServices: false });
-		expect(result.current.showServices).toBe("0");
-		expect(localStorage.getItem("showServices")).toBe("1");
+		expect(result.current.showServices).toBe(false);
+		expect(localStorage.getItem("showServices")).toBe("true");
 	});
 	it.each([
 		false,
 		true,
 	])("restores desired services after cold loading (forced=%s)", (forced) => {
 		window.ForceShowServices = forced;
-		localStorage.setItem("showServices", forced ? "0" : "1");
+		localStorage.setItem("showServices", String(!forced));
 		const { result, rerender } = renderHook(
 			({ available }) => useServerPreferences(available, null),
 			{ initialProps: { available: false } },
 		);
-		expect(result.current.showServices).toBe("0");
+		expect(result.current.showServices).toBe(false);
 		rerender({ available: true });
-		expect(result.current.showServices).toBe("1");
+		expect(result.current.showServices).toBe(true);
 		rerender({ available: false });
 		rerender({ available: true });
-		expect(result.current.showServices).toBe("1");
-		expect(localStorage.getItem("showServices")).toBe(forced ? "0" : "1");
+		expect(result.current.showServices).toBe(true);
+		expect(localStorage.getItem("showServices")).toBe(String(!forced));
 	});
-	it("does not apply desktop inline defaults until width reaches 768, nor reset them on shrinking", () => {
-		vi.stubGlobal("innerWidth", 767);
-		window.ForceCardInline = true;
+	it("honors the saved view on narrow screens and ignores invalid values", () => {
+		vi.stubGlobal("innerWidth", 390);
+		localStorage.setItem("serverView", "grid");
 		const { result, unmount } = renderHook(() =>
 			useServerPreferences(true, null),
 		);
-		expect(result.current.inline).toBe("0");
-		vi.stubGlobal("innerWidth", 768);
-		act(() => window.dispatchEvent(new Event("resize")));
-		expect(result.current.inline).toBe("1");
-		vi.stubGlobal("innerWidth", 767);
-		act(() => window.dispatchEvent(new Event("resize")));
-		expect(result.current.inline).toBe("1");
-		const remove = vi.spyOn(window, "removeEventListener");
+		expect(result.current.view).toBe("grid");
 		unmount();
-		expect(remove).toHaveBeenCalledWith("resize", expect.any(Function));
+		localStorage.setItem("serverView", "garbage");
+		const { result: fresh } = renderHook(() =>
+			useServerPreferences(true, null),
+		);
+		expect(fresh.current.view).toBe("list");
 	});
 	it("waits for data and two frames, then restores scroll only once", () => {
 		sessionStorage.setItem("fromMainPage", "true");

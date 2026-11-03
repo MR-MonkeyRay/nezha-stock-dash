@@ -5,11 +5,21 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-	--font-sans: var(--font-sans);
+	--font-sans:
+		system-ui, -apple-system, "PingFang SC", "Hiragino Sans GB",
+		"Microsoft YaHei", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	--font-num:
+		"DIN Alternate", "DIN Pro", "Roboto Mono", "SF Mono", ui-monospace,
+		SFMono-Regular, Menlo, Consolas, monospace;
 
+	/* Terminal look: squarer corners everywhere (rounded-full is untouched). */
+	--radius-xs: calc(var(--radius) - 2px);
+	--radius-sm: calc(var(--radius) - 2px);
+	--radius-md: calc(var(--radius) - 1px);
 	--radius-lg: var(--radius);
-	--radius-md: calc(var(--radius) - 2px);
-	--radius-sm: calc(var(--radius) - 4px);
+	--radius-xl: calc(var(--radius) + 2px);
+	--radius-2xl: calc(var(--radius) + 4px);
+	--radius-3xl: calc(var(--radius) + 6px);
 
 	--color-background: hsl(var(--background));
 	--color-foreground: hsl(var(--foreground));
@@ -45,6 +55,27 @@
 	--color-chart-4: hsl(var(--chart-4));
 	--color-chart-5: hsl(var(--chart-5));
 
+	/* Market semantics. --up/--down follow html[data-price-color]. */
+	--color-up: hsl(var(--up));
+	--color-down: hsl(var(--down));
+	--color-flat: hsl(var(--flat));
+	--color-suspended: hsl(var(--suspended));
+	--color-highlight: hsl(var(--highlight));
+	--color-highlight-foreground: hsl(var(--highlight-foreground));
+	--color-chart-line: hsl(var(--chart-line));
+	--color-chart-avg: hsl(var(--chart-avg));
+	--color-chart-grid: hsl(var(--chart-grid));
+	--color-chart-axis: hsl(var(--chart-axis));
+	--color-crosshair: hsl(var(--crosshair));
+	--color-status-ok: hsl(var(--status-ok));
+	--color-status-warn: hsl(var(--status-warn));
+	--color-status-bad: hsl(var(--status-bad));
+	--color-ma-1: hsl(var(--ma-1));
+	--color-ma-2: hsl(var(--ma-2));
+	--color-ma-3: hsl(var(--ma-3));
+	--color-ma-4: hsl(var(--ma-4));
+	--color-ma-5: hsl(var(--ma-5));
+
 	--animate-accordion-down: accordion-down 0.2s ease-out;
 	--animate-accordion-up: accordion-up 0.2s ease-out;
 
@@ -66,21 +97,15 @@
 	}
 }
 
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
+/* Borders default to the theme border color instead of Tailwind's
+   `currentcolor`, so `border` utilities need no explicit color. */
 @layer base {
 	*,
 	::after,
 	::before,
 	::backdrop,
 	::file-selector-button {
-		border-color: var(--color-gray-200, currentcolor);
+		border-color: var(--color-border, currentcolor);
 	}
 }
 
@@ -96,7 +121,7 @@
 
 @layer utilities {
 	:root {
-		font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+		font-family: var(--font-sans);
 		line-height: 1.5;
 		font-weight: 400;
 
@@ -115,70 +140,130 @@
 }
 
 @layer base {
+	/*
+	 * Light: white quote pages (东方财富 web style).
+	 * All values are HSL triplets so `hsl(var(--x))` works in chart props.
+	 */
 	:root {
-		--background: 0 0% 98%;
-		--foreground: 20 14.3% 4.1%;
+		--background: 0 0% 100%;
+		--foreground: 222 20% 12%;
 		--card: 0 0% 100%;
-		--card-foreground: 20 14.3% 4.1%;
+		--card-foreground: 222 20% 12%;
 		--popover: 0 0% 100%;
-		--popover-foreground: 20 14.3% 4.1%;
-		--primary: 24 9.8% 10%;
-		--primary-foreground: 60 9.1% 97.8%;
-		--secondary: 60 4.8% 95.9%;
-		--secondary-foreground: 24 9.8% 10%;
-		--muted: 60 4.8% 95.9%;
-		--muted-foreground: 25 5.3% 44.7%;
-		--accent: 60 4.8% 95.9%;
-		--accent-foreground: 24 9.8% 10%;
-		--destructive: 0 84.2% 60.2%;
-		--destructive-foreground: 60 9.1% 97.8%;
-		--border: 20 5.9% 90%;
-		--input: 20 5.9% 90%;
-		--ring: 20 14.3% 4.1%;
-		--radius: 1rem;
-		--chart-1: 220 70% 50%;
-		--chart-2: 340 75% 55%;
-		--chart-3: 30 80% 55%;
-		--chart-4: 280 65% 60%;
-		--chart-5: 160 60% 45%;
-		--chart-6: 180 50% 50%;
-		--chart-7: 216 50% 50%;
-		--chart-8: 252 50% 50%;
-		--chart-9: 288 50% 50%;
-		--chart-10: 324 50% 50%;
+		--popover-foreground: 222 20% 12%;
+		--primary: 218 100% 50%;
+		--primary-foreground: 0 0% 100%;
+		--secondary: 220 18% 96%;
+		--secondary-foreground: 222 20% 12%;
+		--muted: 220 18% 96%;
+		--muted-foreground: 220 9% 42%;
+		--accent: 220 18% 94%;
+		--accent-foreground: 222 20% 12%;
+		--destructive: 0 70% 51%;
+		--destructive-foreground: 0 0% 100%;
+		--border: 220 13% 90%;
+		--input: 220 13% 90%;
+		--ring: 218 100% 54%;
+		--radius: 0.25rem;
+
+		--red: 0 70% 51%;
+		--green: 140 100% 27%;
+		--flat: 0 0% 40%;
+		/* Text tokens below are tuned to WCAG AA (4.5:1) on white. */
+		--suspended: 0 0% 46%;
+		--highlight: 218 100% 54%;
+		--highlight-foreground: 0 0% 100%;
+		--chart-line: 214 90% 48%;
+		--chart-avg: 38 100% 42%;
+		--chart-grid: 220 13% 88%;
+		--chart-axis: 220 9% 40%;
+		--crosshair: 220 14% 90%;
+		--status-ok: 214 90% 48%;
+		--status-warn: 38 100% 32%;
+		--status-bad: 21 90% 42%;
+		--ma-1: 38 100% 42%;
+		--ma-2: 195 100% 38%;
+		--ma-3: 306 67% 41%;
+		--ma-4: 14 82% 50%;
+		--ma-5: 218 52% 45%;
+
+		--chart-1: var(--chart-line);
+		--chart-2: var(--ma-3);
+		--chart-3: var(--ma-4);
+		--chart-4: var(--ma-1);
+		--chart-5: var(--ma-2);
+		--chart-6: 174 60% 40%;
+		--chart-7: var(--ma-5);
+		--chart-8: 262 60% 55%;
+		--chart-9: 330 70% 50%;
+		--chart-10: 90 50% 40%;
+
+		/* 红涨绿跌 (default). */
+		--up: var(--red);
+		--down: var(--green);
 		--timing: cubic-bezier(0.4, 0, 0.2, 1);
+
+		/* Motion tokens: short and decisive, like a trading terminal. */
+		--ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+		--ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+		--dur-fast: 120ms;
+		--dur-base: 200ms;
+		--dur-slow: 360ms;
+		--dur-flash: 900ms;
 	}
 
+	/* Dark: black terminal (通达信 / 同花顺 style). */
 	.dark {
-		--background: 30 15% 8%;
-		--foreground: 60 9.1% 97.8%;
-		--card: 20 14.3% 4.1%;
-		--card-foreground: 60 9.1% 97.8%;
-		--popover: 20 14.3% 4.1%;
-		--popover-foreground: 60 9.1% 97.8%;
-		--primary: 60 9.1% 97.8%;
-		--primary-foreground: 24 9.8% 10%;
-		--secondary: 12 6.5% 15.1%;
-		--secondary-foreground: 60 9.1% 97.8%;
-		--muted: 12 6.5% 15.1%;
-		--muted-foreground: 24 5.4% 63.9%;
-		--accent: 12 6.5% 15.1%;
-		--accent-foreground: 60 9.1% 97.8%;
-		--destructive: 0 62.8% 30.6%;
-		--destructive-foreground: 60 9.1% 97.8%;
-		--border: 12 6.5% 15.1%;
-		--input: 12 6.5% 15.1%;
-		--ring: 24 5.7% 82.9%;
-		--chart-1: 220 70% 50%;
-		--chart-2: 340 75% 55%;
-		--chart-3: 30 80% 55%;
-		--chart-4: 280 65% 60%;
-		--chart-5: 160 60% 45%;
-		--chart-6: 180 50% 50%;
-		--chart-7: 216 50% 50%;
-		--chart-8: 252 50% 50%;
-		--chart-9: 288 50% 50%;
-		--chart-10: 324 50% 50%;
+		--background: 0 0% 0%;
+		--foreground: 0 0% 90%;
+		--card: 214 17% 8%;
+		--card-foreground: 0 0% 90%;
+		--popover: 223 14% 10%;
+		--popover-foreground: 0 0% 90%;
+		--primary: 46 91% 49%;
+		--primary-foreground: 0 0% 0%;
+		--secondary: 220 12% 13%;
+		--secondary-foreground: 0 0% 90%;
+		--muted: 220 12% 13%;
+		--muted-foreground: 0 0% 55%;
+		--accent: 220 12% 16%;
+		--accent-foreground: 0 0% 95%;
+		--destructive: 355 70% 45%;
+		--destructive-foreground: 0 0% 100%;
+		--border: 224 14% 21%;
+		--input: 224 14% 21%;
+		--ring: 46 91% 49%;
+
+		--red: 355 88% 58%;
+		--green: 145 74% 43%;
+		--flat: 0 0% 75%;
+		--suspended: 0 0% 50%;
+		--highlight: 46 91% 49%;
+		--highlight-foreground: 0 0% 0%;
+		--chart-line: 195 81% 50%;
+		--chart-avg: 44 100% 52%;
+		--chart-grid: 0 0% 93% / 0.13;
+		--chart-axis: 0 0% 70%;
+		--crosshair: 215 23% 22%;
+		--status-ok: 195 81% 50%;
+		--status-warn: 46 91% 49%;
+		--status-bad: 29 100% 50%;
+		--ma-1: 44 100% 52%;
+		--ma-2: 195 100% 54%;
+		--ma-3: 306 67% 50%;
+		--ma-4: 14 82% 59%;
+		--ma-5: 218 52% 58%;
+
+		--chart-6: 174 60% 45%;
+		--chart-8: 262 70% 66%;
+		--chart-9: 330 80% 62%;
+		--chart-10: 90 55% 50%;
+	}
+
+	/* 绿涨红跌. Both selectors resolve on <html>, next to .dark. */
+	:root[data-price-color="green-up"] {
+		--up: var(--green);
+		--down: var(--red);
 	}
 }
 
@@ -188,11 +273,11 @@
 	}
 	html {
 		@apply scroll-smooth;
-		background-color: hsl(0 0% 98%);
+		background-color: #ffffff;
 		color-scheme: light;
 	}
 	html.dark {
-		background-color: hsl(30 15% 8%);
+		background-color: #000000;
 		color-scheme: dark;
 	}
 	body {
@@ -219,7 +304,14 @@
 }
 
 ::selection {
-	@apply bg-stone-300 dark:bg-stone-800;
+	@apply bg-highlight/30;
+}
+
+/* Tabular figures for every price-like number. */
+@utility num {
+	font-family: var(--font-num);
+	font-variant-numeric: tabular-nums;
+	letter-spacing: -0.01em;
 }
 
 .hamster-loading-wrapper {
@@ -428,5 +520,339 @@
 		opacity: 0;
 		transform: translateY(-12px);
 		filter: blur(2px);
+	}
+}
+
+/* Ticker tape (行情滚动条). One list plus an aria-hidden clone, shifted by half. */
+@keyframes ticker-scroll {
+	to {
+		transform: translateX(-50%);
+	}
+}
+.ticker-track.is-animated {
+	animation-name: ticker-scroll;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+}
+.ticker:hover .ticker-track,
+.ticker:focus-within .ticker-track {
+	animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+	.ticker {
+		overflow-x: auto;
+	}
+	.ticker-track.is-animated {
+		animation: none;
+	}
+	.ticker-clone {
+		display: none;
+	}
+}
+
+/* ── Motion ───────────────────────────────────────────────────────────────
+   Data motion (tick flash, bars) conveys information and stays on with
+   reduced motion; movement-based motion (slides, lifts, reveals) is removed. */
+
+/* 跳价闪烁: a fading background behind a price whenever it ticks up or down.
+   Two identical keyframes alternate so every tick restarts the animation. */
+@keyframes tick-flash-a {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+@keyframes tick-flash-b {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+.tick-flash {
+	position: relative;
+	isolation: isolate;
+}
+.tick-flash[data-flash]::after {
+	content: "";
+	position: absolute;
+	inset: -1px -3px;
+	z-index: -1;
+	border-radius: 2px;
+	opacity: 0;
+	pointer-events: none;
+}
+.tick-flash[data-flash="up"]::after {
+	background: hsl(var(--up) / 0.28);
+}
+.tick-flash[data-flash="down"]::after {
+	background: hsl(var(--down) / 0.28);
+}
+.tick-flash[data-flash-parity="0"]::after {
+	animation: tick-flash-a var(--dur-flash) var(--ease-out);
+}
+.tick-flash[data-flash-parity="1"]::after {
+	animation: tick-flash-b var(--dur-flash) var(--ease-out);
+}
+
+/* Entrance animations use fill-mode `backwards`, not `both`: the end state is
+   the element's own style, and a filled animation stays in effect forever,
+   keeping large wrappers (the page, the tab panel) on their own paint layer.
+   Sparkline draw-in on first paint (pathLength="1" on the polyline). */
+@keyframes spark-draw {
+	from {
+		stroke-dashoffset: 1;
+	}
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+.spark-draw {
+	stroke-dasharray: 1;
+	animation: spark-draw 700ms var(--ease-out) backwards;
+}
+
+/* Live price dot with an expanding ring, like the last point of a 分时 line. */
+@keyframes live-ping {
+	from {
+		transform: scale(1);
+		opacity: 0.7;
+	}
+	to {
+		transform: scale(3);
+		opacity: 0;
+	}
+}
+.live-ping {
+	transform-origin: center;
+	will-change: transform, opacity;
+	animation: live-ping 1.6s var(--ease-out) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.spark-draw,
+	.live-ping {
+		animation: none;
+	}
+	.live-ping {
+		opacity: 0;
+	}
+}
+
+/* Press feedback. `scale`/`translate` are separate CSS properties, so these
+   compose with Tailwind's transform utilities. Use with motion-safe:press. */
+@utility transition-press {
+	transition-property:
+		color, background-color, border-color, box-shadow, opacity, scale, translate;
+	transition-timing-function: var(--ease-out);
+	transition-duration: var(--dur-base);
+}
+@utility press {
+	&:active:not(:disabled):not([aria-disabled="true"]) {
+		scale: 0.95;
+		transition-duration: var(--dur-fast);
+	}
+}
+@utility press-soft {
+	&:active:not(:disabled) {
+		scale: 0.99;
+		transition-duration: var(--dur-fast);
+	}
+}
+
+/* Entrance: children rise in with a short stagger (capped at 12 steps).
+   Applied only while a list first mounts (useEntrance), so rows that React
+   moves on later re-sorts do not replay it. */
+@keyframes rise-in {
+	from {
+		opacity: 0;
+		translate: 0 6px;
+	}
+}
+.anim-rise,
+.stagger > * {
+	animation: rise-in var(--dur-slow) var(--ease-out) backwards;
+	animation-delay: calc(var(--i, 0) * 28ms);
+}
+.stagger > :nth-child(2) {
+	--i: 1;
+}
+.stagger > :nth-child(3) {
+	--i: 2;
+}
+.stagger > :nth-child(4) {
+	--i: 3;
+}
+.stagger > :nth-child(5) {
+	--i: 4;
+}
+.stagger > :nth-child(6) {
+	--i: 5;
+}
+.stagger > :nth-child(7) {
+	--i: 6;
+}
+.stagger > :nth-child(8) {
+	--i: 7;
+}
+.stagger > :nth-child(9) {
+	--i: 8;
+}
+.stagger > :nth-child(10) {
+	--i: 9;
+}
+.stagger > :nth-child(11) {
+	--i: 10;
+}
+.stagger > :nth-child(n + 12) {
+	--i: 11;
+}
+
+/* Value swap (cycling pill text, sort arrow): the new value slides up in. */
+@keyframes swap-in {
+	from {
+		opacity: 0;
+		translate: 0 35%;
+	}
+}
+.anim-swap {
+	display: inline-block;
+	animation: swap-in var(--dur-base) var(--ease-out);
+}
+
+/* Skeleton shimmer: a soft highlight sweeping across the placeholder. */
+@keyframes shimmer {
+	from {
+		background-position: 150% 0;
+	}
+	to {
+		background-position: -50% 0;
+	}
+}
+.skeleton-shimmer {
+	background-image: linear-gradient(
+		100deg,
+		transparent 20%,
+		hsl(var(--foreground) / 0.06) 50%,
+		transparent 80%
+	);
+	background-size: 200% 100%;
+	background-repeat: no-repeat;
+	animation: shimmer 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.anim-rise,
+	.stagger > *,
+	.anim-swap,
+	.skeleton-shimmer {
+		animation: none;
+	}
+}
+
+/* Detail tab panels slide in from the side of the tab that was picked. */
+@keyframes tab-in {
+	from {
+		opacity: 0;
+		translate: calc(var(--tab-dir, 0) * 16px) 4px;
+	}
+}
+.anim-tab {
+	animation: tab-in var(--dur-slow) var(--ease-out) backwards;
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+}
+.anim-fade {
+	animation: fade-in 420ms var(--ease-out) backwards;
+}
+
+/* Map / service panels grow open. Height animates where interpolate-size is
+   supported; elsewhere the panel fades and slides in at full height. The clip
+   only lasts as long as the growth, so absolutely placed map tooltips can
+   overflow the panel afterwards. */
+@keyframes expand-clip {
+	from,
+	to {
+		overflow: clip;
+	}
+}
+.anim-expand {
+	interpolate-size: allow-keywords;
+	animation: expand-clip var(--dur-slow) linear;
+	transition:
+		height var(--dur-slow) var(--ease-out),
+		opacity var(--dur-slow) var(--ease-out),
+		translate var(--dur-slow) var(--ease-out);
+	@starting-style {
+		height: 0;
+		opacity: 0;
+		translate: 0 -6px;
+	}
+}
+
+/* ── View Transitions (see src/lib/view-transition.ts) ─────────────────── */
+@keyframes vt-fade-out {
+	to {
+		opacity: 0;
+	}
+}
+@keyframes vt-reveal {
+	from {
+		clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 50%));
+	}
+	to {
+		clip-path: circle(
+			var(--vt-r, 150vmax) at var(--vt-x, 50%) var(--vt-y, 50%)
+		);
+	}
+}
+/* Page change: the old page fades, the new page plays its own entrance, and
+   the clicked server name flies into the detail header. */
+html[data-vt="nav"] .vt-server-name {
+	view-transition-name: server-name;
+}
+html[data-vt="nav"]::view-transition-old(root) {
+	animation: vt-fade-out var(--dur-base) var(--ease-out) both;
+}
+html[data-vt="nav"]::view-transition-new(root) {
+	animation: none;
+}
+::view-transition-group(server-name) {
+	animation-duration: 420ms;
+	animation-timing-function: var(--ease-out);
+}
+::view-transition-old(server-name),
+::view-transition-new(server-name) {
+	height: 100%;
+	object-fit: contain;
+	object-position: left center;
+}
+/* Theme: the new theme grows from the toggle; no crossfade underneath. */
+html[data-vt="theme"]::view-transition-old(root) {
+	animation: none;
+}
+html[data-vt="theme"]::view-transition-new(root) {
+	animation: vt-reveal 560ms var(--ease-in-out);
+}
+/* Price color convention: a quick crossfade so red and green swap together. */
+html[data-vt="fade"]::view-transition-group(root) {
+	animation-duration: 260ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.anim-tab,
+	.anim-fade {
+		animation: none;
+	}
+	.anim-expand {
+		animation: none;
+		transition: none;
 	}
 }

@@ -17,7 +17,7 @@ export function BackendErrorState({ error }: { error: unknown }) {
 	return (
 		<div className="flex min-h-96 flex-col items-center justify-center px-4 text-center">
 			<div className="flex max-w-md flex-col items-center gap-2">
-				<p className="text-sm font-semibold text-stone-900 dark:text-stone-100">
+				<p className="text-sm font-semibold text-foreground">
 					{t(
 						unauthorized
 							? "error.loginRequiredTitle"
@@ -37,7 +37,7 @@ export function BackendErrorState({ error }: { error: unknown }) {
 					</Button>
 				) : (
 					message && (
-						<p className="mt-1 max-w-full break-words rounded-md bg-stone-100 px-2 py-1 text-xs text-stone-500 dark:bg-stone-800 dark:text-stone-400">
+						<p className="mt-1 max-w-full break-words rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">
 							{message}
 						</p>
 					)
@@ -57,9 +57,9 @@ export function ServerEmptyState({ filtered = false }: { filtered?: boolean }) {
 		>
 			<ServerStackIcon
 				aria-hidden="true"
-				className="size-7 text-stone-300 dark:text-stone-600"
+				className="size-7 text-muted-foreground/50"
 			/>
-			<p className="text-sm font-medium text-stone-500 dark:text-stone-400">
+			<p className="text-sm font-medium text-muted-foreground">
 				{t(filtered ? "info.noMatchingServers" : "info.noServers")}
 			</p>
 		</div>

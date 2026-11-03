@@ -12,10 +12,10 @@ interface Window {
 	CustomLinks?: string;
 	CustomIllustration?: string;
 	ShowNetTransfer?: boolean;
-	FixedTopServerName?: boolean;
 	ForceUseSvgFlag?: boolean;
-	DisableAnimatedMan?: boolean;
 	ForceTheme?: string;
+	/** "red-up" (红涨绿跌, default) or "green-up" (绿涨红跌). */
+	ForceColorConvention?: string;
 	ForceSortType?: string;
 	ForceSortOrder?: string;
 }

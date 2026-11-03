@@ -22,6 +22,19 @@ interface Props<P extends object> {
 // failed module requests until the document is reloaded.
 const loadedComponents = new WeakMap<() => Promise<unknown>, unknown>();
 
+/** Loads a section's module ahead of time (e.g. on idle) and registers it, so
+ * the first render uses it directly instead of suspending: a suspended
+ * fallback stays up for React's ~300ms reveal throttle even when the module
+ * is already cached. Failures are ignored; rendering retries normally. */
+export function preloadLazy<P extends object>(
+	load: () => Promise<{ default: ComponentType<P> }>,
+) {
+	if (loadedComponents.has(load)) return;
+	load()
+		.then((module) => loadedComponents.set(load, module.default))
+		.catch(() => undefined);
+}
+
 function createContent<P extends object>(
 	load: Props<P>["load"],
 	getPreloaded: Props<P>["getPreloaded"],

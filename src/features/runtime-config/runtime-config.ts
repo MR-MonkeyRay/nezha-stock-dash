@@ -5,10 +5,12 @@ import {
 	type SortOrder,
 	type SortType,
 } from "@/context/sort-context";
+import { isPriceColor, type PriceColor } from "@/lib/price-color";
 import { safeSessionStorage } from "@/lib/storage";
 
 export interface RuntimeConfig {
 	forceTheme?: "dark" | "light";
+	forceColorConvention?: PriceColor;
 	backgroundImage?: string;
 	mobileBackgroundImage?: string;
 	forceSortType?: SortType;
@@ -22,9 +24,7 @@ export interface RuntimeConfig {
 	customLinks?: string;
 	customIllustration?: string;
 	showNetTransfer: boolean;
-	fixedTopServerName: boolean;
 	forceUseSvgFlag: boolean;
-	disableAnimatedMan: boolean;
 }
 
 export const RUNTIME_CONFIG_CHANGE_EVENT = "runtimeConfigChange";
@@ -32,6 +32,7 @@ const text = (value: unknown) =>
 	typeof value === "string" && value ? value : undefined;
 const defaults: RuntimeConfig = {
 	forceTheme: undefined,
+	forceColorConvention: undefined,
 	backgroundImage: undefined,
 	mobileBackgroundImage: undefined,
 	forceSortType: undefined,
@@ -45,9 +46,7 @@ const defaults: RuntimeConfig = {
 	customLinks: undefined,
 	customIllustration: undefined,
 	showNetTransfer: false,
-	fixedTopServerName: false,
 	forceUseSvgFlag: false,
-	disableAnimatedMan: false,
 };
 
 let snapshot = defaults;
@@ -60,6 +59,9 @@ export function readRuntimeConfig(): RuntimeConfig {
 			window.ForceTheme === "dark" || window.ForceTheme === "light"
 				? window.ForceTheme
 				: undefined,
+		forceColorConvention: isPriceColor(window.ForceColorConvention)
+			? window.ForceColorConvention
+			: undefined,
 		backgroundImage: text(window.CustomBackgroundImage),
 		mobileBackgroundImage: text(window.CustomMobileBackgroundImage),
 		forceShowServices: Boolean(window.ForceShowServices),
@@ -71,9 +73,7 @@ export function readRuntimeConfig(): RuntimeConfig {
 		customLinks: text(window.CustomLinks),
 		customIllustration: text(window.CustomIllustration),
 		showNetTransfer: Boolean(window.ShowNetTransfer),
-		fixedTopServerName: Boolean(window.FixedTopServerName),
 		forceUseSvgFlag: Boolean(window.ForceUseSvgFlag),
-		disableAnimatedMan: Boolean(window.DisableAnimatedMan),
 		forceSortType: SORT_TYPES.includes(window.ForceSortType as SortType)
 			? (window.ForceSortType as SortType)
 			: undefined,
@@ -99,6 +99,7 @@ export function refreshRuntimeConfig() {
 
 const observedKeys = [
 	"ForceTheme",
+	"ForceColorConvention",
 	"CustomBackgroundImage",
 	"CustomMobileBackgroundImage",
 	"ForceSortType",
@@ -112,28 +113,24 @@ const observedKeys = [
 	"CustomLinks",
 	"CustomIllustration",
 	"ShowNetTransfer",
-	"FixedTopServerName",
 	"ForceUseSvgFlag",
-	"DisableAnimatedMan",
 ] as const;
 let subscribers = 0;
 let stopObserving: (() => void) | undefined;
 
 function observeAssignments() {
 	const cleanups: Array<() => void> = [];
-	let needsLegacyFallback = false;
 	for (const key of observedKeys) {
 		const descriptor = Object.getOwnPropertyDescriptor(window, key);
-		// Do not replace custom accessors, readonly data, or nonconfigurable globals.
+		// Never replace a custom accessor, readonly data or nonconfigurable
+		// global; custom code that defines one calls refreshRuntimeConfig().
 		if (
 			descriptor &&
 			(!descriptor.configurable ||
 				!("value" in descriptor) ||
 				!descriptor.writable)
-		) {
-			needsLegacyFallback = true;
+		)
 			continue;
-		}
 		let value: unknown = window[key];
 		let assigned = false;
 		const get = () => value;
@@ -164,16 +161,6 @@ function observeAssignments() {
 				});
 		});
 	}
-	// Preserve the former five-second discovery window only for globals that
-	// cannot safely be observed. Normal assignments need no polling at all.
-	if (needsLegacyFallback) {
-		let checks = 0;
-		const interval = window.setInterval(() => {
-			refreshRuntimeConfig();
-			if (++checks >= 50) window.clearInterval(interval);
-		}, 100);
-		cleanups.push(() => window.clearInterval(interval));
-	}
 	return () => {
 		for (const cleanup of cleanups) cleanup();
 	};
@@ -182,11 +169,9 @@ function observeAssignments() {
 function subscribe(listener: () => void) {
 	if (typeof window === "undefined") return () => {};
 	window.addEventListener(RUNTIME_CONFIG_CHANGE_EVENT, listener);
-	window.addEventListener("backgroundChange", listener);
 	if (subscribers++ === 0) stopObserving = observeAssignments();
 	return () => {
 		window.removeEventListener(RUNTIME_CONFIG_CHANGE_EVENT, listener);
-		window.removeEventListener("backgroundChange", listener);
 		if (--subscribers === 0) {
 			stopObserving?.();
 			stopObserving = undefined;
@@ -208,5 +193,5 @@ export function restoreBackground() {
 
 export function updateBackground(newBackground: string | undefined) {
 	window.CustomBackgroundImage = newBackground || "";
-	window.dispatchEvent(new Event("backgroundChange"));
+	refreshRuntimeConfig();
 }

@@ -113,7 +113,7 @@ describe("shared HTTP boundary", () => {
 	});
 });
 
-describe("profile token refresh compatibility", () => {
+describe("profile token refresh", () => {
 	beforeEach(() => {
 		vi.resetModules();
 		vi.useFakeTimers();

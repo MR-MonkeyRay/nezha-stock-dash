@@ -1,5 +1,6 @@
 import { createContext, type ReactNode, useEffect, useState } from "react";
 import { safeLocalStorage } from "@/lib/storage";
+import { DEFAULT_THEME, THEME_BG } from "@/lib/theme-colors";
 
 export type Theme = "dark" | "light" | "system";
 
@@ -15,7 +16,7 @@ type ThemeProviderState = {
 };
 
 const initialState: ThemeProviderState = {
-	theme: "system",
+	theme: DEFAULT_THEME,
 	setTheme: () => null,
 };
 
@@ -23,8 +24,8 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
 	children,
-	defaultTheme = "system",
-	storageKey = "vite-ui-theme",
+	defaultTheme = DEFAULT_THEME,
+	storageKey = "theme",
 }: ThemeProviderProps) {
 	const [theme, setTheme] = useState<Theme>(() => {
 		const stored = safeLocalStorage.getItem(storageKey);
@@ -38,8 +39,7 @@ export function ThemeProvider({
 		const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
 		const updateThemeColor = (nextTheme: "light" | "dark") => {
-			const themeColor =
-				nextTheme === "dark" ? "hsl(30 15% 8%)" : "hsl(0 0% 98%)";
+			const themeColor = THEME_BG[nextTheme];
 			document
 				.querySelector('meta[name="theme-color"]')
 				?.setAttribute("content", themeColor);
@@ -49,8 +49,7 @@ export function ThemeProvider({
 			root.classList.remove("light", "dark");
 			root.classList.add(nextTheme);
 			root.style.colorScheme = nextTheme;
-			root.style.backgroundColor =
-				nextTheme === "dark" ? "hsl(30 15% 8%)" : "hsl(0 0% 98%)";
+			root.style.backgroundColor = THEME_BG[nextTheme];
 			updateThemeColor(nextTheme);
 		};
 

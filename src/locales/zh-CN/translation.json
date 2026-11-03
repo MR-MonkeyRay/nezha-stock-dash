@@ -8,19 +8,10 @@
 	"whereTheTimeIs": "当前时间",
 	"refreshing": "刷新中",
 	"info": {
-		"websocketConnecting": "WebSocket 连接中",
-		"websocketConnected": "WebSocket 连接成功",
-		"websocketDisconnected": "WebSocket 连接断开",
-		"processing": "处理中...",
 		"noServers": "暂无服务器",
 		"noMatchingServers": "没有符合当前筛选条件的服务器"
 	},
 	"serverOverview": {
-		"totalServers": "服务器总数",
-		"onlineServers": "在线服务器",
-		"offlineServers": "离线服务器",
-		"totalBandwidth": "总流量",
-		"speed": "速率",
 		"network": "网络"
 	},
 	"map": {
@@ -31,18 +22,10 @@
 	"serverCard": {
 		"mem": "内存",
 		"stg": "存储",
-		"days": "天",
-		"hours": "小时",
 		"upload": "上传",
-		"download": "下载",
-		"system": "系统",
-		"uptime": "运行时间",
-		"totalUpload": "总上传",
-		"totalDownload": "总下载"
+		"download": "下载"
 	},
 	"cycleTransfer": {
-		"used": "已使用",
-		"total": "总计",
 		"nextUpdate": "下次更新"
 	},
 	"serviceTracker": {
@@ -54,21 +37,15 @@
 		"loading": "加载中..."
 	},
 	"serverDetail": {
-		"status": "状态",
-		"online": "在线",
 		"days": "天",
 		"hours": "小时",
-		"offline": "离线",
 		"unknown": "未知",
-		"uptime": "运行时间",
 		"version": "版本",
 		"arch": "架构",
 		"mem": "内存",
 		"disk": "磁盘",
 		"region": "区域",
 		"system": "系统",
-		"upload": "上传",
-		"download": "下载",
 		"lastActive": "最后上报时间",
 		"temperature": "温度",
 		"bootTime": "启动时间"
@@ -85,20 +62,14 @@
 		"period7d": "7 天",
 		"period30d": "30 天",
 		"tsdbRequired": "需要开启 TSDB 才能启用历史记录功能",
-		"loginRequired": "请登录后查看"
+		"loginRequired": "请登录后查看",
+		"noSwap": "无虚拟内存",
+		"historyError": "无法加载历史数据"
 	},
 	"footer": {
-		"themeBy": "主题-"
-	},
-	"language": {
-		"zh-CN": "简体中文",
-		"zh-TW": "繁體中文",
-		"en": "English",
-		"en-US": "English",
-		"de-DE": "Deutsch",
-		"es-ES": "Español",
-		"ta-IN": "தமிழ்",
-		"ru-RU": "Русский"
+		"themeBy": "主题-",
+		"basedOn": "基于 ",
+		"chartsBy": "K线图表由 "
 	},
 	"theme": {
 		"light": "亮色",
@@ -116,12 +87,14 @@
 		"retry": "重试",
 		"reloadPage": "重新加载页面",
 		"detailPageFailed": "无法显示服务器详情",
-		"chartFailed": "无法显示图表"
+		"chartFailed": "无法显示图表",
+		"somethingWentWrong": "出错了"
 	},
 	"tabSwitch": {
-		"Detail": "详情",
+		"Detail": "分时",
 		"Network": "网络",
-		"Online": "在线"
+		"Online": "在线",
+		"KLine": "K线"
 	},
 	"monitor": {
 		"noData": "没有服务监控数据，请在管理后台服务页添加监控任务",
@@ -138,11 +111,6 @@
 		"staleData": "监控数据刷新失败，正在显示上次获取的数据。",
 		"retry": "重试"
 	},
-	"pwa": {
-		"offlineReady": "应用可以离线使用了",
-		"newContent": "发现新版本",
-		"reload": "更新"
-	},
 	"billingInfo": {
 		"remaining": "剩余天数",
 		"error": "计算错误",
@@ -155,6 +123,7 @@
 	},
 	"TypeCommand": "输入命令或搜索",
 	"NoResults": "结果为空",
+	"commandMoreResults": "还有 {{count}} 个结果，继续输入以缩小范围",
 	"Servers": "服务器",
 	"Shortcuts": "快捷键",
 	"ToggleLightMode": "切换亮色模式",
@@ -205,5 +174,69 @@
 		"expandMore": "展开更多",
 		"today": "今天"
 	},
-	"retry": "重试"
+	"retry": "重试",
+	"priceColor": {
+		"title": "涨跌颜色",
+		"redUp": "红涨绿跌",
+		"greenUp": "绿涨红跌",
+		"forced": "已由站点管理员设置",
+		"useRedUp": "切换为红涨绿跌",
+		"useGreenUp": "切换为绿涨红跌"
+	},
+	"market": {
+		"brand": "行情",
+		"ticker": "行情滚动条",
+		"index": "综合负载指数",
+		"indexHint": "在线服务器平均 CPU",
+		"vsOneMinute": "较1分钟前",
+		"rising": "上涨",
+		"falling": "下跌",
+		"flat": "平盘",
+		"suspended": "停牌",
+		"trading": "交易中",
+		"breadth": "涨跌分布",
+		"total": "总数",
+		"turnover": "成交 (网络)",
+		"traffic": "流量",
+		"live": "实时",
+		"reconnecting": "重连中",
+		"name": "名称",
+		"last": "现价 CPU",
+		"change": "涨跌",
+		"changePct": "涨跌幅",
+		"mem": "内存",
+		"disk": "磁盘",
+		"upSpeed": "上行",
+		"downSpeed": "下行",
+		"uptime": "运行",
+		"intraday": "分时",
+		"listView": "列表",
+		"cardView": "卡片",
+		"viewMode": "视图",
+		"showMap": "地图",
+		"showServices": "服务",
+		"cycleColumn": "切换显示",
+		"high": "最高",
+		"low": "最低",
+		"open": "开盘",
+		"close": "收盘",
+		"avg": "均价",
+		"volume": "量 (网络)",
+		"profile": "简况",
+		"back": "返回",
+		"load": "负载",
+		"processes": "进程",
+		"connections": "连接",
+		"swap": "交换",
+		"totalUp": "总上行",
+		"totalDown": "总下行"
+	},
+	"a11y": {
+		"changeLanguage": "切换语言",
+		"search": "搜索",
+		"toggleTheme": "切换主题",
+		"toggleSortDirection": "切换排序方向",
+		"sortMetric": "排序指标",
+		"usageBar": "使用率"
+	}
 }

@@ -1,9 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import GlobalMap from "@/components/GlobalMap";
+import { useTranslation } from "react-i18next";
 import HomeSkeleton from "@/components/loading/HomeSkeleton";
+import { Loader } from "@/components/loading/Loader";
+import SkeletonBar from "@/components/loading/SkeletonBar";
+import RetryableLazy from "@/components/RetryableLazy";
 import ServerOverview from "@/components/ServerOverview";
-import { ServiceTracker } from "@/components/ServiceTracker";
+import { TickerTape } from "@/features/market/TickerTape";
+import { useMarket } from "@/features/market/use-market";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import {
 	selectGroupServerIds,
 	selectGroupTabs,
@@ -17,7 +22,19 @@ import { useSort } from "@/hooks/use-sort";
 import { useStatus } from "@/hooks/use-status";
 import { useWebSocketContext } from "@/hooks/use-websocket-context";
 import { fetchServerGroup, fetchService } from "@/lib/nezha-api";
-import { useRuntimeConfig } from "@/lib/runtime-config";
+
+// Both panels are off by default, so their code (and the map's outline data)
+// loads only when a visitor opens them. Stable loaders let RetryableLazy reuse
+// a resolved module across toggles.
+const loadGlobalMap = () => import("@/components/GlobalMap");
+const loadServiceTracker = () => import("@/components/ServiceTracker");
+
+const mapFallback = (
+	<div aria-hidden="true" className="mt-8 flex flex-col gap-4">
+		<SkeletonBar className="h-4 w-40" />
+		<div className="aspect-9/5 w-full rounded-sm bg-muted/40" />
+	</div>
+);
 
 export default function Servers({
 	backendError,
@@ -26,6 +43,7 @@ export default function Servers({
 	backendError?: Error | null;
 	configurationLoading?: boolean;
 }) {
+	const { t } = useTranslation();
 	const sort = useSort();
 	const { sortType, sortOrder } = sort;
 	const { data: groupData, error: groupError } = useQuery({
@@ -52,7 +70,7 @@ export default function Servers({
 		nezhaWsData,
 		!configurationLoading,
 	);
-	const { showServices, showMap, inline, currentGroup } = preferences;
+	const { showServices, showMap, view, currentGroup } = preferences;
 
 	const { backgroundImage: customBackgroundImage } = useRuntimeConfig();
 
@@ -68,6 +86,7 @@ export default function Servers({
 		down,
 		downSpeed,
 		filteredServers,
+		groupServers,
 		offlineServers,
 		onlineServers,
 		totalServers,
@@ -86,6 +105,8 @@ export default function Servers({
 		[nezhaWsData, currentGroup, groupServerIdSets, status, sortType, sortOrder],
 	);
 
+	const market = useMarket(groupServers);
+
 	const currentBackendError = backendError || groupError || serviceError;
 
 	if (!nezhaWsData && currentBackendError) {
@@ -99,7 +120,8 @@ export default function Servers({
 	const hasServers = nezhaWsData.servers.length > 0;
 
 	return (
-		<div className="mx-auto w-full max-w-5xl px-0">
+		<div className="anim-rise mx-auto w-full max-w-7xl px-0">
+			<TickerTape items={market.ticker} className="-mx-3 mb-3 md:mx-0" />
 			<ServerOverview
 				total={totalServers}
 				online={onlineServers}
@@ -108,6 +130,8 @@ export default function Servers({
 				down={down}
 				upSpeed={upSpeed}
 				downSpeed={downSpeed}
+				index={market.index}
+				breadth={market.breadth}
 			/>
 			<ServerControls
 				{...preferences}
@@ -117,17 +141,40 @@ export default function Servers({
 				groupTabs={groupTabs}
 				customBackgroundImage={customBackgroundImage}
 			/>
-			{hasServers && showMap === "1" && (
-				<GlobalMap now={nezhaWsData.now} serverList={nezhaWsData.servers} />
+			{hasServers && showMap && (
+				<div className="anim-expand">
+					<RetryableLazy
+						load={loadGlobalMap}
+						fallback={mapFallback}
+						componentProps={{
+							now: nezhaWsData.now,
+							serverList: nezhaWsData.servers,
+						}}
+					/>
+				</div>
 			)}
-			{hasServers && showServices === "1" && (
-				<ServiceTracker serverList={filteredServers} />
+			{hasServers && showServices && (
+				<div className="anim-expand">
+					<RetryableLazy
+						load={loadServiceTracker}
+						// Same markup as the tracker's own loading state: no visual hop.
+						fallback={
+							<div className="mt-4 flex items-center gap-1 text-sm font-medium">
+								<Loader visible={true} />
+								{t("serviceTracker.loading")}
+							</div>
+						}
+						componentProps={{ serverList: filteredServers }}
+					/>
+				</div>
 			)}
 			<ServerList
 				hasServers={hasServers}
 				filteredServers={filteredServers}
-				inline={inline}
+				view={view}
 				now={nezhaWsData.now}
+				quotes={market.quotes}
+				sort={sort}
 			/>
 		</div>
 	);

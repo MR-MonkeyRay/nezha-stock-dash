@@ -16,9 +16,9 @@ const Footer: React.FC = () => {
 	});
 
 	return (
-		<footer className="mx-auto w-full max-w-5xl px-4 lg:px-0 pb-4 server-footer">
+		<footer className="mx-auto w-full max-w-7xl px-3 md:px-6 pb-4 server-footer">
 			<section className="flex flex-col">
-				<section className="mt-1 flex items-center sm:flex-row flex-col justify-between gap-2 text-[13px] font-light tracking-tight text-neutral-600/50 dark:text-neutral-300/50 server-footer-name">
+				<section className="mt-1 flex items-center sm:flex-row flex-col justify-between gap-2 text-[13px] font-light tracking-tight text-muted-foreground/50 server-footer-name">
 					<div className="flex items-center gap-1">
 						&copy;2020-{new Date().getFullYear()}{" "}
 						<a
@@ -31,7 +31,7 @@ const Footer: React.FC = () => {
 						<p>{settingData?.data?.version || ""}</p>
 					</div>
 					<div className="server-footer-theme flex flex-col items-center sm:items-end">
-						<p className="mt-1 text-[13px] font-light tracking-tight text-neutral-600/50 dark:text-neutral-300/50">
+						<p className="mt-1 text-[13px] font-light tracking-tight text-muted-foreground/50">
 							<kbd className="pointer-events-none mx-1 inline-flex h-4 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
 								{isMac ? <span className="text-xs">⌘</span> : "Ctrl "}K
 							</kbd>
@@ -39,20 +39,41 @@ const Footer: React.FC = () => {
 						<section>
 							{t("footer.themeBy")}
 							<a
+								href={"https://github.com/MR-MonkeyRay/nezha-stock-dash"}
+								target="_blank"
+								rel="noopener"
+							>
+								nezha-stock-dash
+							</a>
+							{import.meta.env.VITE_GIT_HASH && (
+								<a
+									href={`https://github.com/MR-MonkeyRay/nezha-stock-dash/commit/${import.meta.env.VITE_GIT_HASH}`}
+									target="_blank"
+									rel="noopener"
+									className="ml-1"
+								>
+									({import.meta.env.VITE_GIT_HASH})
+								</a>
+							)}
+						</section>
+						<section className="text-[11px]">
+							{t("footer.basedOn")}
+							<a
 								href={"https://github.com/hamster1963/nezha-dash"}
 								target="_blank"
 								rel="noopener"
 							>
 								nezha-dash
 							</a>
-							{import.meta.env.VITE_GIT_HASH && (
-								<a
-									href={`https://github.com/hamster1963/nezha-dash-v1/commit/${import.meta.env.VITE_GIT_HASH}`}
-									className="ml-1"
-								>
-									({import.meta.env.VITE_GIT_HASH})
-								</a>
-							)}
+							<span className="mx-1">·</span>
+							{t("footer.chartsBy")}
+							<a
+								href={"https://www.tradingview.com/"}
+								target="_blank"
+								rel="noopener"
+							>
+								TradingView
+							</a>
 						</section>
 					</div>
 				</section>

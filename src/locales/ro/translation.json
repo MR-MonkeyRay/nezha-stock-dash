@@ -1,13 +1,14 @@
 {
+	"commandMoreResults": "Încă {{count}}, continuați să scrieți pentru a restrânge",
 	"nezha": "Monitor-ul Nezha",
 	"theme": {
 		"light": "Mod luminos",
 		"dark": "Mod întunecat"
 	},
-	"Servers": "Servere",
 	"tabSwitch": {
 		"Online": "Online"
 	},
+	"Servers": "Servere",
 	"serverOnlineHistory": {
 		"days1": "1d",
 		"days7": "7d",

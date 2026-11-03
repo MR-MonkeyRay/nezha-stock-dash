@@ -140,6 +140,8 @@ describe("server selectors", () => {
 		expect(ids(result.filteredServers)).toEqual(
 			status === "all" ? [1, 3] : status === "online" ? [1] : [3],
 		);
+		// Group members ignore the status filter (market index and breadth).
+		expect(ids(result.groupServers).sort()).toEqual([1, 3]);
 	});
 	it("handles missing payload and unknown groups", () => {
 		for (const result of [
@@ -155,6 +157,7 @@ describe("server selectors", () => {
 				upSpeed: 0,
 				downSpeed: 0,
 				filteredServers: [],
+				groupServers: [],
 			});
 		}
 	});

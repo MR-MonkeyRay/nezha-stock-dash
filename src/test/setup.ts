@@ -92,6 +92,7 @@ afterEach(() => {
 	});
 	document.documentElement.className = "";
 	document.documentElement.removeAttribute("style");
+	document.documentElement.removeAttribute("data-price-color");
 	Object.defineProperty(document, "cookie", {
 		configurable: true,
 		value: "",
@@ -105,14 +106,13 @@ afterEach(() => {
 	window.ForceSortType = undefined;
 	window.ForceSortOrder = undefined;
 	window.ForceTheme = undefined;
+	window.ForceColorConvention = undefined;
 	window.CustomLogo = undefined;
 	window.CustomDesc = undefined;
 	window.CustomLinks = undefined;
 	window.CustomIllustration = undefined;
 	window.ShowNetTransfer = false;
-	window.FixedTopServerName = false;
 	window.ForceUseSvgFlag = false;
-	window.DisableAnimatedMan = false;
 	vi.unstubAllGlobals();
 	vi.restoreAllMocks();
 	vi.useRealTimers();

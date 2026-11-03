@@ -45,9 +45,17 @@ describe("Footer", () => {
 		renderWithProviders(<Footer />);
 
 		expect(screen.getByText("footer.themeBy")).toBeInTheDocument();
+		expect(screen.getByText("nezha-stock-dash")).toHaveAttribute(
+			"href",
+			"https://github.com/MR-MonkeyRay/nezha-stock-dash",
+		);
 		expect(screen.getByText("nezha-dash")).toHaveAttribute(
 			"href",
 			"https://github.com/hamster1963/nezha-dash",
+		);
+		expect(screen.getByText("TradingView")).toHaveAttribute(
+			"href",
+			"https://www.tradingview.com/",
 		);
 		expect(await screen.findByText("9.9.9")).toBeInTheDocument();
 	});
@@ -71,7 +79,7 @@ describe("Tab and group switches", () => {
 		expect(setCurrentTab).toHaveBeenCalledWith("Network");
 		expect(
 			screen.getByText("tabSwitch.Detail").parentElement?.parentElement,
-		).toHaveClass("text-black");
+		).toHaveClass("text-highlight");
 	});
 
 	it("restores saved groups and hides itself when only All exists", async () => {
@@ -129,7 +137,7 @@ describe("Tab and group switches", () => {
 		expect(scrollIntoView).not.toHaveBeenCalled();
 		expect(
 			container.querySelector(".relative.flex.items-center")?.className,
-		).toContain("bg-stone-100/70");
+		).toContain("bg-card/70");
 	});
 });
 

@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { handlePublicNote } from "@/lib/public-note-cache";
+import { selectServerMetrics } from "@/lib/server-metrics";
 import {
 	fetcher,
-	formatNezhaInfo,
 	formatRelativeTime,
 	formatTime,
 	getDaysBetweenDates,
 	getDaysBetweenDatesWithAutoRenewal,
 	getNextCycleTime,
-	handlePublicNote,
 	nezhaFetcher,
 	parsePublicNote,
 } from "@/lib/utils";
@@ -229,7 +229,7 @@ describe("nezha data formatting", () => {
 	it("maps websocket server state into view-friendly metrics", () => {
 		const now = new Date("2025-01-01T00:00:20.000Z").getTime();
 
-		const result = formatNezhaInfo(now, serverFixture);
+		const result = selectServerMetrics(now, serverFixture);
 
 		expect(result.online).toBe(true);
 		expect(result.up).toBe(2);
@@ -242,7 +242,7 @@ describe("nezha data formatting", () => {
 	});
 
 	it("falls back safely for offline timestamps and empty host totals", () => {
-		const result = formatNezhaInfo(Date.now(), {
+		const result = selectServerMetrics(Date.now(), {
 			...serverFixture,
 			public_note: "",
 			last_active: "0001-01-01T00:00:00.000Z",

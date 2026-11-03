@@ -8,19 +8,10 @@
 	"whereTheTimeIs": "目前時間",
 	"refreshing": "重新整理中",
 	"info": {
-		"websocketConnecting": "WebSocket 連線中",
-		"websocketConnected": "WebSocket 連線成功",
-		"websocketDisconnected": "WebSocket 連線中斷",
-		"processing": "處理中...",
 		"noServers": "暫無伺服器",
 		"noMatchingServers": "沒有符合目前篩選條件的伺服器"
 	},
 	"serverOverview": {
-		"totalServers": "總伺服器",
-		"onlineServers": "線上伺服器",
-		"offlineServers": "離線伺服器",
-		"totalBandwidth": "總頻寬",
-		"speed": "速率",
 		"network": "網路"
 	},
 	"map": {
@@ -31,18 +22,10 @@
 	"serverCard": {
 		"mem": "記憶體",
 		"stg": "儲存空間",
-		"days": "天",
-		"hours": "小時",
 		"upload": "上傳",
-		"download": "下載",
-		"system": "系統",
-		"uptime": "運作時間",
-		"totalUpload": "總上傳",
-		"totalDownload": "總下載"
+		"download": "下載"
 	},
 	"cycleTransfer": {
-		"used": "已使用",
-		"total": "總量",
 		"nextUpdate": "下次更新"
 	},
 	"serviceTracker": {
@@ -54,21 +37,15 @@
 		"loading": "載入中..."
 	},
 	"serverDetail": {
-		"status": "狀態",
-		"online": "線上",
 		"days": "天",
 		"hours": "小時",
-		"offline": "離線",
 		"unknown": "未知",
-		"uptime": "運作時間",
 		"version": "版本",
 		"arch": "架構",
 		"mem": "記憶體",
 		"disk": "磁碟",
 		"region": "地區",
 		"system": "系統",
-		"upload": "上傳",
-		"download": "下載",
 		"lastActive": "最後回報時間",
 		"temperature": "溫度",
 		"bootTime": "啟動時間"
@@ -85,19 +62,14 @@
 		"period7d": "7 天",
 		"period30d": "30 天",
 		"tsdbRequired": "請啟用 TSDB 以使用歷史資料",
-		"loginRequired": "請先登入才能查看"
+		"loginRequired": "請先登入才能查看",
+		"noSwap": "無虛擬記憶體",
+		"historyError": "無法載入歷史資料"
 	},
 	"footer": {
-		"themeBy": "主題-"
-	},
-	"language": {
-		"zh-CN": "简体中文",
-		"zh-TW": "繁體中文",
-		"en-US": "English",
-		"de-DE": "德文",
-		"es-ES": "西班牙文",
-		"ru-RU": "俄文",
-		"ta-IN": "தமிழ்"
+		"themeBy": "主題-",
+		"basedOn": "基於 ",
+		"chartsBy": "K線圖表由 "
 	},
 	"theme": {
 		"light": "亮色",
@@ -109,31 +81,32 @@
 		"backToHome": "回到首頁",
 		"backendUnavailableTitle": "後端 API 無法存取",
 		"backendUnavailableDescription": "頁面仍會正常顯示，但暫時無法載入監控資料。",
+		"loginRequiredTitle": "需要登入",
+		"loginRequiredDescription": "本站需要登入後才能載入監控資料。",
 		"sectionFailed": "無法顯示此部分內容。",
 		"retry": "重試",
 		"reloadPage": "重新載入頁面",
 		"detailPageFailed": "無法顯示伺服器詳細資訊",
-		"chartFailed": "無法顯示圖表"
+		"chartFailed": "無法顯示圖表",
+		"somethingWentWrong": "發生錯誤"
 	},
 	"tabSwitch": {
-		"detail": "詳細資訊",
-		"network": "網路",
-		"Detail": "詳細資訊",
+		"Detail": "分時",
 		"Network": "網路",
-		"Online": "線上"
+		"Online": "線上",
+		"KLine": "K線"
 	},
 	"monitor": {
 		"noData": "沒有伺服器監控資料，請先新增服務監控",
-		"status": "狀態",
 		"avgDelay": "延遲",
 		"monitorCount": "個監控",
 		"packetLoss": "封包遺失率",
 		"clearSelections": "清除",
 		"peakCut": "削峰",
+		"loginRequired": "請先登入才能查看",
 		"period1d": "1 天",
 		"period7d": "7 天",
 		"period30d": "30 天",
-		"loginRequired": "請先登入才能查看",
 		"loadError": "無法載入監控資料。",
 		"staleData": "監控資料更新失敗，正在顯示上次取得的資料。",
 		"retry": "重試"
@@ -150,17 +123,13 @@
 	},
 	"TypeCommand": "輸入命令或搜尋",
 	"NoResults": "沒有結果",
+	"commandMoreResults": "還有 {{count}} 個結果，繼續輸入以縮小範圍",
 	"Servers": "伺服器",
 	"Shortcuts": "快捷鍵",
 	"ToggleLightMode": "切換亮色模式",
 	"ToggleDarkMode": "切換暗色模式",
 	"ToggleSystemMode": "切換系統模式",
 	"Home": "首頁",
-	"pwa": {
-		"offlineReady": "可離線使用之應用程式",
-		"newContent": "有新內容可用",
-		"reload": "更新"
-	},
 	"sort": {
 		"label": "排序",
 		"types": {
@@ -199,11 +168,75 @@
 		"ongoing": "進行中",
 		"noData": "暫無線上紀錄",
 		"loginRequired": "此視窗需要登入後查看，訪客可切換到 1 天",
-		"offlinePeriods": "Offline periods",
+		"offlinePeriods": "離線時間段",
 		"periodsOnline": "在線",
 		"periodsOffline": "離線",
-		"expandMore": "Expand more",
-		"today": "Today"
+		"expandMore": "展開更多",
+		"today": "今天"
 	},
-	"retry": "重試"
+	"retry": "重試",
+	"priceColor": {
+		"title": "漲跌顏色",
+		"redUp": "紅漲綠跌",
+		"greenUp": "綠漲紅跌",
+		"forced": "已由站點管理員設定",
+		"useRedUp": "切換為紅漲綠跌",
+		"useGreenUp": "切換為綠漲紅跌"
+	},
+	"market": {
+		"brand": "行情",
+		"ticker": "行情跑馬燈",
+		"index": "綜合負載指數",
+		"indexHint": "在線伺服器平均 CPU",
+		"vsOneMinute": "較1分鐘前",
+		"rising": "上漲",
+		"falling": "下跌",
+		"flat": "平盤",
+		"suspended": "停牌",
+		"trading": "交易中",
+		"breadth": "漲跌分佈",
+		"total": "總數",
+		"turnover": "成交 (網路)",
+		"traffic": "流量",
+		"live": "即時",
+		"reconnecting": "重連中",
+		"name": "名稱",
+		"last": "現價 CPU",
+		"change": "漲跌",
+		"changePct": "漲跌幅",
+		"mem": "記憶體",
+		"disk": "磁碟",
+		"upSpeed": "上行",
+		"downSpeed": "下行",
+		"uptime": "運行",
+		"intraday": "分時",
+		"listView": "列表",
+		"cardView": "卡片",
+		"viewMode": "檢視",
+		"showMap": "地圖",
+		"showServices": "服務",
+		"cycleColumn": "切換顯示",
+		"high": "最高",
+		"low": "最低",
+		"open": "開盤",
+		"close": "收盤",
+		"avg": "均價",
+		"volume": "量 (網路)",
+		"profile": "簡況",
+		"back": "返回",
+		"load": "負載",
+		"processes": "進程",
+		"connections": "連線",
+		"swap": "交換",
+		"totalUp": "總上行",
+		"totalDown": "總下行"
+	},
+	"a11y": {
+		"changeLanguage": "切換語言",
+		"search": "搜尋",
+		"toggleTheme": "切換主題",
+		"toggleSortDirection": "切換排序方向",
+		"sortMetric": "排序依據",
+		"usageBar": "使用率"
+	}
 }

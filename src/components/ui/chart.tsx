@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import * as RechartsPrimitive from "recharts";
 import { cn } from "@/lib/utils";
@@ -85,18 +83,28 @@ const ChartContainer = React.forwardRef<
 				{...props}
 			>
 				<ChartStyle id={chartId} config={config} />
-				{useResponsiveContainer ? (
-					<RechartsPrimitive.ResponsiveContainer>
-						{children}
-					</RechartsPrimitive.ResponsiveContainer>
-				) : (
-					children
-				)}
+				{useResponsiveContainer ? asResponsive(children) : children}
 			</div>
 		</ChartContext.Provider>
 	);
 });
 ChartContainer.displayName = "Chart";
+
+/** Charts size themselves to the container with plain CSS (`responsive`),
+ * instead of ResponsiveContainer, which renders a first frame at -1×-1 and
+ * warns for every chart on the page. */
+function asResponsive(children: React.ReactNode) {
+	return React.Children.map(children, (child) =>
+		React.isValidElement<{ responsive?: boolean; style?: React.CSSProperties }>(
+			child,
+		)
+			? React.cloneElement(child, {
+					responsive: true,
+					style: { width: "100%", height: "100%", ...child.props.style },
+				})
+			: child,
+	);
+}
 
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 	const colorConfig = Object.entries(config).filter(
@@ -226,7 +234,7 @@ const ChartTooltipContent = React.forwardRef<
 			<div
 				ref={ref}
 				className={cn(
-					"grid min-w-32 items-start gap-1.5 overflow-hidden rounded-sm border border-border/50 bg-stone-100 text-xs dark:bg-stone-900",
+					"grid min-w-32 items-start gap-1.5 overflow-hidden rounded-sm border border-border/50 bg-popover text-popover-foreground text-xs",
 					className,
 				)}
 			>
@@ -237,7 +245,7 @@ const ChartTooltipContent = React.forwardRef<
 				)}
 
 				<div
-					className={cn("grid gap-1.5 bg-white px-2.5 py-1.5 dark:bg-black", {
+					className={cn("grid gap-1.5 bg-popover px-2.5 py-1.5", {
 						"border-t": !nestLabel,
 					})}
 				>

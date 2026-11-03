@@ -1,10 +1,5 @@
 {
 	"nezha": "Monitoreo Nezha",
-	"theme": {
-		"light": "Claro",
-		"dark": "Escuro",
-		"system": "Sistema"
-	},
 	"overview": "Visión xeral",
 	"dashboard": "Panel de control",
 	"login": "Inciar sesión",
@@ -12,18 +7,7 @@
 	"offline": "Desconectado",
 	"whereTheTimeIs": "Onde está a hora",
 	"refreshing": "Recargando",
-	"info": {
-		"websocketConnecting": "Conectando o WebSocket",
-		"websocketConnected": "WebSocket conectado",
-		"websocketDisconnected": "WebSocket desconectado",
-		"processing": "Procesando..."
-	},
 	"serverOverview": {
-		"totalServers": "Servidores totais",
-		"onlineServers": "Servidores en liña",
-		"offlineServers": "Servidores desconectados",
-		"totalBandwidth": "Ancho de banda total",
-		"speed": "Velocidade",
 		"network": "Rede"
 	},
 	"map": {
@@ -34,18 +18,10 @@
 	"serverCard": {
 		"mem": "MEM",
 		"stg": "STG",
-		"days": "Dias",
-		"hours": "Horas",
 		"upload": "Subir",
-		"download": "Descargar",
-		"system": "Sistema",
-		"uptime": "Tempo activo",
-		"totalUpload": "Subir",
-		"totalDownload": "Descargar"
+		"download": "Descargar"
 	},
 	"cycleTransfer": {
-		"used": "empregado",
-		"total": "total",
 		"nextUpdate": "próxima actualización"
 	},
 	"serviceTracker": {
@@ -57,21 +33,15 @@
 		"loading": "Cargando..."
 	},
 	"serverDetail": {
-		"status": "Estado",
-		"online": "Activo",
 		"days": "Días",
 		"hours": "Horas",
-		"offline": "Desconectado",
 		"unknown": "Descoñecido",
-		"uptime": "Tempo activo",
 		"version": "Versión",
 		"arch": "Arch",
 		"mem": "Mem",
 		"disk": "Disco",
 		"region": "Rexión",
 		"system": "Sistema",
-		"upload": "Subida",
-		"download": "Descarga",
 		"lastActive": "Última vez activo",
 		"temperature": "Temperatura",
 		"bootTime": "Tempo de reinicio"
@@ -87,14 +57,10 @@
 	"footer": {
 		"themeBy": "Tema por "
 	},
-	"language": {
-		"zh-CN": "简体中文 (Chinés simplificado)",
-		"zh-TW": "繁體中文 (Chinés tradicional)",
-		"en-US": "English (Inglés)",
-		"de-DE": "Deutsch (Alemán)",
-		"es-ES": "Español",
-		"ru-RU": "Русский (Ruso)",
-		"ta-IN": "தமிழ் (Tamil)"
+	"theme": {
+		"light": "Claro",
+		"dark": "Escuro",
+		"system": "Sistema"
 	},
 	"error": {
 		"pageNotFound": "Páxina non atopada",
@@ -112,11 +78,6 @@
 		"packetLoss": "Pérdida de datos",
 		"clearSelections": "Limpar"
 	},
-	"pwa": {
-		"offlineReady": "Aplicación lista para traballar desconectada (offline)",
-		"newContent": "Novo contido dispoñíble",
-		"reload": "Actualizar"
-	},
 	"billingInfo": {
 		"remaining": "Restante",
 		"error": "erro",
@@ -129,6 +90,7 @@
 	},
 	"TypeCommand": "Escribe un comando ou procura...",
 	"NoResults": "Non se atoparon resultados.",
+	"commandMoreResults": "{{count}} máis, continúa escribindo para restrinxir",
 	"Servers": "Servidores",
 	"Shortcuts": "Atallos",
 	"ToggleLightMode": "Cambiar ao modo claro",

@@ -1,0 +1,131 @@
+{
+	"commandMoreResults": "மேலும் {{count}}, தொடர்ந்து தட்டச்சு செய்து குறைக்கவும்",
+	"nezha": "கண்காணிப்பு",
+	"overview": "கண்ணோட்டம்",
+	"dashboard": "முகப்புப்பெட்டி",
+	"login": "புகுபதிவு",
+	"online": "ஆன்லைனில்",
+	"offline": "இணையமில்லாமல்",
+	"whereTheTimeIs": "நேரம் இருக்கும் இடம்",
+	"refreshing": "புத்துணர்ச்சி",
+	"info": {
+		"noServers": "சேவையகங்கள் எதுவும் இல்லை",
+		"noMatchingServers": "தற்போதைய வடிப்பான்களுடன் பொருந்தும் சேவையகங்கள் எதுவும் இல்லை"
+	},
+	"serverOverview": {
+		"network": "பிணையம்"
+	},
+	"map": {
+		"Distributions": "சேவையகங்கள் விநியோகிக்கப்படுகின்றன",
+		"Regions": "பகுதிகள்",
+		"Servers": "சேவையகங்கள்"
+	},
+	"serverCard": {
+		"mem": "மெம்",
+		"stg": "Stg",
+		"upload": "பதிவேற்றும்",
+		"download": "பதிவிறக்கம்"
+	},
+	"cycleTransfer": {
+		"nextUpdate": "அடுத்த புதுப்பிப்பு"
+	},
+	"serviceTracker": {
+		"noService": "பணி தரவு இல்லை",
+		"uptime": "நேரம்",
+		"daysAgo": "சில நாட்களுக்கு முன்பு",
+		"today": "இன்று",
+		"loading": "ஏற்றுகிறது ..."
+	},
+	"serverDetail": {
+		"days": "நாட்கள்",
+		"unknown": "தெரியவில்லை",
+		"version": "பதிப்பு",
+		"arch": "மான்",
+		"mem": "மெம்",
+		"disk": "வட்டு",
+		"region": "பகுதி",
+		"system": "மண்டலம்",
+		"lastActive": "கடைசி செயலில் நேரம்",
+		"temperature": "வெப்பநிலை"
+	},
+	"serverDetailChart": {
+		"process": "செயல்முறை",
+		"disk": "வட்டு",
+		"mem": "மெம்",
+		"swap": "இடமாற்றம்",
+		"upload": "பதிவேற்றும்",
+		"download": "பதிவிறக்கம்"
+	},
+	"footer": {
+		"themeBy": "மூலம் கருப்பொருள் "
+	},
+	"theme": {
+		"light": "ஒளி",
+		"dark": "இருண்ட",
+		"system": "மண்டலம்"
+	},
+	"error": {
+		"pageNotFound": "பக்கம் கிடைக்கவில்லை",
+		"backToHome": "வீட்டிற்கு திரும்பவும்"
+	},
+	"tabSwitch": {
+		"Detail": "விவரம்",
+		"Network": "பிணையம்",
+		"Online": "Online"
+	},
+	"monitor": {
+		"noData": "சேவையக மானிட்டர் தரவு இல்லை, முதலில் ஒரு பணி மானிட்டரைச் சேர்க்கவும்",
+		"avgDelay": "சுணக்கம்",
+		"monitorCount": "சேவைகள்",
+		"packetLoss": "தொகுப்பு இழப்பு",
+		"clearSelections": "அழி",
+		"peakCut": "Peak cut",
+		"period1d": "1 நாள்",
+		"period7d": "7 நாட்கள்",
+		"period30d": "30 நாட்கள்"
+	},
+	"billingInfo": {
+		"remaining": "மீதமுள்ள",
+		"error": "பிழை",
+		"indefinite": "காலவரையற்றது",
+		"expired": "காலாவதியான",
+		"days": "நாட்கள்",
+		"price": "விலை",
+		"free": "இலவசம்",
+		"usage-baseed": "பயன்பாடு அடிப்படையிலானது"
+	},
+	"sort": {
+		"label": "வரிசைப்படுத்து",
+		"types": {
+			"default": "இயல்புநிலை",
+			"name": "பெயர்",
+			"uptime": "இயக்க நேரம்",
+			"system": "கணினி",
+			"cpu": "CPU",
+			"mem": "நினைவகம்",
+			"disk": "வட்டு",
+			"up": "பதிவேற்றம்",
+			"down": "பதிவிறக்கம்",
+			"up_total": "மொத்த பதிவேற்றம்",
+			"down_total": "மொத்த பதிவிறக்கம்"
+		}
+	},
+	"serverOnlineHistory": {
+		"days1": "1d",
+		"days7": "7d",
+		"days30": "30d",
+		"onlineRate": "Online rate",
+		"totalOnline": "Online in window",
+		"lastActive": "Last active",
+		"dailyOnline": "Daily online time",
+		"periods": "Online periods",
+		"ongoing": "Ongoing",
+		"noData": "No online records",
+		"loginRequired": "This window requires login; guests can switch to 1d",
+		"offlinePeriods": "Offline periods",
+		"periodsOnline": "Online",
+		"periodsOffline": "Offline",
+		"expandMore": "Expand more",
+		"today": "Today"
+	}
+}

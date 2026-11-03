@@ -223,7 +223,7 @@ describe("Header", () => {
 		const { container } = renderHeader();
 
 		expect(await screen.findAllByText("login")).toHaveLength(2);
-		expect(screen.getByText("offline")).toBeInTheDocument();
+		expect(screen.getByText("market.reconnecting")).toBeInTheDocument();
 		expect(
 			container.querySelector("[data-visible='true']"),
 		).toBeInTheDocument();
@@ -341,7 +341,6 @@ describe("RefreshToast", () => {
 
 	it("renders only while reconnect refresh is needed", () => {
 		vi.useFakeTimers();
-		sessionStorage.setItem("needRefresh", "true");
 
 		const { container, rerender } = renderInRouter(<RefreshToast />);
 
@@ -355,6 +354,5 @@ describe("RefreshToast", () => {
 		);
 
 		expect(screen.getByText("refreshing...")).toBeInTheDocument();
-		expect(sessionStorage.getItem("needRefresh")).toBeNull();
 	});
 });
