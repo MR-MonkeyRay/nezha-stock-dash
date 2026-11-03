@@ -6,7 +6,7 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useRuntimeConfig } from "@/lib/runtime-config";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { cn } from "@/lib/utils";
 
 import { Separator } from "./ui/separator";

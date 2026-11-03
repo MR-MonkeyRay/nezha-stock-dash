@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { useActiveIndicator } from "@/hooks/use-active-indicator";
-import { useRuntimeConfig } from "@/lib/runtime-config";
 import { safeSessionStorage } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 

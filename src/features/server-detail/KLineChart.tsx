@@ -16,12 +16,12 @@ import { useTranslation } from "react-i18next";
 import ChartSkeleton from "@/components/loading/ChartSkeleton";
 import { Card } from "@/components/ui/card";
 import { directionTextClass, formatSigned } from "@/features/market/direction";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { useLoginUser } from "@/hooks/use-login-user";
 import { useMetricHistory } from "@/hooks/use-metric-history";
 import { useWebSocketContext } from "@/hooks/use-websocket-context";
 import { formatBytes } from "@/lib/format";
 import { fetchSetting } from "@/lib/nezha-api";
-import { useRuntimeConfig } from "@/lib/runtime-config";
 import { cn } from "@/lib/utils";
 import type { MetricPeriod, MetricType } from "@/types/nezha-api";
 import {

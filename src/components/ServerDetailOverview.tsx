@@ -15,13 +15,14 @@ import {
 	orderFrames,
 	selectCpuSeries,
 } from "@/features/market/quote-series";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useWebSocketContext } from "@/hooks/use-websocket-context";
 import { formatBytes } from "@/lib/format";
 import { regionName } from "@/lib/language";
-import { useRuntimeConfig } from "@/lib/runtime-config";
+import { selectServerMetrics } from "@/lib/server-metrics";
 import { safeSessionStorage } from "@/lib/storage";
-import { cn, formatNezhaInfo } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import {
 	Accordion,
 	AccordionContent,
@@ -122,7 +123,7 @@ export default function ServerDetailOverview({
 		return <ServerDetailLoading />;
 	}
 
-	const info = formatNezhaInfo(nezhaWsData.now, server);
+	const info = selectServerMetrics(nezhaWsData.now, server);
 	const {
 		name,
 		online,

@@ -11,9 +11,9 @@ import {
 	SUSPENDED_QUOTE,
 } from "@/features/market/quote-series";
 import { Sparkline } from "@/features/market/Sparkline";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { useStatus } from "@/hooks/use-status";
 import { formatBytes } from "@/lib/format";
-import { useRuntimeConfig } from "@/lib/runtime-config";
 import { cn } from "@/lib/utils";
 import SkeletonBar from "./loading/SkeletonBar";
 
@@ -47,11 +47,8 @@ export default function ServerOverview({
 }: ServerOverviewProps) {
 	const { t } = useTranslation();
 	const { status, setStatus } = useStatus();
-	const {
-		backgroundImage: customBackgroundImage,
-		disableAnimatedMan,
-		customIllustration,
-	} = useRuntimeConfig();
+	const { backgroundImage: customBackgroundImage, customIllustration } =
+		useRuntimeConfig();
 	const quote = index?.quote ?? SUSPENDED_QUOTE;
 	const panel = cn("relative overflow-hidden p-3 md:p-4", {
 		"bg-card/70": customBackgroundImage,
@@ -105,7 +102,7 @@ export default function ServerOverview({
 						/>
 					</button>
 				)}
-				{!loading && customIllustration && !disableAnimatedMan && (
+				{!loading && customIllustration && (
 					<img
 						className="pointer-events-none absolute right-2 top-1 w-14 opacity-80"
 						alt="illustration"

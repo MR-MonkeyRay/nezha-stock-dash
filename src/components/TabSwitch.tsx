@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { useActiveIndicator } from "@/hooks/use-active-indicator";
-import { useRuntimeConfig } from "@/lib/runtime-config";
 import { cn } from "@/lib/utils";
 
 export default function TabSwitch({

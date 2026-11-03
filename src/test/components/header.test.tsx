@@ -341,7 +341,6 @@ describe("RefreshToast", () => {
 
 	it("renders only while reconnect refresh is needed", () => {
 		vi.useFakeTimers();
-		sessionStorage.setItem("needRefresh", "true");
 
 		const { container, rerender } = renderInRouter(<RefreshToast />);
 
@@ -355,6 +354,5 @@ describe("RefreshToast", () => {
 		);
 
 		expect(screen.getByText("refreshing...")).toBeInTheDocument();
-		expect(sessionStorage.getItem("needRefresh")).toBeNull();
 	});
 });

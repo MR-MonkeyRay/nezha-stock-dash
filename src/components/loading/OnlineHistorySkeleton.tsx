@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import Bar from "@/components/loading/SkeletonBar";
 import { Card, CardContent } from "@/components/ui/card";
-import { useRuntimeConfig } from "@/lib/runtime-config";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { cn } from "@/lib/utils";
 
 function Metric({ footer = true }: { footer?: boolean }) {

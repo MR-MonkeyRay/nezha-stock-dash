@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect } from "react";
 import { useTheme } from "@/hooks/use-theme";
 import { THEME_BG } from "@/lib/theme-colors";

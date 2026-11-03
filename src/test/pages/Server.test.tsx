@@ -157,7 +157,7 @@ function websocketPayload(servers: NezhaServer[]) {
 describe("Servers page", () => {
 	beforeEach(() => {
 		// Most cases assert on the card grid; the watchlist is the theme default.
-		localStorage.setItem("inline", "0");
+		localStorage.setItem("serverView", "grid");
 		apiMocks.fetchServerGroup.mockResolvedValue({
 			success: true,
 			data: [
@@ -624,15 +624,15 @@ describe("Servers page", () => {
 		);
 		await user.click(controls[0]);
 		expect(screen.getByTestId("global-map")).toHaveTextContent("2");
-		expect(localStorage.getItem("showMap")).toBe("1");
+		expect(localStorage.getItem("showMap")).toBe("true");
 
 		await user.click(controls[1]);
 		expect(screen.getByTestId("service-tracker")).toHaveTextContent("2");
-		expect(localStorage.getItem("showServices")).toBe("1");
+		expect(localStorage.getItem("showServices")).toBe("true");
 	});
 
 	it("defaults to the watchlist and switches to cards from the view control", async () => {
-		localStorage.removeItem("inline");
+		localStorage.removeItem("serverView");
 		const user = userEvent.setup();
 		const online = createServer({ id: 1, name: "alpha" });
 
@@ -653,13 +653,13 @@ describe("Servers page", () => {
 		});
 		// The card grid staggers in on mount only.
 		expect(document.querySelector(".server-card-list")).toHaveClass("stagger");
-		expect(localStorage.getItem("inline")).toBe("0");
+		expect(localStorage.getItem("serverView")).toBe("grid");
 		await user.click(screen.getByRole("button", { name: /market.listView/ }));
 		expect(screen.getByTestId("server-card-inline")).toBeInTheDocument();
 	});
 
-	it("applies external status filters and inline card preferences", async () => {
-		localStorage.setItem("inline", "1");
+	it("applies external status filters and the saved list view", async () => {
+		localStorage.setItem("serverView", "list");
 		Object.defineProperty(window, "innerWidth", {
 			configurable: true,
 			value: 1024,

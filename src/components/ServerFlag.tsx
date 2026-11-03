@@ -1,7 +1,7 @@
 import { hasFlag } from "country-flag-icons";
 import getUnicodeFlagIcon from "country-flag-icons/unicode";
 import { useEffect, useState } from "react";
-import { useRuntimeConfig } from "@/lib/runtime-config";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { cn } from "@/lib/utils";
 
 const normalizeCountryCode = (countryCode: string) =>

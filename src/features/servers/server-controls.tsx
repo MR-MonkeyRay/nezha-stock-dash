@@ -28,12 +28,12 @@ export function ServerControls({
 	customBackgroundImage,
 	showMap,
 	showServices,
-	inline,
+	view,
 	currentGroup,
 	handleTagChange,
 	toggleMap,
 	toggleServices,
-	toggleInline,
+	setView,
 	sortType,
 	sortOrder,
 	setSortType,
@@ -62,23 +62,23 @@ export function ServerControls({
 						data-testid="view-thumb"
 						className="absolute inset-y-0 left-0 w-1/2 bg-highlight transition-transform duration-(--dur-base) ease-(--ease-out) motion-reduce:transition-none"
 						style={{
-							transform: inline === "1" ? "translateX(0)" : "translateX(100%)",
+							transform: view === "list" ? "translateX(0)" : "translateX(100%)",
 						}}
 					/>
 					{(
 						[
-							["1", t("market.listView"), QueueListIcon],
-							["0", t("market.cardView"), Squares2X2Icon],
+							["list", t("market.listView"), QueueListIcon],
+							["grid", t("market.cardView"), Squares2X2Icon],
 						] as const
 					).map(([value, label, Icon]) => (
 						<button
 							key={value}
 							type="button"
-							aria-pressed={inline === value}
-							onClick={inline === value ? undefined : toggleInline}
+							aria-pressed={view === value}
+							onClick={() => setView(value)}
 							className={cn(
 								"relative flex items-center justify-center gap-1 px-2 transition-press motion-safe:press",
-								inline === value
+								view === value
 									? "text-highlight-foreground"
 									: "text-muted-foreground hover:text-foreground",
 							)}
@@ -91,9 +91,9 @@ export function ServerControls({
 				</fieldset>
 				<button
 					type="button"
-					aria-pressed={showMap === "1"}
+					aria-pressed={showMap}
 					onClick={toggleMap}
-					className={toggleClass(showMap === "1")}
+					className={toggleClass(showMap)}
 				>
 					<MapIcon className="size-3.5" />
 					<span className="hidden sm:inline">{t("market.showMap")}</span>
@@ -102,9 +102,9 @@ export function ServerControls({
 				{hasServices && (
 					<button
 						type="button"
-						aria-pressed={showServices === "1"}
+						aria-pressed={showServices}
 						onClick={toggleServices}
-						className={toggleClass(showServices === "1")}
+						className={toggleClass(showServices)}
 					>
 						<ChartBarSquareIcon className="size-3.5" />
 						<span className="hidden sm:inline">{t("market.showServices")}</span>

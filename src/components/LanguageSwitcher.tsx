@@ -7,13 +7,13 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import {
 	type LanguageCode,
 	resolveLanguage,
 	SUPPORTED_LANGUAGES,
 	storeLanguage,
 } from "@/lib/language";
-import { useRuntimeConfig } from "@/lib/runtime-config";
 import { cn } from "@/lib/utils";
 
 export function LanguageSwitcher() {

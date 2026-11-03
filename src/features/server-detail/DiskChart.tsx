@@ -16,10 +16,10 @@ import {
 	ChartTooltip,
 	ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import type { ChartPeriod } from "@/hooks/use-metric-history";
 import { useHistoricalData } from "@/hooks/use-metric-history";
 import { formatBytes } from "@/lib/format";
-import { useRuntimeConfig } from "@/lib/runtime-config";
 import { selectServerMetrics } from "@/lib/server-metrics";
 import { cn, formatRelativeTime, formatTime } from "@/lib/utils";
 import type { NezhaServer } from "@/types/nezha-api";

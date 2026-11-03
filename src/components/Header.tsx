@@ -1,17 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
+import dayjs from "dayjs";
 import { ImageMinus } from "lucide-react";
-import { DateTime } from "luxon";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { ModeToggle } from "@/components/ThemeSwitcher";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { useBackground } from "@/hooks/use-background";
 import { useLoginUser } from "@/hooks/use-login-user";
 import { useWebSocketContext } from "@/hooks/use-websocket-context";
 import { fetchSetting } from "@/lib/nezha-api";
-import { useRuntimeConfig } from "@/lib/runtime-config";
 import { safeSessionStorage } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 
@@ -28,22 +28,16 @@ interface TimeState {
 	ss: number;
 }
 
+const readTime = (): TimeState => {
+	const now = new Date();
+	return { hh: now.getHours(), mm: now.getMinutes(), ss: now.getSeconds() };
+};
+
 const useCurrentTime = () => {
-	const [time, setTime] = useState<TimeState>({
-		hh: DateTime.now().setLocale("en-US").hour,
-		mm: DateTime.now().setLocale("en-US").minute,
-		ss: DateTime.now().setLocale("en-US").second,
-	});
+	const [time, setTime] = useState<TimeState>(readTime);
 
 	useEffect(() => {
-		const intervalId = setInterval(() => {
-			const now = DateTime.now().setLocale("en-US");
-			setTime({
-				hh: now.hour,
-				mm: now.minute,
-				ss: now.second,
-			});
-		}, 1000);
+		const intervalId = setInterval(() => setTime(readTime()), 1000);
 
 		return () => clearInterval(intervalId);
 	}, []);
@@ -294,7 +288,6 @@ export function RefreshToast() {
 
 	useEffect(() => {
 		if (!needReconnect) return;
-		safeSessionStorage.removeItem("needRefresh");
 		const timer = setTimeout(() => navigate(0), 1000);
 		return () => clearTimeout(timer);
 	}, [needReconnect, navigate]);
@@ -367,7 +360,7 @@ function Overview({ loading }: { loading: boolean }) {
 		<section className="mt-3 flex h-6 items-center justify-between text-xs text-muted-foreground header-timer">
 			<p className="flex items-center gap-2">
 				<span className="font-medium text-foreground">{t("overview")}</span>
-				<span className="num">{DateTime.now().toFormat("yyyy-LL-dd")}</span>
+				<span className="num">{dayjs().format("YYYY-MM-DD")}</span>
 				<span className="hidden sm:inline">{t("whereTheTimeIs")}</span>
 			</p>
 			{mounted ? (

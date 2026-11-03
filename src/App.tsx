@@ -8,7 +8,11 @@ import {
 	Routes,
 	useLocation,
 } from "react-router-dom";
-
+import { InjectContext } from "@/features/runtime-config/inject";
+import {
+	refreshRuntimeConfig,
+	useRuntimeConfig,
+} from "@/features/runtime-config/runtime-config";
 import { DashCommand } from "./components/DashCommand";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Footer from "./components/Footer";
@@ -18,10 +22,8 @@ import { ServerDetailPageLoading } from "./components/loading/ServerDetailLoadin
 import RetryableLazy from "./components/RetryableLazy";
 import { useBackground } from "./hooks/use-background";
 import { useTheme } from "./hooks/use-theme";
-import { InjectContext } from "./lib/inject";
 import { resolveLanguage, shouldApplySiteLanguage } from "./lib/language";
 import { fetchSetting } from "./lib/nezha-api";
-import { refreshRuntimeConfig, useRuntimeConfig } from "./lib/runtime-config";
 import {
 	getPreloadedServerDetail,
 	loadServerDetail,

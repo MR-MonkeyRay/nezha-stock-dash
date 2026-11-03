@@ -1,5 +1,3 @@
-"use client";
-
 import {
 	Home,
 	Moon,
@@ -25,7 +23,7 @@ import { usePriceColor } from "@/hooks/use-price-color";
 import { useTheme } from "@/hooks/use-theme";
 import { useWebSocketContext } from "@/hooks/use-websocket-context";
 import { saveMainPageScrollPosition } from "@/lib/navigation";
-import { formatNezhaInfo } from "@/lib/utils";
+import { selectServerMetrics } from "@/lib/server-metrics";
 import { withViewTransition } from "@/lib/view-transition";
 import type { Theme } from "./ThemeProvider";
 
@@ -119,7 +117,7 @@ export function DashCommand() {
 		return (nezhaWsData.servers ?? []).map((server) => ({
 			id: server.id,
 			name: server.name,
-			online: formatNezhaInfo(nezhaWsData.now, server).online,
+			online: selectServerMetrics(nezhaWsData.now, server).online,
 		}));
 	}, [isOpen, nezhaWsData]);
 

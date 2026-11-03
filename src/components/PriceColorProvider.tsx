@@ -6,6 +6,7 @@ import {
 	useMemo,
 	useState,
 } from "react";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import {
 	applyPriceColor,
 	DEFAULT_PRICE_COLOR,
@@ -13,7 +14,6 @@ import {
 	readStoredPriceColor,
 	storePriceColor,
 } from "@/lib/price-color";
-import { useRuntimeConfig } from "@/lib/runtime-config";
 
 export type PriceColorState = {
 	priceColor: PriceColor;

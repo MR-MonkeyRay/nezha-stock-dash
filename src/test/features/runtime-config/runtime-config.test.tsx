@@ -1,13 +1,14 @@
 import { act, render, renderHook, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { SortProvider } from "@/context/sort-provider";
-import { useBackground } from "@/hooks/use-background";
-import { useSort } from "@/hooks/use-sort";
 import {
 	readRuntimeConfig,
 	refreshRuntimeConfig,
+	updateBackground,
 	useRuntimeConfig,
-} from "@/lib/runtime-config";
+} from "@/features/runtime-config/runtime-config";
+import { useBackground } from "@/hooks/use-background";
+import { useSort } from "@/hooks/use-sort";
 
 function Probe() {
 	const { sortType, sortOrder } = useSort();
@@ -19,7 +20,7 @@ function Probe() {
 }
 
 describe("runtime configuration boundary", () => {
-	it("validates legacy globals and keeps stable snapshots", () => {
+	it("validates customization globals and keeps stable snapshots", () => {
 		window.ForceTheme = "unsupported";
 		window.ForceColorConvention = "blue-up";
 		window.ForceSortType = "invalid";
@@ -57,7 +58,7 @@ describe("runtime configuration boundary", () => {
 		expect(interval).not.toHaveBeenCalled();
 	});
 
-	it("observes delayed legacy assignments without an event or polling", async () => {
+	it("observes delayed assignments without an event or polling", async () => {
 		vi.useFakeTimers();
 		const interval = vi.spyOn(window, "setInterval");
 		const { unmount } = render(
@@ -104,9 +105,7 @@ describe("runtime configuration boundary", () => {
 			window.CustomLinks = '[{"name":"Help","link":"/help"}]';
 			window.CustomIllustration = "/fleet.webp";
 			window.ShowNetTransfer = true;
-			window.FixedTopServerName = true;
 			window.ForceUseSvgFlag = true;
-			window.DisableAnimatedMan = true;
 			window.ForcePeakCutEnabled = true;
 		});
 		expect(result.current).toMatchObject({
@@ -115,9 +114,7 @@ describe("runtime configuration boundary", () => {
 			customLinks: '[{"name":"Help","link":"/help"}]',
 			customIllustration: "/fleet.webp",
 			showNetTransfer: true,
-			fixedTopServerName: true,
 			forceUseSvgFlag: true,
-			disableAnimatedMan: true,
 			forcePeakCutEnabled: true,
 		});
 		const previous = result.current;
@@ -131,8 +128,8 @@ describe("runtime configuration boundary", () => {
 		expect(result.current.showNetTransfer).toBe(false);
 	});
 
-	it("leaves existing accessors intact and uses bounded legacy discovery", async () => {
-		vi.useFakeTimers();
+	it("leaves existing accessors intact and picks them up on explicit refresh", () => {
+		const interval = vi.spyOn(window, "setInterval");
 		const previous = Object.getOwnPropertyDescriptor(window, "ForceSortType");
 		let value: string | undefined;
 		const get = () => value;
@@ -151,17 +148,16 @@ describe("runtime configuration boundary", () => {
 		act(() => {
 			window.ForceSortType = "mem";
 		});
-		await act(async () => {
-			await vi.advanceTimersByTimeAsync(100);
-		});
+		expect(result.current.forceSortType).toBeUndefined();
+		act(() => refreshRuntimeConfig());
 		expect(result.current.forceSortType).toBe("mem");
+		expect(interval).not.toHaveBeenCalled();
 		unmount();
 		expect(Object.getOwnPropertyDescriptor(window, "ForceSortType")?.get).toBe(
 			get,
 		);
 		if (previous) Object.defineProperty(window, "ForceSortType", previous);
 		else Reflect.deleteProperty(window, "ForceSortType");
-		expect(vi.getTimerCount()).toBe(0);
 	});
 
 	it("does not overwrite custom descriptor replacement on cleanup", () => {
@@ -176,12 +172,11 @@ describe("runtime configuration boundary", () => {
 		expect(window.ForceSortType).toBe("cpu");
 	});
 
-	it("supports legacy background events and removes subscriptions on unmount", () => {
+	it("applies background updates and removes subscriptions on unmount", () => {
 		const { result, unmount } = renderHook(useRuntimeConfig);
 		act(() => {
-			window.CustomBackgroundImage = "/late.png";
 			window.CustomMobileBackgroundImage = "/mobile.png";
-			window.dispatchEvent(new Event("backgroundChange"));
+			updateBackground("/late.png");
 		});
 		expect(result.current.backgroundImage).toBe("/late.png");
 		expect(result.current.mobileBackgroundImage).toBe("/mobile.png");
@@ -189,10 +184,6 @@ describe("runtime configuration boundary", () => {
 		unmount();
 		expect(remove).toHaveBeenCalledWith(
 			"runtimeConfigChange",
-			expect.any(Function),
-		);
-		expect(remove).toHaveBeenCalledWith(
-			"backgroundChange",
 			expect.any(Function),
 		);
 	});

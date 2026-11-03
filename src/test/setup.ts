@@ -112,9 +112,7 @@ afterEach(() => {
 	window.CustomLinks = undefined;
 	window.CustomIllustration = undefined;
 	window.ShowNetTransfer = false;
-	window.FixedTopServerName = false;
 	window.ForceUseSvgFlag = false;
-	window.DisableAnimatedMan = false;
 	vi.unstubAllGlobals();
 	vi.restoreAllMocks();
 	vi.useRealTimers();

@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import ChartSkeleton from "@/components/loading/ChartSkeleton";
 import Bar from "@/components/loading/SkeletonBar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { useRuntimeConfig } from "@/lib/runtime-config";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { cn } from "@/lib/utils";
 
 export default function NetworkChartLoading() {

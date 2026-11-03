@@ -1,12 +1,12 @@
-# Incremental frontend boundaries
+# Frontend architecture
 
-The application keeps React, TanStack Query, the existing WebSocket provider and public import facades. Feature folders contain behavior with a stable owner; shared formatting, transport and cache adapters stay in `lib`.
+The application uses React, TanStack Query and a single WebSocket provider. Feature folders contain behavior with a stable owner; shared formatting, transport and cache adapters stay in `lib`. Modules are imported from their owner directly; there are no re-export facades.
 
 ## Server overview
 
 `features/servers/selectors.ts` owns group membership, stable sorting, status filtering and group-level statistics. It is independent of storage and React. `use-server-preferences.ts` owns saved flags, group selection and scroll restoration. Controls, lists and empty/error states are separate components. `pages/Server.tsx` composes these boundaries with API and WebSocket data.
 
-Compatibility keys remain `showMap`, `showServices`, `inline` (string `0`/`1`), `selectedGroup`, `fromMainPage` and `scrollPosition`. `inline="1"` is the watchlist and is the default when nothing is stored; `inline="0"` is the quote-tile grid. Both views are responsive, so the saved value applies at every width.
+Saved preferences live in `localStorage`: `serverView` (`list`, the default watchlist, or `grid`, the quote-tile grid) and the `showMap` / `showServices` flags (`true`/`false`). Both views are responsive, so the saved view applies at every width. `sessionStorage` holds `selectedGroup`, `fromMainPage` and `scrollPosition` for returning from a detail page.
 
 ## Market view
 
@@ -18,9 +18,9 @@ Compatibility keys remain `showMap`, `showServices`, `inline` (string `0`/`1`), 
 
 ## Detail charts
 
-`features/server-detail/realtime-series.ts` projects one server from the provider's existing history, once per render dependency change. Current data wins duplicate timestamps, output is oldest-first and capped at 30 frames. Missing servers/cards do not create fabricated samples. Zero and consecutive equal readings are valid. Charts synchronize by timestamp value, since GPU histories can be sparse.
+`features/server-detail/realtime-series.ts` projects one server from the provider's history, once per render dependency change. Current data wins duplicate timestamps, output is oldest-first and capped at 30 frames. Missing servers/cards do not create fabricated samples. Zero and consecutive equal readings are valid. Charts synchronize by timestamp value, since GPU histories can be sparse.
 
-Metric-specific components preserve presentation, units and tooltips. Network history bytes/second becomes MiB/second; memory/swap/disk history bytes becomes percentage using host capacity. GPU realtime samples are indexed by card; the historical backend has one `gpu` metric and no per-card index parameter, so historical queries are shared rather than inventing an API.
+Metric-specific components own presentation, units and tooltips. Network history bytes/second becomes MiB/second; memory/swap/disk history bytes becomes percentage using host capacity. GPU realtime samples are indexed by card; the historical backend has one `gpu` metric and no per-card index parameter, so historical queries are shared rather than inventing an API.
 
 `hooks/use-metric-history.ts` uses TanStack Query keys containing server ID, metric and period. Aborts are forwarded to the transport. Results expose status, error and actual data period; incomplete or failed paired requests do not display stale series. Each member of a pair is cached independently and timestamps are joined using the primary series order.
 
@@ -28,17 +28,17 @@ K-line (`features/server-detail/KLineChart.tsx`) is lazy-loaded with `lightweigh
 
 ## Pure metrics and transport
 
-`lib/server-metrics.ts` is storage-free. `formatNezhaInfo` remains a compatibility facade combining that projection with `lib/public-note-cache.ts`. The cache retains `server_${id}_public_note` and its existing nonempty-note/fallback semantics.
+`lib/server-metrics.ts` (`selectServerMetrics`) is a pure, storage-free projection. `lib/public-note-cache.ts` restores omitted public notes from `server_${id}_public_note` in `sessionStorage` once per received snapshot, before React consumes it.
 
-`lib/http.ts` handles HTTP and business failures without unwrapping payloads. `lib/nezha-api.ts` preserves existing fetch functions and adds optional cancellation. Profile refresh retains its CSRF header and hourly throttle.
+`lib/http.ts` handles HTTP and business failures without unwrapping payloads. `lib/nezha-api.ts` holds the fetch functions, each with optional cancellation. Profile refresh sends a CSRF header and is throttled to once an hour.
 
 ## Runtime configuration
 
-`features/runtime-config` owns trusted custom-code injection and typed access to legacy globals. `lib/inject.ts` and `lib/runtime-config.ts` remain public compatibility facades.
+`features/runtime-config` owns trusted custom-code injection (`inject.ts`) and typed access to the `window.*` customization globals documented in the README (`runtime-config.ts`).
 
 Initialization awaits ordered external scripts and styles, exposes loading/ready/error, and aborts stale work. Each injection owns its DOM nodes and cleanup. Removing script nodes cannot undo arbitrary JavaScript side effects already executed.
 
-The public `window.*` names are unchanged. Writable configurable data properties are observed while consumers are mounted, so delayed assignments work without a mandatory new event. Existing custom accessors, readonly and nonconfigurable globals are never replaced; these retain a bounded five-second discovery fallback. `runtimeConfigChange` explicitly refreshes unusual custom integrations, and the existing `backgroundChange` event remains supported. The saved background key is unchanged.
+Writable configurable data properties are observed while consumers are mounted, so delayed assignments apply without any event. Custom accessors, readonly and nonconfigurable globals are never replaced; scripts that define them dispatch `runtimeConfigChange` (or call `refreshRuntimeConfig()`) after changing a value. The header's background toggle keeps the hidden image in `sessionStorage` as `savedBackgroundImage`.
 
 ## Internationalization
 
@@ -48,4 +48,4 @@ The public `window.*` names are unchanged. Writable configurable data properties
 
 ## Verification
 
-Run `pnpm verify` for formatting/lint, coverage, TypeScript and production build. Regression suites cover values/timestamps, empty monitors, failed and out-of-order history switches, server identity changes, sparse GPUs, selector ordering, saved preferences, delayed configuration and aborted injection. Coverage thresholds are unchanged. Recharts unit doubles verify data and synchronization contracts; browser checks are complementary and must be reported separately.
+Run `pnpm verify` for formatting/lint, coverage, TypeScript and production build. Regression suites cover values/timestamps, empty monitors, failed and out-of-order history switches, server identity changes, sparse GPUs, selector ordering, saved preferences, delayed configuration and aborted injection. Coverage thresholds are enforced in `vite.config.ts`. Recharts unit doubles verify data and synchronization contracts; browser checks are complementary and must be reported separately.

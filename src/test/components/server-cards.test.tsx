@@ -59,7 +59,6 @@ describe("ServerCard quote tile", () => {
 		vi.setSystemTime(new Date("2025-01-15T00:00:00.000Z"));
 		Object.assign(window, {
 			ForceUseSvgFlag: true,
-			FixedTopServerName: true,
 			ShowNetTransfer: true,
 		});
 	});

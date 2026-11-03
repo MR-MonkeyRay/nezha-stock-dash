@@ -1,11 +1,12 @@
 import { geoEquirectangular, geoPath } from "d3-geo";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import useTooltip from "@/hooks/use-tooltip";
 import { geoJsonString } from "@/lib/geo-json-string";
 import { countryCoordinates } from "@/lib/geo-limit";
-import { useRuntimeConfig } from "@/lib/runtime-config";
-import { cn, formatNezhaInfo } from "@/lib/utils";
+import { selectServerMetrics } from "@/lib/server-metrics";
+import { cn } from "@/lib/utils";
 import type { NezhaServer } from "@/types/nezha-api";
 
 import MapTooltip from "./MapTooltip";
@@ -58,7 +59,7 @@ export default function GlobalMap({
 			countryServers[countryCode].push({
 				id: server.id,
 				name: server.name,
-				status: formatNezhaInfo(now, server).online,
+				status: selectServerMetrics(now, server).online,
 			});
 		});
 

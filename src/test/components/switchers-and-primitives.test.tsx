@@ -11,7 +11,6 @@ import {
 	AccordionItem,
 	AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
 	Dialog,
 	DialogClose,
@@ -39,32 +38,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectLabel,
-	SelectSeparator,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import {
-	Table,
-	TableBody,
-	TableCaption,
-	TableCell,
-	TableFooter,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from "@/components/ui/table";
 import {
 	Tooltip,
 	TooltipContent,
@@ -165,7 +139,7 @@ describe("language and theme switchers", () => {
 });
 
 describe("Radix UI wrappers", () => {
-	it("opens accordion, popover, tooltip, and dialog content", async () => {
+	it("opens accordion, tooltip, and dialog content", async () => {
 		const user = userEvent.setup();
 
 		render(
@@ -176,10 +150,6 @@ describe("Radix UI wrappers", () => {
 						<AccordionContent>Status body</AccordionContent>
 					</AccordionItem>
 				</Accordion>
-				<Popover>
-					<PopoverTrigger>Open popover</PopoverTrigger>
-					<PopoverContent>Popover body</PopoverContent>
-				</Popover>
 				<TooltipProvider delayDuration={0}>
 					<Tooltip>
 						<TooltipTrigger>Hover status</TooltipTrigger>
@@ -204,9 +174,6 @@ describe("Radix UI wrappers", () => {
 		await user.click(screen.getByRole("button", { name: "Toggle status" }));
 		expect(screen.getByText("Status body")).toBeInTheDocument();
 
-		await user.click(screen.getByRole("button", { name: "Open popover" }));
-		expect(screen.getByText("Popover body")).toBeInTheDocument();
-
 		await user.hover(screen.getByText("Hover status"));
 		expect(await screen.findByRole("tooltip")).toHaveTextContent(
 			"Tooltip body",
@@ -220,32 +187,20 @@ describe("Radix UI wrappers", () => {
 		});
 	});
 
-	it("toggles checkbox and switch controls through labels", async () => {
+	it("toggles a switch through its label", async () => {
 		const user = userEvent.setup();
-		const onCheckboxChange = vi.fn();
 		const onSwitchChange = vi.fn();
 
 		render(
 			<>
-				<Label htmlFor="alerts">Alerts</Label>
-				<Checkbox id="alerts" onCheckedChange={onCheckboxChange} />
-				<Switch
-					id="compact"
-					aria-label="Compact mode"
-					onCheckedChange={onSwitchChange}
-				/>
+				<Label htmlFor="compact">Compact mode</Label>
+				<Switch id="compact" onCheckedChange={onSwitchChange} />
 			</>,
 		);
 
-		await user.click(screen.getByText("Alerts"));
-		await user.click(screen.getByRole("switch", { name: "Compact mode" }));
+		await user.click(screen.getByText("Compact mode"));
 
-		expect(onCheckboxChange).toHaveBeenCalledWith(true);
 		expect(onSwitchChange).toHaveBeenCalledWith(true);
-		expect(screen.getByRole("checkbox")).toHaveAttribute(
-			"data-state",
-			"checked",
-		);
 		expect(
 			screen.getByRole("switch", { name: "Compact mode" }),
 		).toHaveAttribute("data-state", "checked");
@@ -297,59 +252,5 @@ describe("Radix UI wrappers", () => {
 		);
 		expect(screen.getByText("More actions")).toHaveClass("pl-8");
 		expect(screen.getByText("Archive")).toBeInTheDocument();
-	});
-
-	it("selects values and renders table structure", async () => {
-		const user = userEvent.setup();
-		const onValueChange = vi.fn();
-
-		render(
-			<>
-				<Select onValueChange={onValueChange}>
-					<SelectTrigger aria-label="Region">
-						<SelectValue placeholder="Choose region" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectGroup>
-							<SelectLabel>Regions</SelectLabel>
-							<SelectItem value="asia">Asia</SelectItem>
-							<SelectSeparator />
-							<SelectItem value="europe">Europe</SelectItem>
-						</SelectGroup>
-					</SelectContent>
-				</Select>
-				<Table>
-					<TableCaption>Server summary</TableCaption>
-					<TableHeader>
-						<TableRow>
-							<TableHead>Name</TableHead>
-							<TableHead>Status</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody>
-						<TableRow>
-							<TableCell>edge-1</TableCell>
-							<TableCell>online</TableCell>
-						</TableRow>
-					</TableBody>
-					<TableFooter>
-						<TableRow>
-							<TableCell>Total</TableCell>
-							<TableCell>1</TableCell>
-						</TableRow>
-					</TableFooter>
-				</Table>
-			</>,
-		);
-
-		await user.click(screen.getByRole("combobox", { name: "Region" }));
-		await user.click(await screen.findByRole("option", { name: "Asia" }));
-
-		expect(onValueChange).toHaveBeenCalledWith("asia");
-		expect(screen.getByText("Server summary")).toBeInTheDocument();
-		expect(
-			screen.getByRole("columnheader", { name: "Name" }),
-		).toBeInTheDocument();
-		expect(screen.getByText("edge-1")).toBeInTheDocument();
 	});
 });

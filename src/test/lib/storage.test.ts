@@ -4,8 +4,8 @@ import {
 	handlePublicNote,
 	restoreServerPublicNotes,
 } from "@/lib/public-note-cache";
+import { selectServerMetrics } from "@/lib/server-metrics";
 import { safeLocalStorage, safeSessionStorage } from "@/lib/storage";
-import { formatNezhaInfo } from "@/lib/utils";
 import { createServer } from "@/test/fixtures";
 
 describe("optional browser persistence", () => {
@@ -89,14 +89,16 @@ describe("optional browser persistence", () => {
 			"cached at receipt",
 		);
 		for (const now of [1, 2, 3]) {
-			expect(formatNezhaInfo(now, received).public_note).toBe(
+			expect(selectServerMetrics(now, received).public_note).toBe(
 				"cached at receipt",
 			);
 		}
 		const [restored] = restoreServerPublicNotes([
 			{ ...server, public_note: "" },
 		]);
-		expect(formatNezhaInfo(4, restored).public_note).toBe("cached at receipt");
+		expect(selectServerMetrics(4, restored).public_note).toBe(
+			"cached at receipt",
+		);
 		expect(write).toHaveBeenCalledTimes(1);
 	});
 

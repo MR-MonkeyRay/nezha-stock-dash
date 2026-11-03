@@ -1,5 +1,3 @@
-"use client";
-
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import * as React from "react";
 import { useCallback, useMemo } from "react";
@@ -38,10 +36,10 @@ import {
 	buildMonitorSeries,
 	type MonitorChartPoint,
 } from "@/features/network-monitor/monitor-series";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { useActiveIndicator } from "@/hooks/use-active-indicator";
 import { useLoginUser } from "@/hooks/use-login-user";
 import { fetchMonitor, type MonitorPeriod } from "@/lib/nezha-api";
-import { useRuntimeConfig } from "@/lib/runtime-config";
 import { cn, formatTime } from "@/lib/utils";
 import type { NezhaMonitor, ServerMonitorChart } from "@/types/nezha-api";
 import NetworkChartLoading from "./NetworkChartLoading";

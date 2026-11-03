@@ -17,12 +17,12 @@ import {
 	ChartTooltipContent,
 } from "@/components/ui/chart";
 import { formatSpeed } from "@/features/market/format";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import type { ChartPeriod } from "@/hooks/use-metric-history";
 import {
 	combineMetricHistory,
 	useMetricHistory,
 } from "@/hooks/use-metric-history";
-import { useRuntimeConfig } from "@/lib/runtime-config";
 import { selectServerMetrics } from "@/lib/server-metrics";
 import { cn, formatRelativeTime, formatTime } from "@/lib/utils";
 import type { NezhaServer } from "@/types/nezha-api";

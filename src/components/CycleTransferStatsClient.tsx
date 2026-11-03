@@ -1,7 +1,7 @@
 import type React from "react";
 import { useTranslation } from "react-i18next";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { formatBytes } from "@/lib/format";
-import { useRuntimeConfig } from "@/lib/runtime-config";
 import { cn } from "@/lib/utils";
 
 interface CycleTransferStatsClientProps {

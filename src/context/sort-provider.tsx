@@ -1,5 +1,5 @@
 import { type ReactNode, useEffect, useState } from "react";
-import { useRuntimeConfig } from "@/lib/runtime-config";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 
 import { SortContext, type SortOrder, type SortType } from "./sort-context";
 

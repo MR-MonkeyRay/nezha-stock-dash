@@ -12,9 +12,9 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { usePriceColor } from "@/hooks/use-price-color";
 import type { PriceColor } from "@/lib/price-color";
-import { useRuntimeConfig } from "@/lib/runtime-config";
 import { cn } from "@/lib/utils";
 import { centerOf, withViewTransition } from "@/lib/view-transition";
 

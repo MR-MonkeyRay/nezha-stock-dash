@@ -5,6 +5,7 @@ import BillingInfo from "@/components/billingInfo";
 import PlanInfo from "@/components/PlanInfo";
 import ServerFlag from "@/components/ServerFlag";
 import type { SortContextType, SortType } from "@/context/sort-context";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { useEntrance } from "@/hooks/use-entrance";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useOpenServer, useServerLinkClick } from "@/hooks/use-open-server";
@@ -14,9 +15,9 @@ import {
 	GetOsName,
 	MageMicrosoftWindows,
 } from "@/lib/logo-class";
-import { useRuntimeConfig } from "@/lib/runtime-config";
 import { preloadServerDetail } from "@/lib/server-detail-preload";
-import { cn, formatNezhaInfo, parsePublicNote } from "@/lib/utils";
+import { selectServerMetrics } from "@/lib/server-metrics";
+import { cn, parsePublicNote } from "@/lib/utils";
 import type { NezhaServer } from "@/types/nezha-api";
 import {
 	formatSpeed,
@@ -212,7 +213,7 @@ const WatchlistRow = memo(function WatchlistRow({
 	const { t } = useTranslation();
 	const open = useOpenServer();
 	const linkClick = useServerLinkClick();
-	const info = formatNezhaInfo(now, server);
+	const info = selectServerMetrics(now, server);
 	const halted = quote.direction === "suspended";
 	const note = parsePublicNote(info.public_note);
 	const dash = <span className="text-suspended">--</span>;
@@ -398,7 +399,7 @@ const QuoteRow = memo(function QuoteRow({
 	onCycle: () => void;
 }) {
 	const linkClick = useServerLinkClick();
-	const info = formatNezhaInfo(now, server);
+	const info = selectServerMetrics(now, server);
 	const halted = quote.direction === "suspended";
 	return (
 		<li className="quote-row relative grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b border-border/60 px-3 py-2 transition-colors duration-(--dur-fast) last:border-0 has-[a:active]:bg-accent/60">

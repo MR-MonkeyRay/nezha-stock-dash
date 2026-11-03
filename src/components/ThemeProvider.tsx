@@ -25,7 +25,7 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 export function ThemeProvider({
 	children,
 	defaultTheme = DEFAULT_THEME,
-	storageKey = "vite-ui-theme",
+	storageKey = "theme",
 }: ThemeProviderProps) {
 	const [theme, setTheme] = useState<Theme>(() => {
 		const stored = safeLocalStorage.getItem(storageKey);

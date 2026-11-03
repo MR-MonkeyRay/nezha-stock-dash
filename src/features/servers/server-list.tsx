@@ -6,24 +6,22 @@ import { useEntrance } from "@/hooks/use-entrance";
 import { cn } from "@/lib/utils";
 import type { NezhaServer } from "@/types/nezha-api";
 import { ServerEmptyState } from "./server-states";
+import type { ServerView } from "./use-server-preferences";
 
 const NO_QUOTES = new Map<number, Quote>();
 
-/**
- * `inline === "1"` is the 行情列表 (watchlist) and the default; "0" is the
- * quote-tile grid. Section class names are kept for users' custom CSS.
- */
+/** Section class names are a styling hook for users' custom CSS. */
 export function ServerList({
 	hasServers,
 	filteredServers,
-	inline,
+	view,
 	now,
 	quotes = NO_QUOTES,
 	sort,
 }: {
 	hasServers: boolean;
 	filteredServers: NezhaServer[];
-	inline: string;
+	view: ServerView;
 	now: number;
 	quotes?: Map<number, Quote>;
 	sort: Pick<
@@ -34,7 +32,7 @@ export function ServerList({
 	return !hasServers ? (
 		<ServerEmptyState />
 	) : filteredServers.length > 0 ? (
-		inline === "1" ? (
+		view === "list" ? (
 			<section className="mt-3 server-inline-list">
 				<Watchlist
 					servers={filteredServers}

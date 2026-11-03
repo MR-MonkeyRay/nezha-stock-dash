@@ -3,7 +3,7 @@ import {
 	restoreBackground,
 	updateBackground,
 	useRuntimeConfig,
-} from "@/lib/runtime-config";
+} from "@/features/runtime-config/runtime-config";
 
 export function useBackground() {
 	const { backgroundImage } = useRuntimeConfig();

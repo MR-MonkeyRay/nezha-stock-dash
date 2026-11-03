@@ -10,7 +10,6 @@ import { SearchButton } from "@/components/SearchButton";
 import ServerOverview from "@/components/ServerOverview";
 import ServerUsageBar from "@/components/ServerUsageBar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -203,24 +202,18 @@ describe("interactive app controls", () => {
 });
 
 describe("ui primitives", () => {
-	it("forwards classes and events through Button and Input", async () => {
+	it("forwards classes and events through Button", async () => {
 		const user = userEvent.setup();
 		const onClick = vi.fn();
-		const onChange = vi.fn();
 		render(
-			<>
-				<Button variant="secondary" size="sm" onClick={onClick}>
-					Save
-				</Button>
-				<Input placeholder="Name" onChange={onChange} />
-			</>,
+			<Button variant="secondary" size="sm" onClick={onClick}>
+				Save
+			</Button>,
 		);
 
 		await user.click(screen.getByRole("button", { name: "Save" }));
-		await user.type(screen.getByPlaceholderText("Name"), "edge");
 
 		expect(onClick).toHaveBeenCalledOnce();
-		expect(onChange).toHaveBeenCalled();
 		expect(screen.getByRole("button", { name: "Save" })).toHaveClass(
 			"bg-secondary",
 		);

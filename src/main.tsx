@@ -34,7 +34,7 @@ if (!rootElement) {
 }
 
 ReactDOM.createRoot(rootElement).render(
-	<ThemeProvider storageKey="vite-ui-theme">
+	<ThemeProvider>
 		<PriceColorProvider>
 			<ThemeColorManager />
 			<QueryClientProvider client={queryClient}>

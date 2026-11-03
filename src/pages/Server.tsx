@@ -6,6 +6,7 @@ import ServerOverview from "@/components/ServerOverview";
 import { ServiceTracker } from "@/components/ServiceTracker";
 import { TickerTape } from "@/features/market/TickerTape";
 import { useMarket } from "@/features/market/use-market";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import {
 	selectGroupServerIds,
 	selectGroupTabs,
@@ -19,7 +20,6 @@ import { useSort } from "@/hooks/use-sort";
 import { useStatus } from "@/hooks/use-status";
 import { useWebSocketContext } from "@/hooks/use-websocket-context";
 import { fetchServerGroup, fetchService } from "@/lib/nezha-api";
-import { useRuntimeConfig } from "@/lib/runtime-config";
 
 export default function Servers({
 	backendError,
@@ -54,7 +54,7 @@ export default function Servers({
 		nezhaWsData,
 		!configurationLoading,
 	);
-	const { showServices, showMap, inline, currentGroup } = preferences;
+	const { showServices, showMap, view, currentGroup } = preferences;
 
 	const { backgroundImage: customBackgroundImage } = useRuntimeConfig();
 
@@ -125,12 +125,12 @@ export default function Servers({
 				groupTabs={groupTabs}
 				customBackgroundImage={customBackgroundImage}
 			/>
-			{hasServers && showMap === "1" && (
+			{hasServers && showMap && (
 				<div className="anim-expand">
 					<GlobalMap now={nezhaWsData.now} serverList={nezhaWsData.servers} />
 				</div>
 			)}
-			{hasServers && showServices === "1" && (
+			{hasServers && showServices && (
 				<div className="anim-expand">
 					<ServiceTracker serverList={filteredServers} />
 				</div>
@@ -138,7 +138,7 @@ export default function Servers({
 			<ServerList
 				hasServers={hasServers}
 				filteredServers={filteredServers}
-				inline={inline}
+				view={view}
 				now={nezhaWsData.now}
 				quotes={market.quotes}
 				sort={sort}

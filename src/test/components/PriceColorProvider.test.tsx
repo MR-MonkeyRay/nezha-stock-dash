@@ -4,8 +4,8 @@ import {
 	PriceColorContext,
 	PriceColorProvider,
 } from "@/components/PriceColorProvider";
+import { refreshRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { usePriceColor } from "@/hooks/use-price-color";
-import { refreshRuntimeConfig } from "@/lib/runtime-config";
 
 function Probe() {
 	const { priceColor, setPriceColor, forced } = usePriceColor();

@@ -14,6 +14,7 @@ import {
 } from "@/features/market/QuoteText";
 import { type Quote, SUSPENDED_QUOTE } from "@/features/market/quote-series";
 import { Sparkline } from "@/features/market/Sparkline";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { useOpenServer } from "@/hooks/use-open-server";
 import { formatBytes } from "@/lib/format";
 import {
@@ -21,9 +22,9 @@ import {
 	GetOsName,
 	MageMicrosoftWindows,
 } from "@/lib/logo-class";
-import { useRuntimeConfig } from "@/lib/runtime-config";
 import { preloadServerDetail } from "@/lib/server-detail-preload";
-import { cn, formatNezhaInfo, parsePublicNote } from "@/lib/utils";
+import { selectServerMetrics } from "@/lib/server-metrics";
+import { cn, parsePublicNote } from "@/lib/utils";
 import type { NezhaServer } from "@/types/nezha-api";
 import BillingInfo from "./billingInfo";
 import PlanInfo from "./PlanInfo";
@@ -54,12 +55,9 @@ function ServerCard({
 		net_out_transfer,
 		public_note,
 		platform,
-	} = formatNezhaInfo(now, serverInfo);
-	const {
-		backgroundImage: customBackgroundImage,
-		showNetTransfer,
-		fixedTopServerName,
-	} = useRuntimeConfig();
+	} = selectServerMetrics(now, serverInfo);
+	const { backgroundImage: customBackgroundImage, showNetTransfer } =
+		useRuntimeConfig();
 	const parsedData = parsePublicNote(public_note);
 	const effectiveQuote = online ? quote : SUSPENDED_QUOTE;
 	const halted = effectiveQuote.direction === "suspended";
@@ -83,7 +81,7 @@ function ServerCard({
 					<p
 						className={cn(
 							"flex items-center gap-1.5 font-semibold",
-							fixedTopServerName ? "text-sm" : "text-[13px]",
+							"text-[13px]",
 							halted && "text-muted-foreground",
 						)}
 					>

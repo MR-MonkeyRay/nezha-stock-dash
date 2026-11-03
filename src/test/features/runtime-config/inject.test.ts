@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { InjectContext } from "@/lib/inject";
+import { InjectContext } from "@/features/runtime-config/inject";
 
 describe("InjectContext", () => {
 	it("injects supported resource nodes and marks them for cleanup", async () => {

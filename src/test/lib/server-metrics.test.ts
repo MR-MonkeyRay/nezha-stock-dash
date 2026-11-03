@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
-import { restoreServerPublicNotes } from "@/lib/public-note-cache";
+import {
+	handlePublicNote,
+	restoreServerPublicNotes,
+} from "@/lib/public-note-cache";
 import { selectServerMetrics } from "@/lib/server-metrics";
-import { formatNezhaInfo, handlePublicNote } from "@/lib/utils";
 import { createServer } from "@/test/fixtures";
 
 const now = Date.parse("2025-01-01T00:00:30.000Z");
@@ -36,9 +38,10 @@ describe("pure server metrics", () => {
 			});
 		try {
 			expect(selectServerMetrics(now, createServer()).public_note).toBe("");
-			expect(formatNezhaInfo(now, createServer()).public_note).toBe("");
+			expect(selectServerMetrics(now, createServer()).public_note).toBe("");
 			expect(
-				formatNezhaInfo(now, createServer({ public_note: "live" })).public_note,
+				selectServerMetrics(now, createServer({ public_note: "live" }))
+					.public_note,
 			).toBe("live");
 			expect(storage).not.toHaveBeenCalled();
 		} finally {
@@ -73,22 +76,19 @@ describe("pure server metrics", () => {
 		});
 	});
 
-	it("restores cached notes at data receipt while keeping both projections pure", () => {
+	it("restores cached notes at data receipt while keeping the projection pure", () => {
 		sessionStorage.clear();
 		const server = createServer({ id: 42, public_note: "first" });
 		const pure = selectServerMetrics(now, server);
 		expect(sessionStorage.length).toBe(0);
-		expect(formatNezhaInfo(now, server)).toEqual(pure);
+		expect(selectServerMetrics(now, server)).toEqual(pure);
 		expect(sessionStorage.length).toBe(0);
 		restoreServerPublicNotes([server]);
 		expect(sessionStorage.getItem("server_42_public_note")).toBe("first");
 		const [restored] = restoreServerPublicNotes([
 			{ ...server, public_note: "" },
 		]);
-		expect(formatNezhaInfo(now, restored).public_note).toBe("first");
-		expect(
-			formatNezhaInfo(now, { ...server, public_note: "" }).public_note,
-		).toBe("");
+		expect(selectServerMetrics(now, restored).public_note).toBe("first");
 		expect(
 			selectServerMetrics(now, { ...server, public_note: "" }).public_note,
 		).toBe("");

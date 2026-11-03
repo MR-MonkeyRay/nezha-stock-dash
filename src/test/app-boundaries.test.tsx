@@ -46,7 +46,7 @@ vi.mock("@/hooks/use-background", () => ({
 vi.mock("@/hooks/use-theme", () => ({
 	useTheme: () => ({ setTheme: vi.fn() }),
 }));
-vi.mock("@/lib/inject", () => ({
+vi.mock("@/features/runtime-config/inject", () => ({
 	InjectContext: () => Promise.resolve(),
 }));
 vi.mock("@/lib/nezha-api", () => ({

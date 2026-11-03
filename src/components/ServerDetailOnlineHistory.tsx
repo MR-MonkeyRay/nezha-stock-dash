@@ -10,6 +10,7 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { useActiveIndicator } from "@/hooks/use-active-indicator";
 import { useLoginUser } from "@/hooks/use-login-user";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -24,7 +25,6 @@ import {
 	panelDay,
 	panelNow,
 } from "@/lib/online-history";
-import { useRuntimeConfig } from "@/lib/runtime-config";
 import { cn } from "@/lib/utils";
 
 const DAY_OPTIONS = [1, 7, 30];

@@ -26,7 +26,7 @@
   - **网络**：上行在零轴上方、下行在下方的镜像“成交量”柱状图，以及延迟 / 丢包图
 - **移动端适配**：所有页面在 390px 宽度下可用。
 - **多语言**：自动识别浏览器语言，简体中文 / 繁體中文 / English 完整翻译，右上角可手动切换并记住选择；另含 11 种社区翻译（未覆盖的文案回落为英文）。
-- 完整保留上游 nezha-dash 的功能：分组、地图、服务监控、⌘K 命令面板、自定义代码全局变量等。
+- 分组、地图、服务监控、⌘K 命令面板、自定义代码全局变量等常用功能。
 
 ## 截图
 
@@ -66,7 +66,7 @@ https://github.com/MR-MonkeyRay/nezha-stock-dash
 
 - 页头右侧 **主题按钮**（月亮 / 太阳图标）下拉菜单：浅色 / 深色 / 跟随系统，以及 **涨跌颜色：红涨绿跌 / 绿涨红跌**。
 - **⌘K / Ctrl K** 命令面板中搜索“红涨绿跌”或“绿涨红跌”。
-- 选择保存在浏览器 `localStorage`（键 `vite-ui-theme`、`priceColor`）。
+- 选择保存在浏览器 `localStorage`（键 `theme`、`priceColor`）。
 
 ## 自定义代码（全局变量）
 
@@ -83,7 +83,6 @@ https://github.com/MR-MonkeyRay/nezha-stock-dash
 | `window.ForceSortType` | `"default"` `"name"` `"uptime"` `"system"` `"cpu"` `"mem"` `"disk"` `"up"` `"down"` `"up total"` `"down total"` | 强制排序字段 |
 | `window.ForceSortOrder` | `"asc"` \| `"desc"` | 强制排序方向 |
 | `window.ShowNetTransfer` | `boolean` | 在列表/卡片中显示总流量 |
-| `window.FixedTopServerName` | `boolean` | 卡片视图中服务器名使用较大字号（兼容上游） |
 | `window.ForceUseSvgFlag` | `boolean` | 使用 SVG 国旗而非 emoji |
 | `window.CustomLogo` | `string` | 自定义 Logo 图片地址 |
 | `window.CustomDesc` | `string` | 页头站点描述 |
@@ -91,7 +90,6 @@ https://github.com/MR-MonkeyRay/nezha-stock-dash
 | `window.CustomBackgroundImage` | `string` | 背景图 |
 | `window.CustomMobileBackgroundImage` | `string` | 移动端背景图 |
 | `window.CustomIllustration` | `string` | 首页概览右侧插画图片地址 |
-| `window.DisableAnimatedMan` | `boolean` | 不显示首页插画 |
 
 示例：
 
@@ -102,7 +100,7 @@ https://github.com/MR-MonkeyRay/nezha-stock-dash
 </script>
 ```
 
-> 与上游的差异：首页默认显示**行情列表**（`inline` 未保存时）；首页插画只有在设置了 `CustomIllustration` 时才会显示。
+> 首页默认显示**行情列表**；首页插画只有在设置了 `CustomIllustration` 时才会显示。
 
 ## 开发
 

@@ -1,7 +1,7 @@
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import { useTranslation } from "react-i18next";
+import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { useCommand } from "@/hooks/use-command";
-import { useRuntimeConfig } from "@/lib/runtime-config";
 import { cn } from "@/lib/utils";
 
 import { Button } from "./ui/button";
