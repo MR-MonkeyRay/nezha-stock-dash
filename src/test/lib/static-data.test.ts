@@ -1,25 +1,28 @@
 import { describe, expect, it } from "vitest";
+import worldMap from "@/components/map/world-map.json";
 
-import { geoJsonString } from "@/lib/geo-json-string";
-import { countryCoordinates } from "@/lib/geo-limit";
-
-describe("static geographic data", () => {
-	it("provides known country coordinate metadata", () => {
-		expect(countryCoordinates.CN).toMatchObject({
-			lat: 35,
-			lng: 105,
-			name: "China",
-		});
-		expect(countryCoordinates.US.name).toBe("United States");
+describe("precomputed world map", () => {
+	it("ships outlines with centroids inside the viewBox", () => {
+		expect(worldMap.countries.length).toBeGreaterThan(150);
+		for (const [code, d, cx, cy] of worldMap.countries as [
+			string,
+			string,
+			number,
+			number,
+		][]) {
+			expect(code).toMatch(/^([A-Z]{2}|-99)$/);
+			expect(d).toMatch(/^M/);
+			expect(cx).toBeGreaterThanOrEqual(0);
+			expect(cx).toBeLessThanOrEqual(worldMap.width);
+			expect(cy).toBeGreaterThanOrEqual(0);
+			expect(cy).toBeLessThanOrEqual(worldMap.height);
+		}
 	});
 
-	it("ships parseable GeoJSON feature collection data", () => {
-		const geoJson = JSON.parse(geoJsonString) as {
-			type: string;
-			features: unknown[];
-		};
-
-		expect(geoJson.type).toBe("FeatureCollection");
-		expect(geoJson.features.length).toBeGreaterThan(0);
+	it("draws small countries as markers only when they have no outline", () => {
+		const outlined = new Set(worldMap.countries.map(([code]) => code));
+		expect(Object.keys(worldMap.markers)).toContain("SG");
+		for (const code of Object.keys(worldMap.markers))
+			expect(outlined.has(code)).toBe(false);
 	});
 });

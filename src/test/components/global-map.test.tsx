@@ -6,8 +6,6 @@ import GlobalMap, { InteractiveMap } from "@/components/GlobalMap";
 import { TooltipProvider } from "@/context/tooltip-provider";
 import { createServer } from "@/test/fixtures";
 
-type InteractiveMapProps = Parameters<typeof InteractiveMap>[0];
-
 const now = Date.parse("2025-01-01T00:00:20.000Z");
 
 function LocationProbe() {
@@ -24,29 +22,6 @@ function renderMap(ui: React.ReactElement) {
 			</TooltipProvider>
 		</MemoryRouter>,
 	);
-}
-
-function mapFeature(code: string, name: string) {
-	return {
-		type: "Feature",
-		properties: {
-			iso_a2_eh: code,
-			iso_a3_eh: `${code}A`,
-			name,
-		},
-		geometry: {
-			type: "Polygon",
-			coordinates: [
-				[
-					[-100, 30],
-					[-90, 30],
-					[-90, 40],
-					[-100, 40],
-					[-100, 30],
-				],
-			],
-		},
-	};
 }
 
 describe("GlobalMap", () => {
@@ -72,51 +47,27 @@ describe("GlobalMap", () => {
 	});
 });
 
+const outline = (container: HTMLElement, code: string) =>
+	container.querySelector(`path[data-code="${code}"]`) as SVGPathElement;
+
 describe("InteractiveMap", () => {
 	it("shows country tooltips, navigates from servers, and clears tooltip state", async () => {
 		const user = userEvent.setup();
-		const filteredFeatures = [
-			mapFeature("US", "United States"),
-			mapFeature("DE", "Germany"),
-		] as unknown as InteractiveMapProps["filteredFeatures"];
-
 		const { container } = renderMap(
 			<InteractiveMap
-				countries={["US", "SG"]}
-				serverCounts={{ US: 2, SG: 1 }}
-				width={900}
-				height={500}
-				filteredFeatures={filteredFeatures}
 				countryServers={{
 					US: [
-						{
-							id: 11,
-							name: "us-online",
-							status: true,
-						},
-						{
-							id: 12,
-							name: "us-offline",
-							status: false,
-						},
+						{ id: 11, name: "us-online", status: true },
+						{ id: 12, name: "us-offline", status: false },
 					],
-					SG: [
-						{
-							id: 13,
-							name: "sg-edge",
-							status: true,
-						},
-					],
+					SG: [{ id: 13, name: "sg-edge", status: true }],
 				}}
 			/>,
 		);
 
-		const highlightedCountry = container.querySelector(
-			"path.fill-chart-line\\/70",
-		);
-		expect(highlightedCountry).toBeInTheDocument();
-
-		fireEvent.mouseEnter(highlightedCountry as SVGPathElement);
+		const us = outline(container, "US");
+		expect(us).toHaveClass("fill-chart-line/70");
+		fireEvent.mouseEnter(us);
 
 		expect(await screen.findByText("United States")).toBeInTheDocument();
 		expect(screen.getByText("2 map.Servers")).toBeInTheDocument();
@@ -125,56 +76,73 @@ describe("InteractiveMap", () => {
 		expect(sessionStorage.getItem("fromMainPage")).toBe("true");
 		expect(screen.getByText("/server/12")).toBeInTheDocument();
 
-		const fallbackMarker = container.querySelector(
-			"circle.fill-chart-line\\/70",
-		);
-		expect(fallbackMarker).toBeInTheDocument();
-
-		fireEvent.mouseEnter(fallbackMarker as SVGCircleElement);
+		// Singapore is too small for the 1:110m outlines and is drawn as a dot.
+		const marker = container.querySelector("circle") as SVGCircleElement;
+		expect(marker).toBeInTheDocument();
+		fireEvent.mouseEnter(marker);
 
 		expect(await screen.findByText("Singapore")).toBeInTheDocument();
 		expect(screen.getByRole("button", { name: /sg-edge/ })).toBeInTheDocument();
 
 		fireEvent.mouseLeave(container.querySelector(".relative") as HTMLElement);
-
 		expect(screen.queryByText("Singapore")).not.toBeInTheDocument();
 	});
 
-	it("clears tooltip state for non-highlighted countries and empty map areas", () => {
-		const filteredFeatures = [
-			mapFeature("US", "United States"),
-			mapFeature("DE", "Germany"),
-		] as unknown as InteractiveMapProps["filteredFeatures"];
-
+	it("positions the tooltip relative to the rendered map and flips at edges", () => {
 		const { container } = renderMap(
 			<InteractiveMap
-				countries={["US"]}
-				serverCounts={{ US: 1 }}
-				width={900}
-				height={500}
-				filteredFeatures={filteredFeatures}
 				countryServers={{
-					US: [
-						{
-							id: 11,
-							name: "us-online",
-							status: true,
-						},
-					],
+					AU: [{ id: 1, name: "syd", status: true }],
+					CA: [{ id: 2, name: "yyz", status: true }],
 				}}
 			/>,
 		);
+		fireEvent.mouseEnter(outline(container, "AU"));
+		const tooltip = screen.getByTestId("map-tooltip");
+		expect(tooltip.style.left).toMatch(/%$/);
+		expect(tooltip.style.transform).toContain("calc(-100% - 12px)");
 
-		const [highlightedCountry, neutralCountry] = Array.from(
-			container.querySelectorAll("path"),
+		fireEvent.mouseEnter(outline(container, "CA"));
+		expect(screen.getByTestId("map-tooltip").style.transform).toBe(
+			"translate(12px, 8px)",
 		);
-		fireEvent.mouseEnter(highlightedCountry as SVGPathElement);
+	});
+
+	it("clears tooltip state for non-highlighted countries and empty map areas", () => {
+		const { container } = renderMap(
+			<InteractiveMap
+				countryServers={{ US: [{ id: 11, name: "us-online", status: true }] }}
+			/>,
+		);
+
+		fireEvent.mouseEnter(outline(container, "US"));
 		expect(screen.getByText("United States")).toBeInTheDocument();
 
-		fireEvent.mouseEnter(neutralCountry as SVGPathElement);
+		const neutral = outline(container, "DE");
+		expect(neutral).toHaveClass("fill-muted");
+		fireEvent.mouseEnter(neutral);
 		expect(screen.queryByText("United States")).not.toBeInTheDocument();
 
+		fireEvent.mouseEnter(outline(container, "US"));
 		fireEvent.mouseEnter(container.querySelector("rect") as SVGRectElement);
 		expect(screen.queryByText("United States")).not.toBeInTheDocument();
+	});
+
+	it("keeps outline elements across data ticks for the same countries", () => {
+		const servers = { US: [{ id: 1, name: "a", status: true }] };
+		const { container, rerender } = renderMap(
+			<InteractiveMap countryServers={servers} />,
+		);
+		const before = outline(container, "US");
+		rerender(
+			<MemoryRouter>
+				<TooltipProvider>
+					<InteractiveMap
+						countryServers={{ US: [{ id: 1, name: "a", status: false }] }}
+					/>
+				</TooltipProvider>
+			</MemoryRouter>,
+		);
+		expect(outline(container, "US")).toBe(before);
 	});
 });

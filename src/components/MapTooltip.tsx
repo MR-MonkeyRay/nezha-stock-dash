@@ -5,7 +5,15 @@ import useTooltip from "@/hooks/use-tooltip";
 import { regionName } from "@/lib/language";
 import { saveMainPageScrollPosition } from "@/lib/navigation";
 
-const MapTooltip = memo(function MapTooltip() {
+/** `width`/`height` are the map's viewBox, so the tooltip tracks the hovered
+ * point at any rendered size and flips away from the nearest edges. */
+const MapTooltip = memo(function MapTooltip({
+	width,
+	height,
+}: {
+	width: number;
+	height: number;
+}) {
 	const { t, i18n } = useTranslation();
 	const navigate = useNavigate();
 	const { tooltipData } = useTooltip();
@@ -15,12 +23,14 @@ const MapTooltip = memo(function MapTooltip() {
 	const countryName =
 		regionName(tooltipData.code, i18n.language) ?? tooltipData.country;
 
-	const verticalPlacement =
-		tooltipData.centroid[1] < 120
-			? "translate(20%, 8px)"
-			: tooltipData.centroid[1] > 380
-				? "translate(20%, calc(-100% - 8px))"
-				: "translate(20%, -50%)";
+	const [x, y] = tooltipData.centroid;
+	const horizontal = x > width * 0.6 ? "calc(-100% - 12px)" : "12px";
+	const vertical =
+		y < height * 0.25
+			? "8px"
+			: y > height * 0.75
+				? "calc(-100% - 8px)"
+				: "-50%";
 
 	return (
 		<div
@@ -28,9 +38,9 @@ const MapTooltip = memo(function MapTooltip() {
 			data-testid="map-tooltip"
 			key={tooltipData.country}
 			style={{
-				left: tooltipData.centroid[0],
-				top: tooltipData.centroid[1],
-				transform: verticalPlacement,
+				left: `${(x / width) * 100}%`,
+				top: `${(y / height) * 100}%`,
+				transform: `translate(${horizontal}, ${vertical})`,
 			}}
 			onMouseEnter={(e) => {
 				e.stopPropagation();

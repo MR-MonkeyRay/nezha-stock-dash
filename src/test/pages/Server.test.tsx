@@ -94,7 +94,7 @@ vi.mock("@/features/market/TickerTape", () => ({
 }));
 
 vi.mock("@/components/ServiceTracker", () => ({
-	ServiceTracker: ({ serverList }: { serverList: NezhaServer[] }) => (
+	default: ({ serverList }: { serverList: NezhaServer[] }) => (
 		<div data-testid="service-tracker">{serverList.length}</div>
 	),
 }));
@@ -623,11 +623,11 @@ describe("Servers page", () => {
 			".server-overview-controls section > button",
 		);
 		await user.click(controls[0]);
-		expect(screen.getByTestId("global-map")).toHaveTextContent("2");
+		expect(await screen.findByTestId("global-map")).toHaveTextContent("2");
 		expect(localStorage.getItem("showMap")).toBe("true");
 
 		await user.click(controls[1]);
-		expect(screen.getByTestId("service-tracker")).toHaveTextContent("2");
+		expect(await screen.findByTestId("service-tracker")).toHaveTextContent("2");
 		expect(localStorage.getItem("showServices")).toBe("true");
 	});
 

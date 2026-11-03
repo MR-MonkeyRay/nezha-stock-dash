@@ -27,7 +27,7 @@ import { fetchSetting } from "./lib/nezha-api";
 import {
 	getPreloadedServerDetail,
 	loadServerDetail,
-	preloadServerDetail,
+	preloadServerDetailWhenIdle,
 } from "./lib/server-detail-preload";
 import { cn } from "./lib/utils";
 import ErrorPage from "./pages/ErrorPage";
@@ -88,10 +88,8 @@ const MainApp: React.FC = () => {
 		useRuntimeConfig();
 	const { backgroundImage: customBackgroundImage } = useBackground();
 
-	useEffect(() => {
-		// Preloading is optional; lazy routing retains its normal error boundary.
-		preloadServerDetail();
-	}, []);
+	// Preloading is optional; lazy routing retains its normal error boundary.
+	useEffect(() => preloadServerDetailWhenIdle(), []);
 
 	useEffect(() => {
 		if (settingsPending) return;

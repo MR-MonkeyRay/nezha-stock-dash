@@ -16,7 +16,7 @@ vi.mock("@/lib/server-detail-preload", () => ({
 		return mocks.loadDetail;
 	},
 	getPreloadedServerDetail: () => undefined,
-	preloadServerDetail: vi.fn(),
+	preloadServerDetailWhenIdle: vi.fn(() => () => {}),
 }));
 vi.mock("@/components/Header", () => ({
 	default: () => (

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useEffect } from "react";
 import { MemoryRouter, useLocation } from "react-router-dom";
@@ -154,7 +154,7 @@ describe("MapTooltip", () => {
 			<MemoryRouter initialEntries={["/"]}>
 				<TooltipProvider>
 					<TooltipSeeder />
-					<MapTooltip />
+					<MapTooltip width={900} height={500} />
 					<LocationProbe />
 				</TooltipProvider>
 			</MemoryRouter>,
@@ -162,7 +162,8 @@ describe("MapTooltip", () => {
 
 		expect(await screen.findByText("Mainland China")).toBeInTheDocument();
 		expect(screen.getByTestId("map-tooltip")).toHaveStyle({
-			transform: "translate(20%, 8px)",
+			transform: "translate(12px, 8px)",
+			left: `${(12 / 900) * 100}%`,
 		});
 		expect(screen.getByText("2 map.Servers")).toBeInTheDocument();
 		await user.click(screen.getByRole("button", { name: /edge-2/ }));
@@ -173,54 +174,58 @@ describe("MapTooltip", () => {
 });
 
 describe("ServerFlag", () => {
-	it("uses SVG flag classes when emoji flags are forced off", () => {
+	const flagImage = (container: HTMLElement) =>
+		container.querySelector("img") as HTMLImageElement | null;
+
+	it("renders the SVG flag file when emoji flags are forced off", () => {
 		Object.assign(window, { ForceUseSvgFlag: true });
 		const { container } = render(<ServerFlag country_code="us" />);
 
-		expect(container.querySelector(".fi-us")).toBeInTheDocument();
+		expect(flagImage(container)?.getAttribute("src")).toMatch(/us\.svg/);
+		expect(flagImage(container)).toHaveAttribute("loading", "lazy");
 	});
 
-	it("normalizes SVG flag classes and ignores invalid country codes", () => {
+	it("normalizes codes and ignores unknown ones", () => {
 		Object.assign(window, { ForceUseSvgFlag: true });
-		const { container, rerender } = render(<ServerFlag country_code="US" />);
+		const { container, rerender } = render(
+			<ServerFlag country_code=" gb_eng " />,
+		);
 
-		expect(container.querySelector(".fi-us")).toBeInTheDocument();
+		expect(flagImage(container)?.getAttribute("src")).toMatch(/gb-eng\.svg/);
 
 		rerender(<ServerFlag country_code="u" />);
-
 		expect(container).toBeEmptyDOMElement();
 	});
 
-	it("uses emoji flags when the canvas probe detects support", async () => {
+	it("uses emoji flags when the one-time canvas probe detects support", async () => {
 		Object.assign(window, { ForceUseSvgFlag: false });
-		const originalCreateElement = document.createElement.bind(document);
-		const canvasContext = {
-			fillStyle: "",
-			textBaseline: "",
-			font: "",
+		vi.resetModules();
+		const getContext = vi.fn(() => ({
 			fillText: vi.fn(),
 			getImageData: vi.fn(() => ({
 				data: new Uint8ClampedArray([0, 0, 0, 255]),
 			})),
-		} as unknown as CanvasRenderingContext2D;
+		}));
+		const originalCreateElement = document.createElement.bind(document);
 		vi.spyOn(document, "createElement").mockImplementation(
-			(tagName, options) => {
-				if (tagName === "canvas") {
-					return {
-						getContext: vi.fn(() => canvasContext),
-					} as unknown as HTMLCanvasElement;
-				}
+			(tagName, options) =>
+				tagName === "canvas"
+					? ({ getContext } as unknown as HTMLCanvasElement)
+					: originalCreateElement(tagName, options),
+		);
+		const { default: FreshFlag } = await import("@/components/ServerFlag");
 
-				return originalCreateElement(tagName, options);
-			},
+		const { container } = render(
+			<>
+				<FreshFlag country_code="US" />
+				<FreshFlag country_code="JP" />
+			</>,
 		);
 
-		const { container } = render(<ServerFlag country_code="US" />);
-
-		await waitFor(() => {
-			expect(container).toHaveTextContent("🇺🇸");
-		});
-		expect(container.querySelector(".fi-US")).not.toBeInTheDocument();
+		expect(container).toHaveTextContent("🇺🇸");
+		expect(container).toHaveTextContent("🇯🇵");
+		expect(flagImage(container)).not.toBeInTheDocument();
+		expect(getContext).toHaveBeenCalledTimes(1);
 	});
 
 	it("renders nothing for missing country codes", () => {

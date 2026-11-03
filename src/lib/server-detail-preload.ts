@@ -47,3 +47,17 @@ export function preloadServerDetail() {
 		() => undefined,
 	);
 }
+
+/** Preload once the browser is idle so the detail route's charting code never
+ * competes with the first render of the current page. Returns a canceller. */
+export function preloadServerDetailWhenIdle(): () => void {
+	if (typeof window.requestIdleCallback === "function") {
+		const handle = window.requestIdleCallback(preloadServerDetail, {
+			timeout: 4000,
+		});
+		return () => window.cancelIdleCallback(handle);
+	}
+	// Safari has no requestIdleCallback; wait past first paint and data.
+	const timer = window.setTimeout(preloadServerDetail, 2000);
+	return () => window.clearTimeout(timer);
+}
