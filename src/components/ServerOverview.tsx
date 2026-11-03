@@ -216,21 +216,31 @@ function BreadthPanel({
 					{t("market.total")} {total}
 				</button>
 			</div>
+			{/* Segments are full-width layers moved and scaled with transforms, so
+			    the per-tick change animates on the compositor (no layout). */}
 			<div
-				className="flex h-1.5 w-full overflow-hidden rounded-full bg-muted"
+				className="relative h-1.5 w-full overflow-hidden rounded-full bg-muted"
 				aria-hidden="true"
 			>
-				{segments.map((segment) => (
-					// Always rendered so a segment can grow from 0 instead of popping in.
-					<span
-						key={segment.key}
-						className={cn(
-							"transition-[width] duration-500 ease-(--ease-out) motion-reduce:transition-none",
-							segment.bar,
-						)}
-						style={{ width: `${(segment.value / counted) * 100}%` }}
-					/>
-				))}
+				{segments.map((segment, index) => {
+					const start = segments
+						.slice(0, index)
+						.reduce((sum, previous) => sum + previous.value / counted, 0);
+					return (
+						// Always rendered so a segment can grow from 0 instead of popping in.
+						<span
+							key={segment.key}
+							data-segment={segment.key}
+							className={cn(
+								"absolute inset-0 origin-left transition-transform duration-500 ease-(--ease-out) motion-reduce:transition-none",
+								segment.bar,
+							)}
+							style={{
+								transform: `translateX(${start * 100}%) scaleX(${segment.value / counted})`,
+							}}
+						/>
+					);
+				})}
 			</div>
 			<div className="grid grid-cols-4 gap-x-2 gap-y-1 sm:grid-cols-2">
 				{items.map((item) => {

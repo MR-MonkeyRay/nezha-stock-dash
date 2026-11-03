@@ -581,7 +581,7 @@
 	position: relative;
 	isolation: isolate;
 }
-.tick-flash::after {
+.tick-flash[data-flash]::after {
 	content: "";
 	position: absolute;
 	inset: -1px -3px;
@@ -603,7 +603,10 @@
 	animation: tick-flash-b var(--dur-flash) var(--ease-out);
 }
 
-/* Sparkline draw-in on first paint (pathLength="1" on the polyline). */
+/* Entrance animations use fill-mode `backwards`, not `both`: the end state is
+   the element's own style, and a filled animation stays in effect forever,
+   keeping large wrappers (the page, the tab panel) on their own paint layer.
+   Sparkline draw-in on first paint (pathLength="1" on the polyline). */
 @keyframes spark-draw {
 	from {
 		stroke-dashoffset: 1;
@@ -614,7 +617,7 @@
 }
 .spark-draw {
 	stroke-dasharray: 1;
-	animation: spark-draw 700ms var(--ease-out) both;
+	animation: spark-draw 700ms var(--ease-out) backwards;
 }
 
 /* Live price dot with an expanding ring, like the last point of a 分时 line. */
@@ -629,8 +632,8 @@
 	}
 }
 .live-ping {
-	transform-box: fill-box;
 	transform-origin: center;
+	will-change: transform, opacity;
 	animation: live-ping 1.6s var(--ease-out) infinite;
 }
 
@@ -676,7 +679,7 @@
 }
 .anim-rise,
 .stagger > * {
-	animation: rise-in var(--dur-slow) var(--ease-out) both;
+	animation: rise-in var(--dur-slow) var(--ease-out) backwards;
 	animation-delay: calc(var(--i, 0) * 28ms);
 }
 .stagger > :nth-child(2) {
@@ -763,7 +766,7 @@
 	}
 }
 .anim-tab {
-	animation: tab-in var(--dur-slow) var(--ease-out) both;
+	animation: tab-in var(--dur-slow) var(--ease-out) backwards;
 }
 
 @keyframes fade-in {
@@ -772,7 +775,7 @@
 	}
 }
 .anim-fade {
-	animation: fade-in 420ms var(--ease-out) both;
+	animation: fade-in 420ms var(--ease-out) backwards;
 }
 
 /* Map / service panels grow open. Height animates where interpolate-size is

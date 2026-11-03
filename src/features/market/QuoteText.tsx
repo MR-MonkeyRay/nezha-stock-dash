@@ -36,17 +36,16 @@ export function QuotePrice({
 	suffix?: string;
 	className?: string;
 }) {
-	const flash = useTickFlash(quote.last);
+	// data-flash / data-flash-parity are set on the node by the hook.
+	const flashRef = useTickFlash<HTMLSpanElement>(quote.last);
 	return (
 		<span
+			ref={flashRef}
 			className={cn(
-				"num",
-				flash.direction && "tick-flash",
+				"num tick-flash",
 				directionTextClass(quote.direction),
 				className,
 			)}
-			data-flash={flash.direction ?? undefined}
-			data-flash-parity={flash.direction ? flash.parity : undefined}
 		>
 			{formatPrice(quote.last, digits)}
 			{quote.last !== null && suffix}

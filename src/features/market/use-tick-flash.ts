@@ -1,47 +1,91 @@
-import { useState } from "react";
+import { type RefObject, useEffect, useRef } from "react";
 import { FLAT_EPSILON } from "./quote-series";
 
-export type TickFlash = {
-	/** Direction of the latest tick, null until the value first moves. */
-	direction: "up" | "down" | null;
-	/** Alternates 0/1 on every tick so the CSS animation restarts. */
-	parity: 0 | 1;
-};
-
-type State = TickFlash & { value: number | null };
-
-/**
- * 跳价闪烁: reports whether a price just ticked up or down versus the previous
- * render. State is adjusted during render (not in an effect), so a tick costs no
- * extra commit and StrictMode double renders cannot flip the parity twice.
- * Moves smaller than FLAT_EPSILON, and transitions to/from null, do not flash.
+/*
+ * 跳价闪烁. With hundreds of servers nearly every price moves on each 2s tick,
+ * and starting hundreds of CSS animations per tick saturates the main thread.
+ * So the flash is applied imperatively (no extra React render) and only to
+ * prices that are on screen.
+ *
+ * Visibility is checked once per tick, not tracked continuously: an
+ * IntersectionObserver over every price would be recomputed on every frame the
+ * ticker marquee produces. The check runs two animation frames after the tick,
+ * when the browser has already laid out the new DOM, so reading geometry is
+ * free; done inside React's commit it would force that layout synchronously
+ * and lengthen the tick task. Reads all happen before any write (no layout
+ * thrashing). Rows skipped by `content-visibility: auto` are rejected by
+ * checkVisibility without forcing their layout; everything else is tested
+ * against the viewport. A 16-32ms delay before the flash is imperceptible.
  */
-export function useTickFlash(value: number | null): TickFlash {
-	const state = useTickState(value);
-	return { direction: state.direction, parity: state.parity };
+
+type Direction = "up" | "down";
+// Keyed by element: a price queued twice before the flush flashes once.
+const pending = new Map<HTMLElement, Direction>();
+
+function afterNextPaint(run: () => void) {
+	if (typeof requestAnimationFrame !== "function") {
+		setTimeout(run, 0);
+		return;
+	}
+	requestAnimationFrame(() => requestAnimationFrame(run));
 }
 
-function useTickState(value: number | null): State {
-	const [state, setState] = useState<State>({
-		value,
-		direction: null,
-		parity: 0,
-	});
-	if (!Object.is(state.value, value)) {
-		const previous = state.value;
-		const moved =
-			previous !== null &&
-			value !== null &&
-			Math.abs(value - previous) >= FLAT_EPSILON;
-		const next: State = moved
-			? {
-					value,
-					direction: value > previous ? "up" : "down",
-					parity: state.parity === 0 ? 1 : 0,
-				}
-			: { ...state, value };
-		setState(next);
-		return next;
+function flushFlashes() {
+	const jobs = [...pending];
+	pending.clear();
+	const visible = jobs.filter(
+		([element]) => element.isConnected && isOnScreen(element),
+	);
+	for (const [element, direction] of visible) {
+		element.dataset.flash = direction;
+		element.dataset.flashParity =
+			element.dataset.flashParity === "0" ? "1" : "0";
 	}
-	return state;
+}
+
+function scheduleFlash(element: HTMLElement, direction: Direction) {
+	const first = pending.size === 0;
+	pending.set(element, direction);
+	if (first) afterNextPaint(flushFlashes);
+}
+
+export function isOnScreen(element: HTMLElement) {
+	if (
+		typeof element.checkVisibility === "function" &&
+		!element.checkVisibility({ contentVisibilityAuto: true })
+	) {
+		return false;
+	}
+	const rect = element.getBoundingClientRect();
+	// Nothing measurable (e.g. no layout engine): don't suppress the flash.
+	if (rect.width === 0 && rect.height === 0) return true;
+	const height = window.innerHeight || document.documentElement.clientHeight;
+	const width = window.innerWidth || document.documentElement.clientWidth;
+	return (
+		rect.bottom > 0 && rect.top < height && rect.right > 0 && rect.left < width
+	);
+}
+
+/**
+ * Returns a ref for the price element. When `value` moves by at least
+ * FLAT_EPSILON while the element is on screen, `data-flash` (up/down) is set
+ * and `data-flash-parity` flips so the CSS animation restarts. Transitions to
+ * or from null never flash.
+ */
+export function useTickFlash<T extends HTMLElement>(
+	value: number | null,
+): RefObject<T | null> {
+	const ref = useRef<T>(null);
+	const previous = useRef(value);
+
+	useEffect(() => {
+		const before = previous.current;
+		previous.current = value;
+		const element = ref.current;
+		if (!element || before === null || value === null) return;
+		if (Math.abs(value - before) < FLAT_EPSILON) return;
+		scheduleFlash(element, value > before ? "up" : "down");
+	}, [value]);
+
+	return ref;
 }

@@ -66,13 +66,14 @@ export const Sparkline = memo(function Sparkline({
 		[values, width, height, domain],
 	);
 	const suspended = direction === "suspended" || values.length === 0;
-	return (
+	const ping = live && !suspended && last;
+	const svg = (
 		<svg
 			aria-hidden="true"
 			width={width}
 			height={height}
 			viewBox={`0 0 ${width} ${height}`}
-			className={cn("shrink-0 overflow-visible", className)}
+			className={cn("shrink-0 overflow-visible", ping ? "block" : className)}
 			data-testid="sparkline"
 		>
 			{suspended ? (
@@ -109,20 +110,35 @@ export const Sparkline = memo(function Sparkline({
 						vectorEffect="non-scaling-stroke"
 						className={cn("spark-draw", directionTextClass(direction))}
 					/>
-					{live && last && (
-						<g className={directionTextClass(direction)} data-testid="live-dot">
-							<circle
-								cx={last.x}
-								cy={last.y}
-								r={2.5}
-								fill="currentColor"
-								className="live-ping"
-							/>
-							<circle cx={last.x} cy={last.y} r={2} fill="currentColor" />
-						</g>
+					{ping && (
+						<circle
+							cx={ping.x}
+							cy={ping.y}
+							r={2}
+							fill="currentColor"
+							className={directionTextClass(direction)}
+						/>
 					)}
 				</>
 			)}
 		</svg>
+	);
+	if (!ping) return svg;
+	// The expanding ring is an HTML layer, not an SVG circle: CSS transforms on
+	// SVG are not composited, and an infinite main-thread animation costs a
+	// full frame (style, paint, commit) 60 times a second on large dashboards.
+	return (
+		<span className={cn("relative shrink-0", className)}>
+			{svg}
+			<span
+				aria-hidden="true"
+				data-testid="live-dot"
+				className={cn(
+					"live-ping pointer-events-none absolute size-[5px] rounded-full bg-current",
+					directionTextClass(direction),
+				)}
+				style={{ left: ping.x - 2.5, top: ping.y - 2.5 }}
+			/>
+		</span>
 	);
 });
