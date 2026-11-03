@@ -1,5 +1,3 @@
-import countries from "i18n-iso-countries";
-import enLocale from "i18n-iso-countries/langs/en.json";
 import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -20,6 +18,7 @@ import {
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useWebSocketContext } from "@/hooks/use-websocket-context";
 import { formatBytes } from "@/lib/format";
+import { regionName } from "@/lib/language";
 import { useRuntimeConfig } from "@/lib/runtime-config";
 import { safeSessionStorage } from "@/lib/storage";
 import { cn, formatNezhaInfo } from "@/lib/utils";
@@ -35,8 +34,6 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "./ui/tooltip";
-
-countries.registerLocale(enLocale);
 
 function Stat({
 	label,
@@ -76,7 +73,7 @@ export default function ServerDetailOverview({
 }: {
 	server_id: string;
 }) {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
 	const navigate = useNavigate();
 	const { backgroundImage: customBackgroundImage } = useRuntimeConfig();
 	const desktop = useMediaQuery("(min-width: 768px)");
@@ -301,7 +298,8 @@ export default function ServerDetailOverview({
 											</TooltipTrigger>
 											<TooltipContent>
 												<p>
-													{countries.getName(country_code.toUpperCase(), "en")}
+													{regionName(country_code, i18n.language) ??
+														country_code.toUpperCase()}
 												</p>
 											</TooltipContent>
 										</Tooltip>

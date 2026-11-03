@@ -195,6 +195,7 @@ export function InteractiveMap({
 										setTooltipData({
 											centroid: path.centroid(feature),
 											country: feature.properties.name,
+											code: countryCode,
 											count: serverCount,
 											servers: countryServers[countryCode] ?? [],
 										});
@@ -227,6 +228,7 @@ export function InteractiveMap({
 									setTooltipData({
 										centroid: [x, y],
 										country: coords.name,
+										code: countryCode,
 										count: serverCount,
 										servers: countryServers[countryCode] ?? [],
 									});

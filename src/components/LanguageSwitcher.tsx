@@ -1,7 +1,3 @@
-import { useRuntimeConfig } from "@/lib/runtime-config";
-
-("use client");
-
 import { CheckCircleIcon, LanguageIcon } from "@heroicons/react/20/solid";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -11,6 +7,13 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+	type LanguageCode,
+	resolveLanguage,
+	SUPPORTED_LANGUAGES,
+	storeLanguage,
+} from "@/lib/language";
+import { useRuntimeConfig } from "@/lib/runtime-config";
 import { cn } from "@/lib/utils";
 
 export function LanguageSwitcher() {
@@ -18,29 +21,13 @@ export function LanguageSwitcher() {
 
 	const { backgroundImage: customBackgroundImage } = useRuntimeConfig();
 
-	const locale = i18n.languages[0];
+	const locale = resolveLanguage(i18n.language);
 
-	const handleSelect = (e: Event, newLocale: string) => {
-		e.preventDefault(); // 阻止默认的关闭行为
-		i18n.changeLanguage(newLocale);
+	const handleSelect = (e: Event, newLocale: LanguageCode) => {
+		e.preventDefault(); // keep the menu open so the check mark visibly moves
+		storeLanguage(newLocale);
+		void Promise.resolve(i18n.changeLanguage(newLocale)).catch(() => undefined);
 	};
-
-	const localeItems = [
-		{ name: t("language.zh-CN"), code: "zh-CN" },
-		{ name: t("language.zh-TW"), code: "zh-TW" },
-		{ name: t("language.en-US"), code: "en-US" },
-		{ name: t("language.ru-RU"), code: "ru-RU" },
-		{ name: t("language.es-ES"), code: "es-ES" },
-		{ name: t("language.de-DE"), code: "de-DE" },
-		{ name: t("language.ta-IN"), code: "ta-IN" },
-		{ name: t("language.fr"), code: "fr" },
-		{ name: t("language.gl"), code: "gl" },
-		{ name: t("language.id"), code: "id" },
-		{ name: t("language.ja"), code: "ja" },
-		{ name: t("language.pt_BR"), code: "pt_BR" },
-		{ name: t("language.ro"), code: "ro" },
-		{ name: t("language.uk"), code: "uk" },
-	];
 
 	return (
 		<DropdownMenu>
@@ -48,18 +35,20 @@ export function LanguageSwitcher() {
 				<Button
 					variant="outline"
 					size="sm"
+					title={t("a11y.changeLanguage")}
 					className={cn("rounded-sm bg-card px-[9px]", {
 						"bg-card/70": customBackgroundImage,
 					})}
 				>
 					<LanguageIcon className="size-4" />
-					<span className="sr-only">Change language</span>
+					<span className="sr-only">{t("a11y.changeLanguage")}</span>
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="flex flex-col gap-0.5" align="end">
-				{localeItems.map((item, index) => (
+				{SUPPORTED_LANGUAGES.map((item, index) => (
 					<DropdownMenuItem
 						key={item.code}
+						lang={item.code.replace(/_/g, "-")}
 						onSelect={(e) => handleSelect(e, item.code)}
 						className={cn(
 							"text-xs",
@@ -67,9 +56,9 @@ export function LanguageSwitcher() {
 								"gap-3 bg-muted font-semibold": locale === item.code,
 							},
 							{
-								"rounded-t-[5px]": index === localeItems.length - 1,
+								"rounded-t-[5px]": index === SUPPORTED_LANGUAGES.length - 1,
 								"rounded-[5px]":
-									index !== 0 && index !== localeItems.length - 1,
+									index !== 0 && index !== SUPPORTED_LANGUAGES.length - 1,
 								"rounded-b-[5px]": index === 0,
 							},
 						)}

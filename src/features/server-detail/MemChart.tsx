@@ -102,11 +102,12 @@ export function MemChart({
 							<div>
 								{data.host.swap_total ? (
 									<>
-										swap: {formatBytes(data.state.swap_used)} /{" "}
+										{t("serverDetailChart.swap")}:{" "}
+										{formatBytes(data.state.swap_used)} /{" "}
 										{formatBytes(data.host.swap_total)}
 									</>
 								) : (
-									<>no swap</>
+									t("serverDetailChart.noSwap")
 								)}
 							</div>
 						</section>

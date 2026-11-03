@@ -90,15 +90,6 @@
 	"footer": {
 		"themeBy": "Tema por "
 	},
-	"language": {
-		"zh-CN": "Chinês simplificado",
-		"zh-TW": "Chinês Tradicional",
-		"en-US": "Inglês",
-		"de-DE": "Alemão",
-		"es-ES": "Espanhol",
-		"ru-RU": "Russo",
-		"ta-IN": "Tamil Indiano"
-	},
 	"theme": {
 		"light": "Claro",
 		"dark": "Escuro",

@@ -398,10 +398,10 @@ describe("Servers page", () => {
 			lastData: websocketPayload([lowCpu, highCpu]),
 		});
 
-		await user.selectOptions(screen.getByLabelText("Sort metric"), "cpu");
+		await user.selectOptions(screen.getByLabelText("a11y.sortMetric"), "cpu");
 		expect(screen.getAllByTestId("server-card")[0]).toHaveTextContent("beta");
 
-		await user.click(screen.getByLabelText("Toggle sort direction"));
+		await user.click(screen.getByLabelText("a11y.toggleSortDirection"));
 		expect(screen.getAllByTestId("server-card")[0]).toHaveTextContent("alpha");
 	});
 
@@ -422,13 +422,13 @@ describe("Servers page", () => {
 			lastData: websocketPayload([onlineAlpha, offlineZeta]),
 		});
 
-		expect(screen.getByLabelText("Toggle sort direction")).toBeDisabled();
+		expect(screen.getByLabelText("a11y.toggleSortDirection")).toBeDisabled();
 
-		await user.selectOptions(screen.getByLabelText("Sort metric"), "name");
+		await user.selectOptions(screen.getByLabelText("a11y.sortMetric"), "name");
 
 		expect(screen.getAllByTestId("server-card")[0]).toHaveTextContent("zeta");
 
-		await user.click(screen.getByLabelText("Toggle sort direction"));
+		await user.click(screen.getByLabelText("a11y.toggleSortDirection"));
 		expect(screen.getAllByTestId("server-card")[0]).toHaveTextContent("alpha");
 	});
 
@@ -450,7 +450,10 @@ describe("Servers page", () => {
 			lastData: websocketPayload([missingPlatform, linux]),
 		});
 
-		await user.selectOptions(screen.getByLabelText("Sort metric"), "system");
+		await user.selectOptions(
+			screen.getByLabelText("a11y.sortMetric"),
+			"system",
+		);
 
 		const cards = screen.getAllByTestId("server-card");
 		expect(cards).toHaveLength(2);

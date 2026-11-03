@@ -19,6 +19,7 @@ import RetryableLazy from "./components/RetryableLazy";
 import { useBackground } from "./hooks/use-background";
 import { useTheme } from "./hooks/use-theme";
 import { InjectContext } from "./lib/inject";
+import { resolveLanguage, shouldApplySiteLanguage } from "./lib/language";
 import { fetchSetting } from "./lib/nezha-api";
 import { refreshRuntimeConfig, useRuntimeConfig } from "./lib/runtime-config";
 import {
@@ -26,7 +27,6 @@ import {
 	loadServerDetail,
 	preloadServerDetail,
 } from "./lib/server-detail-preload";
-import { safeLocalStorage } from "./lib/storage";
 import { cn } from "./lib/utils";
 import ErrorPage from "./pages/ErrorPage";
 import Server from "./pages/Server";
@@ -128,9 +128,9 @@ const MainApp: React.FC = () => {
 
 	const language = settingData?.data?.config?.language;
 	useEffect(() => {
-		const savedLanguage = safeLocalStorage.getItem("language");
-		if (language && !savedLanguage)
-			void Promise.resolve(i18n.changeLanguage(language)).catch(
+		const siteLanguage = resolveLanguage(language);
+		if (siteLanguage && shouldApplySiteLanguage())
+			void Promise.resolve(i18n.changeLanguage(siteLanguage)).catch(
 				() => undefined,
 			);
 	}, [language, i18n]);

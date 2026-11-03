@@ -85,28 +85,14 @@
 		"period7d": "7 Days",
 		"period30d": "30 Days",
 		"tsdbRequired": "Enable TSDB to use historical data",
-		"loginRequired": "Please login to view"
+		"loginRequired": "Please login to view",
+		"noSwap": "No swap",
+		"historyError": "Unable to load historical data"
 	},
 	"footer": {
 		"themeBy": "Theme by ",
 		"basedOn": "Based on ",
 		"chartsBy": "K-line charts by "
-	},
-	"language": {
-		"zh-CN": "简体中文",
-		"zh-TW": "繁體中文",
-		"en-US": "English",
-		"de-DE": "Deutsch",
-		"es-ES": "Español",
-		"ru-RU": "Русский",
-		"ta-IN": "தமிழ்",
-		"fr": "Français",
-		"gl": "Galego",
-		"id": "Bahasa Indonesia",
-		"ja": "日本語",
-		"pt_BR": "Português (Brasil)",
-		"ro": "Română",
-		"uk": "Українська"
 	},
 	"theme": {
 		"light": "Light",
@@ -124,7 +110,8 @@
 		"retry": "Try again",
 		"reloadPage": "Reload page",
 		"detailPageFailed": "Server details couldn’t be displayed",
-		"chartFailed": "Chart couldn’t be displayed"
+		"chartFailed": "Chart couldn’t be displayed",
+		"somethingWentWrong": "Something went wrong"
 	},
 	"tabSwitch": {
 		"Detail": "Intraday",
@@ -273,5 +260,13 @@
 		"swap": "Swap",
 		"totalUp": "Total up",
 		"totalDown": "Total down"
+	},
+	"a11y": {
+		"changeLanguage": "Change language",
+		"search": "Search",
+		"toggleTheme": "Toggle theme",
+		"toggleSortDirection": "Toggle sort direction",
+		"sortMetric": "Sort metric",
+		"usageBar": "Usage"
 	}
 }

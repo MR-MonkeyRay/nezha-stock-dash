@@ -109,7 +109,7 @@ describe("interactive app controls", () => {
 		);
 
 		expect(screen.getByText("command-closed")).toBeInTheDocument();
-		await user.click(screen.getByRole("button", { name: "Search" }));
+		await user.click(screen.getByRole("button", { name: "a11y.search" }));
 		expect(screen.getByText("command-open")).toBeInTheDocument();
 	});
 

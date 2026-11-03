@@ -85,22 +85,14 @@
 		"period7d": "7 天",
 		"period30d": "30 天",
 		"tsdbRequired": "需要开启 TSDB 才能启用历史记录功能",
-		"loginRequired": "请登录后查看"
+		"loginRequired": "请登录后查看",
+		"noSwap": "无虚拟内存",
+		"historyError": "无法加载历史数据"
 	},
 	"footer": {
 		"themeBy": "主题-",
 		"basedOn": "基于 ",
 		"chartsBy": "K线图表由 "
-	},
-	"language": {
-		"zh-CN": "简体中文",
-		"zh-TW": "繁體中文",
-		"en": "English",
-		"en-US": "English",
-		"de-DE": "Deutsch",
-		"es-ES": "Español",
-		"ta-IN": "தமிழ்",
-		"ru-RU": "Русский"
 	},
 	"theme": {
 		"light": "亮色",
@@ -118,7 +110,8 @@
 		"retry": "重试",
 		"reloadPage": "重新加载页面",
 		"detailPageFailed": "无法显示服务器详情",
-		"chartFailed": "无法显示图表"
+		"chartFailed": "无法显示图表",
+		"somethingWentWrong": "出错了"
 	},
 	"tabSwitch": {
 		"Detail": "分时",
@@ -267,5 +260,13 @@
 		"swap": "交换",
 		"totalUp": "总上行",
 		"totalDown": "总下行"
+	},
+	"a11y": {
+		"changeLanguage": "切换语言",
+		"search": "搜索",
+		"toggleTheme": "切换主题",
+		"toggleSortDirection": "切换排序方向",
+		"sortMetric": "排序指标",
+		"usageBar": "使用率"
 	}
 }

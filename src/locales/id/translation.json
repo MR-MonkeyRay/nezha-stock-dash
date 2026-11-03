@@ -95,15 +95,6 @@
 	"footer": {
 		"themeBy": "Tema oleh "
 	},
-	"language": {
-		"zh-CN": "简体中文",
-		"zh-TW": "繁體中文",
-		"en-US": "Inggris",
-		"de-DE": "Jerman",
-		"es-ES": "Spanyol",
-		"ru-RU": "Rusia",
-		"ta-IN": "Tamil"
-	},
 	"error": {
 		"pageNotFound": "Halaman tidak ditemukan",
 		"backToHome": "Kembali ke beranda",

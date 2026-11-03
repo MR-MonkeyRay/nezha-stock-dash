@@ -131,7 +131,7 @@ export function ServerControls({
 				)}
 			>
 				<button
-					aria-label="Toggle sort direction"
+					aria-label={t("a11y.toggleSortDirection")}
 					onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
 					disabled={sortType === "default"}
 					className="flex h-full cursor-pointer items-center gap-1.5 px-2.5 disabled:cursor-not-allowed disabled:opacity-40"
@@ -159,7 +159,7 @@ export function ServerControls({
 						{t(`sort.types.${sortType.replace(/ /g, "_")}`)}
 					</span>
 					<select
-						aria-label="Sort metric"
+						aria-label={t("a11y.sortMetric")}
 						value={sortType}
 						onChange={(e) => {
 							const val = e.target.value as typeof sortType;

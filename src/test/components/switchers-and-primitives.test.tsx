@@ -78,10 +78,27 @@ describe("language and theme switchers", () => {
 
 		render(<LanguageSwitcher />);
 
-		await user.click(screen.getByRole("button", { name: "Change language" }));
+		await user.click(
+			screen.getByRole("button", { name: "a11y.changeLanguage" }),
+		);
 
-		expect(screen.getByText("language.zh-CN")).toBeInTheDocument();
-		expect(screen.getByText("language.en-US")).toHaveClass("font-semibold");
+		expect(screen.getByText("简体中文")).toBeInTheDocument();
+		expect(screen.getByText("English")).toHaveClass("font-semibold");
+	});
+
+	it("persists an explicit language choice", async () => {
+		const user = userEvent.setup();
+		localStorage.removeItem("language");
+
+		render(<LanguageSwitcher />);
+
+		await user.click(
+			screen.getByRole("button", { name: "a11y.changeLanguage" }),
+		);
+		await user.click(screen.getByText("繁體中文"));
+
+		expect(localStorage.getItem("language")).toBe("zh-TW");
+		localStorage.removeItem("language");
 	});
 
 	it("updates the theme through the mode menu", async () => {
@@ -93,7 +110,7 @@ describe("language and theme switchers", () => {
 			</ThemeProvider>,
 		);
 
-		await user.click(screen.getByRole("button", { name: "Toggle theme" }));
+		await user.click(screen.getByRole("button", { name: "a11y.toggleTheme" }));
 		await user.click(await screen.findByText("theme.light"));
 
 		expect(document.documentElement).toHaveClass("light");
@@ -115,7 +132,7 @@ describe("language and theme switchers", () => {
 			"data-price-color",
 			"red-up",
 		);
-		await user.click(screen.getByRole("button", { name: "Toggle theme" }));
+		await user.click(screen.getByRole("button", { name: "a11y.toggleTheme" }));
 		expect(await screen.findByText("priceColor.title")).toBeInTheDocument();
 		await user.click(screen.getByText("priceColor.greenUp"));
 
@@ -136,7 +153,7 @@ describe("language and theme switchers", () => {
 			</PriceColorProvider>,
 		);
 
-		await user.click(screen.getByRole("button", { name: "Toggle theme" }));
+		await user.click(screen.getByRole("button", { name: "a11y.toggleTheme" }));
 		expect(await screen.findByText("priceColor.forced")).toBeInTheDocument();
 		const redUp = screen.getByRole("menuitem", { name: /priceColor.redUp/ });
 		expect(redUp).toHaveAttribute("data-disabled");

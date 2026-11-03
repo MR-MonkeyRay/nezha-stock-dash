@@ -102,11 +102,6 @@
 		"mem": "Speicher",
 		"swap": "Swap"
 	},
-	"language": {
-		"zh-TW": "Traditionelles Chinesisch",
-		"en-US": "Englisch",
-		"zh-CN": "vereinfachtes Chinesisch"
-	},
 	"online": "Online",
 	"offline": "Offline",
 	"serverOverview": {

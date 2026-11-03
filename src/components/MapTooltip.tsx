@@ -2,14 +2,18 @@ import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import useTooltip from "@/hooks/use-tooltip";
+import { regionName } from "@/lib/language";
 import { saveMainPageScrollPosition } from "@/lib/navigation";
 
 const MapTooltip = memo(function MapTooltip() {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
 	const navigate = useNavigate();
 	const { tooltipData } = useTooltip();
 
 	if (!tooltipData) return null;
+
+	const countryName =
+		regionName(tooltipData.code, i18n.language) ?? tooltipData.country;
 
 	const verticalPlacement =
 		tooltipData.centroid[1] < 120
@@ -34,9 +38,7 @@ const MapTooltip = memo(function MapTooltip() {
 		>
 			<div>
 				<p className="font-medium">
-					{tooltipData.country === "China"
-						? "Mainland China"
-						: tooltipData.country}
+					{countryName === "China" ? "Mainland China" : countryName}
 				</p>
 				<p className="text-muted-foreground text-xs font-light mb-1">
 					{tooltipData.count} {t("map.Servers")}
