@@ -4,6 +4,8 @@
 
 > A stock-terminal style user theme for Nezha Monitoring v2: servers are quoted like stocks (CPU = price) with a watchlist, market index, breadth, intraday charts and K-line candles. Red-up/green-down by default, switchable to green-up/red-down.
 
+![哪吒行情 · Nezha Stock Dash 总览：桌面端深色行情列表与移动端详情、浅色绿涨红跌](docs/screenshots/overview.webp)
+
 ## 特性
 
 - **行情终端外观**：默认黑底深色（通达信 / 同花顺风格），另有白底浅色（东方财富网页风格）和跟随系统；等宽数字、方角面板。
@@ -24,6 +26,28 @@
   - **网络**：上行在零轴上方、下行在下方的镜像“成交量”柱状图，以及延迟 / 丢包图
 - **移动端适配**：所有页面在 390px 宽度下可用。
 - 完整保留上游 nezha-dash 的功能：分组、地图、服务监控、⌘K 命令面板、多语言、自定义代码全局变量等。
+
+## 截图
+
+> 截图使用仓库自带的 mock 数据生成（`MOCK_NEZHA_COUNT=12 node scripts/mock-nezha-server.js`），服务器名称与数值均为模拟数据。
+
+### 桌面端
+
+| 首页 · 行情列表（深色，默认） | 首页 · 行情列表（浅色） |
+| :---: | :---: |
+| ![首页行情列表，深色主题](docs/screenshots/home-dark.webp) | ![首页行情列表，浅色主题](docs/screenshots/home-light.webp) |
+| **卡片视图** | **详情页 · 分时** |
+| ![卡片视图](docs/screenshots/cards-dark.webp) | ![详情页分时图](docs/screenshots/detail-dark.webp) |
+
+**详情页 · K 线**：OHLC 蜡烛图 + MA5 / MA10 / MA20 均线，网络流量作为成交量。
+
+![详情页 K 线](docs/screenshots/kline-dark.webp)
+
+### 移动端
+
+| 自选股列表 | 浅色 · 绿涨红跌 | 个股报价页 | K 线 |
+| :---: | :---: | :---: | :---: |
+| ![移动端自选股列表](docs/screenshots/mobile-home-dark.webp) | ![移动端浅色主题，绿涨红跌](docs/screenshots/mobile-home-light-greenup.webp) | ![移动端个股报价页](docs/screenshots/mobile-detail-dark.webp) | ![移动端 K 线](docs/screenshots/mobile-kline-dark.webp) |
 
 ## 安装
 
