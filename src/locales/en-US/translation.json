@@ -123,6 +123,7 @@
 	},
 	"TypeCommand": "Type a command or search...",
 	"NoResults": "No results found.",
+	"commandMoreResults": "{{count}} more, keep typing to narrow down",
 	"Servers": "Servers",
 	"Shortcuts": "Shortcuts",
 	"ToggleLightMode": "Toggle Light Mode",

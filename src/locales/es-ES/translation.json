@@ -98,6 +98,7 @@
 	},
 	"TypeCommand": "Escriba un comando o busca...",
 	"NoResults": "No se encontraron resultados.",
+	"commandMoreResults": "{{count}} más, sigue escribiendo para acotar",
 	"Servers": "Servidores",
 	"Shortcuts": "Atajos",
 	"ToggleLightMode": "Activar el modo claro",

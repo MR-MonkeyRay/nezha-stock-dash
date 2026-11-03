@@ -90,6 +90,7 @@
 	},
 	"TypeCommand": "Escribe un comando ou procura...",
 	"NoResults": "Non se atoparon resultados.",
+	"commandMoreResults": "{{count}} máis, continúa escribindo para restrinxir",
 	"Servers": "Servidores",
 	"Shortcuts": "Atallos",
 	"ToggleLightMode": "Cambiar ao modo claro",

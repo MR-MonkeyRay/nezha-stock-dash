@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DashCommand } from "@/components/DashCommand";
+import { DashCommand, rankServers } from "@/components/DashCommand";
 import { createServer } from "@/test/fixtures";
 
 const dashMocks = vi.hoisted(() => ({
@@ -161,5 +161,80 @@ describe("DashCommand", () => {
 		dashMocks.priceColorForced = true;
 		rerender(<DashCommand />);
 		expect(screen.queryByText("priceColor.useGreenUp")).not.toBeInTheDocument();
+	});
+
+	it("caps server results and narrows them as the user types", async () => {
+		const user = userEvent.setup();
+		dashMocks.lastData = {
+			now: Date.parse("2025-01-01T00:00:20.000Z"),
+			servers: Array.from({ length: 120 }, (_, index) =>
+				createServer({
+					id: index + 1,
+					name: `node-${index + 1}`,
+					last_active: "2025-01-01T00:00:00.000Z",
+				}),
+			),
+		};
+
+		render(<DashCommand />);
+		expect(screen.getAllByText(/^node-/)).toHaveLength(50);
+		expect(screen.getByText("commandMoreResults")).toBeInTheDocument();
+
+		await user.type(screen.getByPlaceholderText("TypeCommand"), "node-11");
+		const names = screen.getAllByText(/^node-/).map((node) => node.textContent);
+		expect(names[0]).toBe("node-11");
+		expect(names).toEqual([
+			"node-11",
+			"node-110",
+			"node-111",
+			"node-112",
+			"node-113",
+			"node-114",
+			"node-115",
+			"node-116",
+			"node-117",
+			"node-118",
+			"node-119",
+		]);
+		expect(screen.queryByText("commandMoreResults")).not.toBeInTheDocument();
+		expect(screen.queryByText("ToggleDarkMode")).not.toBeInTheDocument();
+	});
+
+	it("keeps the results still while websocket ticks arrive", () => {
+		seedWebSocketData();
+		const { rerender } = render(<DashCommand />);
+		expect(screen.getByText("edge-7")).toBeInTheDocument();
+
+		dashMocks.lastData = {
+			now: Date.parse("2025-01-01T00:00:22.000Z"),
+			servers: [createServer({ id: 8, name: "edge-8" })],
+		};
+		rerender(<DashCommand />);
+		expect(screen.getByText("edge-7")).toBeInTheDocument();
+		expect(screen.queryByText("edge-8")).not.toBeInTheDocument();
+	});
+});
+
+describe("rankServers", () => {
+	const entry = (id: number, name: string) => ({
+		id,
+		name,
+		code: String(id).padStart(6, "0"),
+		countryCode: "",
+		online: true,
+		cpu: 0,
+		search: `${name} ${String(id).padStart(6, "0")}`.toLowerCase(),
+	});
+
+	it("ranks stock code, then name prefix, then substring", () => {
+		const servers = [
+			entry(1, "Tokyo-edge"),
+			entry(42, "edge-1"),
+			entry(3, "eu"),
+		];
+		expect(rankServers(servers, "edge").map((s) => s.id)).toEqual([42, 1]);
+		expect(rankServers(servers, "42").map((s) => s.id)).toEqual([42]);
+		expect(rankServers(servers, "000003").map((s) => s.id)).toEqual([3]);
+		expect(rankServers(servers, "  ")).toBe(servers);
 	});
 });

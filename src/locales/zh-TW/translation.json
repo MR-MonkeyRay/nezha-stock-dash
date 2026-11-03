@@ -123,6 +123,7 @@
 	},
 	"TypeCommand": "輸入命令或搜尋",
 	"NoResults": "沒有結果",
+	"commandMoreResults": "還有 {{count}} 個結果，繼續輸入以縮小範圍",
 	"Servers": "伺服器",
 	"Shortcuts": "快捷鍵",
 	"ToggleLightMode": "切換亮色模式",

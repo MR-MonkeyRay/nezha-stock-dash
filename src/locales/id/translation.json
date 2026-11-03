@@ -109,6 +109,7 @@
 	},
 	"TypeCommand": "Ketik perintah atau cari...",
 	"NoResults": "Tidak ada hasil ditemukan.",
+	"commandMoreResults": "{{count}} lainnya, terus ketik untuk mempersempit",
 	"Servers": "Server",
 	"Shortcuts": "Jalan pintas",
 	"ToggleLightMode": "Alihkan Mode Terang",

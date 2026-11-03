@@ -50,6 +50,7 @@
 		"Online": "Online"
 	},
 	"NoResults": "Немає результатів.",
+	"commandMoreResults": "Ще {{count}}, продовжуйте вводити, щоб звузити",
 	"Servers": "Сервери",
 	"serverOnlineHistory": {
 		"days1": "1d",

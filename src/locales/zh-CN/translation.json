@@ -123,6 +123,7 @@
 	},
 	"TypeCommand": "输入命令或搜索",
 	"NoResults": "结果为空",
+	"commandMoreResults": "还有 {{count}} 个结果，继续输入以缩小范围",
 	"Servers": "服务器",
 	"Shortcuts": "快捷键",
 	"ToggleLightMode": "切换亮色模式",

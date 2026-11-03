@@ -109,6 +109,7 @@
 	},
 	"TypeCommand": "Digite um comando ou pesquisa...",
 	"NoResults": "Nenhum resultado encontrado.",
+	"commandMoreResults": "Mais {{count}}, continue digitando para refinar",
 	"Servers": "Servidores",
 	"Shortcuts": "Atalhos",
 	"ToggleLightMode": "Habilitar tema claro",

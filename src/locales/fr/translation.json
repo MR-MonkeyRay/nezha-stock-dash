@@ -12,6 +12,7 @@
 		"Online": "Online"
 	},
 	"NoResults": "Aucun résultat trouvé.",
+	"commandMoreResults": "{{count}} de plus, continuez à taper pour affiner",
 	"serverOnlineHistory": {
 		"days1": "1d",
 		"days7": "7d",
