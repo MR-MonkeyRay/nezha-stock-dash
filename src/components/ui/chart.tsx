@@ -83,18 +83,28 @@ const ChartContainer = React.forwardRef<
 				{...props}
 			>
 				<ChartStyle id={chartId} config={config} />
-				{useResponsiveContainer ? (
-					<RechartsPrimitive.ResponsiveContainer>
-						{children}
-					</RechartsPrimitive.ResponsiveContainer>
-				) : (
-					children
-				)}
+				{useResponsiveContainer ? asResponsive(children) : children}
 			</div>
 		</ChartContext.Provider>
 	);
 });
 ChartContainer.displayName = "Chart";
+
+/** Charts size themselves to the container with plain CSS (`responsive`),
+ * instead of ResponsiveContainer, which renders a first frame at -1×-1 and
+ * warns for every chart on the page. */
+function asResponsive(children: React.ReactNode) {
+	return React.Children.map(children, (child) =>
+		React.isValidElement<{ responsive?: boolean; style?: React.CSSProperties }>(
+			child,
+		)
+			? React.cloneElement(child, {
+					responsive: true,
+					style: { width: "100%", height: "100%", ...child.props.style },
+				})
+			: child,
+	);
+}
 
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 	const colorConfig = Object.entries(config).filter(

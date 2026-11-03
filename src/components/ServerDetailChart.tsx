@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { LiveWhenVisible } from "@/components/LiveWhenVisible";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import { ServerDetailChartLoading } from "@/components/loading/ServerDetailLoading";
 import { ConnectChart } from "@/features/server-detail/ConnectChart";
@@ -91,7 +92,7 @@ export default function ServerDetailChart({
 			/>
 			<section className="grid md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-3 server-charts">
 				{/* CPU is the primary 分时 chart, full width like a quote page. */}
-				<div className="md:col-span-2 lg:col-span-3">
+				<LiveWhenVisible className="md:col-span-2 lg:col-span-3">
 					<LocalErrorBoundary title="CPU" resetKey={chartResetKey}>
 						<CpuChart
 							now={nezhaWsData.now}
@@ -100,96 +101,108 @@ export default function ServerDetailChart({
 							period={selectedPeriod}
 						/>
 					</LocalErrorBoundary>
-				</div>
+				</LiveWhenVisible>
 				{gpuStats.length >= 1 && gpuList.length === gpuStats.length
 					? gpuList.map((gpu, index) => (
-							<LocalErrorBoundary
-								title={`GPU: ${gpu}`}
-								resetKey={chartResetKey}
-								key={index}
-							>
-								<GpuChart
-									index={index}
-									id={server.id}
-									gpuStat={gpuStats[index]}
-									gpuName={gpu}
-									gpuMemory={gpuDetails[index]}
-									series={series}
-									period={selectedPeriod}
-								/>
-							</LocalErrorBoundary>
-						))
-					: gpuStats.length > 0
-						? gpuStats.map((gpu, index) => (
+							<LiveWhenVisible key={index}>
 								<LocalErrorBoundary
-									title={`GPU #${index + 1}`}
+									title={`GPU: ${gpu}`}
 									resetKey={chartResetKey}
-									key={index}
 								>
 									<GpuChart
 										index={index}
 										id={server.id}
-										gpuStat={gpu}
-										gpuName={`#${index + 1}`}
+										gpuStat={gpuStats[index]}
+										gpuName={gpu}
 										gpuMemory={gpuDetails[index]}
 										series={series}
 										period={selectedPeriod}
 									/>
 								</LocalErrorBoundary>
+							</LiveWhenVisible>
+						))
+					: gpuStats.length > 0
+						? gpuStats.map((gpu, index) => (
+								<LiveWhenVisible key={index}>
+									<LocalErrorBoundary
+										title={`GPU #${index + 1}`}
+										resetKey={chartResetKey}
+									>
+										<GpuChart
+											index={index}
+											id={server.id}
+											gpuStat={gpu}
+											gpuName={`#${index + 1}`}
+											gpuMemory={gpuDetails[index]}
+											series={series}
+											period={selectedPeriod}
+										/>
+									</LocalErrorBoundary>
+								</LiveWhenVisible>
 							))
 						: null}
-				<LocalErrorBoundary
-					title={t("serverDetailChart.mem")}
-					resetKey={chartResetKey}
-				>
-					<MemChart
-						now={nezhaWsData.now}
-						data={server}
-						series={series}
-						period={selectedPeriod}
-					/>
-				</LocalErrorBoundary>
-				<LocalErrorBoundary
-					title={t("serverDetailChart.disk")}
-					resetKey={chartResetKey}
-				>
-					<DiskChart
-						now={nezhaWsData.now}
-						data={server}
-						series={series}
-						period={selectedPeriod}
-					/>
-				</LocalErrorBoundary>
-				<LocalErrorBoundary
-					title={t("serverDetailChart.process")}
-					resetKey={chartResetKey}
-				>
-					<ProcessChart
-						now={nezhaWsData.now}
-						data={server}
-						series={series}
-						period={selectedPeriod}
-					/>
-				</LocalErrorBoundary>
-				<LocalErrorBoundary
-					title={t("serverOverview.network")}
-					resetKey={chartResetKey}
-				>
-					<NetworkChart
-						now={nezhaWsData.now}
-						data={server}
-						series={series}
-						period={selectedPeriod}
-					/>
-				</LocalErrorBoundary>
-				<LocalErrorBoundary title="TCP / UDP" resetKey={chartResetKey}>
-					<ConnectChart
-						now={nezhaWsData.now}
-						data={server}
-						series={series}
-						period={selectedPeriod}
-					/>
-				</LocalErrorBoundary>
+				<LiveWhenVisible>
+					<LocalErrorBoundary
+						title={t("serverDetailChart.mem")}
+						resetKey={chartResetKey}
+					>
+						<MemChart
+							now={nezhaWsData.now}
+							data={server}
+							series={series}
+							period={selectedPeriod}
+						/>
+					</LocalErrorBoundary>
+				</LiveWhenVisible>
+				<LiveWhenVisible>
+					<LocalErrorBoundary
+						title={t("serverDetailChart.disk")}
+						resetKey={chartResetKey}
+					>
+						<DiskChart
+							now={nezhaWsData.now}
+							data={server}
+							series={series}
+							period={selectedPeriod}
+						/>
+					</LocalErrorBoundary>
+				</LiveWhenVisible>
+				<LiveWhenVisible>
+					<LocalErrorBoundary
+						title={t("serverDetailChart.process")}
+						resetKey={chartResetKey}
+					>
+						<ProcessChart
+							now={nezhaWsData.now}
+							data={server}
+							series={series}
+							period={selectedPeriod}
+						/>
+					</LocalErrorBoundary>
+				</LiveWhenVisible>
+				<LiveWhenVisible>
+					<LocalErrorBoundary
+						title={t("serverOverview.network")}
+						resetKey={chartResetKey}
+					>
+						<NetworkChart
+							now={nezhaWsData.now}
+							data={server}
+							series={series}
+							period={selectedPeriod}
+						/>
+					</LocalErrorBoundary>
+				</LiveWhenVisible>
+				<LiveWhenVisible>
+					<LocalErrorBoundary title="TCP / UDP" resetKey={chartResetKey}>
+						<ConnectChart
+							now={nezhaWsData.now}
+							data={server}
+							series={series}
+							period={selectedPeriod}
+						/>
+					</LocalErrorBoundary>
+				</LiveWhenVisible>
 			</section>
 		</section>
 	);

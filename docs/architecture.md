@@ -20,7 +20,7 @@ The world map and service tracker are lazy-loaded when first shown. Map outlines
 
 ## Detail charts
 
-`features/server-detail/realtime-series.ts` projects one server from the provider's history, once per render dependency change. Current data wins duplicate timestamps, output is oldest-first and capped at 30 frames. Missing servers/cards do not create fabricated samples. Zero and consecutive equal readings are valid. Charts synchronize by timestamp value, since GPU histories can be sparse.
+`features/server-detail/realtime-series.ts` projects one server from the provider's history, once per render dependency change. Current data wins duplicate timestamps, output is oldest-first and capped at 30 frames. Missing servers/cards do not create fabricated samples. Zero and consecutive equal readings are valid. Charts synchronize by timestamp value, since GPU histories can be sparse. Each chart card is wrapped in `components/LiveWhenVisible.tsx`: off-screen (beyond 200px) or in a background tab it keeps its last render and skips websocket ticks, then catches up when it becomes visible again. `ChartContainer` sizes charts with recharts' `responsive` prop rather than `ResponsiveContainer`.
 
 Metric-specific components own presentation, units and tooltips. Network history bytes/second becomes MiB/second; memory/swap/disk history bytes becomes percentage using host capacity. GPU realtime samples are indexed by card; the historical backend has one `gpu` metric and no per-card index parameter, so historical queries are shared rather than inventing an API.
 
