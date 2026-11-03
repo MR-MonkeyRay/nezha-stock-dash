@@ -1,64 +1,27 @@
 {
 	"nezha": "Nezha Моніторинг",
-	"theme": {
-		"light": "Світло",
-		"dark": "Темний",
-		"system": "Як в Системі"
-	},
-	"NoResults": "Немає результатів.",
-	"Servers": "Сервери",
-	"map": {
-		"Servers": "сервери",
-		"Distributions": "Сервери розподілені в",
-		"Regions": "Регіони"
-	},
-	"serverCard": {
-		"mem": "МЕМ",
-		"stg": "STG",
-		"days": "Днів",
-		"hours": "Годин",
-		"upload": "Завантаження",
-		"download": "Завантажити",
-		"system": "Система",
-		"uptime": "Аптайм",
-		"totalUpload": "Завантажено",
-		"totalDownload": "Скачано"
-	},
-	"serverDetail": {
-		"mem": "Мем",
-		"status": "Статус",
-		"online": "Online",
-		"days": "Днів",
-		"hours": "Годин",
-		"offline": "Offline",
-		"unknown": "Невідомо"
-	},
-	"serverDetailChart": {
-		"mem": "Мем"
-	},
 	"overview": "Огляд",
 	"dashboard": "Інформаційна панель",
+	"login": "Логін",
 	"online": "Онлайн",
 	"offline": "Оффлайн",
 	"whereTheTimeIs": "Де час",
 	"refreshing": "Оновлення",
-	"info": {
-		"websocketConnecting": "WebSocket з'єднання",
-		"websocketConnected": "WebSocket з'єднано",
-		"websocketDisconnected": "WebSocket відключено",
-		"processing": "Обробка..."
-	},
 	"serverOverview": {
-		"totalServers": "Всього Серверів",
-		"onlineServers": "Сервери в мережі",
-		"offlineServers": "Сервери не в мережі",
-		"totalBandwidth": "Загальна пропускна здатність",
-		"speed": "Швидкість",
 		"network": "Мережа"
 	},
+	"map": {
+		"Distributions": "Сервери розподілені в",
+		"Regions": "Регіони",
+		"Servers": "сервери"
+	},
+	"serverCard": {
+		"mem": "МЕМ",
+		"stg": "STG",
+		"upload": "Завантаження",
+		"download": "Завантажити"
+	},
 	"cycleTransfer": {
-		"used": "використано",
-		"total": "всього",
 		"nextUpdate": "наступне оновлення"
 	},
 	"serviceTracker": {
@@ -69,10 +32,25 @@
 		"today": "Сьогодні",
 		"loading": "Завантаження..."
 	},
-	"login": "Логін",
+	"serverDetail": {
+		"days": "Днів",
+		"hours": "Годин",
+		"unknown": "Невідомо",
+		"mem": "Мем"
+	},
+	"serverDetailChart": {
+		"mem": "Мем"
+	},
+	"theme": {
+		"light": "Світло",
+		"dark": "Темний",
+		"system": "Як в Системі"
+	},
 	"tabSwitch": {
 		"Online": "Online"
 	},
+	"NoResults": "Немає результатів.",
+	"Servers": "Сервери",
 	"serverOnlineHistory": {
 		"days1": "1d",
 		"days7": "7d",

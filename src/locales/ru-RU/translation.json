@@ -1,0 +1,145 @@
+{
+	"nezha": "Nezha Monitoring",
+	"overview": "Обзор",
+	"dashboard": "Панель",
+	"login": "Логин",
+	"online": "Онлайн",
+	"offline": "Оффлайн",
+	"whereTheTimeIs": "Где время",
+	"refreshing": "Обновление",
+	"info": {
+		"noServers": "Нет доступных серверов",
+		"noMatchingServers": "Нет серверов, соответствующих текущим фильтрам"
+	},
+	"serverOverview": {
+		"network": "Сеть"
+	},
+	"map": {
+		"Distributions": "Серверы распределены в",
+		"Regions": "Регионы",
+		"Servers": "сервера"
+	},
+	"serverCard": {
+		"mem": "MEM",
+		"stg": "STG",
+		"upload": "Загрузка",
+		"download": "Скачать"
+	},
+	"cycleTransfer": {
+		"nextUpdate": "следующее обновление"
+	},
+	"serviceTracker": {
+		"noService": "Нет данных о сервисе",
+		"uptime": "Аптайм",
+		"delay": "Задержка",
+		"daysAgo": "Дней назад",
+		"today": "Сегодня",
+		"loading": "Загрузка..."
+	},
+	"serverDetail": {
+		"days": "Дней",
+		"hours": "Часов",
+		"unknown": "Неизвестно",
+		"version": "Версия",
+		"arch": "Arch",
+		"mem": "Mem",
+		"disk": "Диск",
+		"region": "Регион",
+		"system": "Система",
+		"lastActive": "Время последней активности",
+		"temperature": "Температура",
+		"bootTime": "Время загрузки"
+	},
+	"serverDetailChart": {
+		"process": "Процесс",
+		"disk": "Диск",
+		"mem": "Mem",
+		"swap": "Swap",
+		"upload": "Загрузка",
+		"download": "Скачивание",
+		"realtime": "Сейчас",
+		"period1d": "1 День",
+		"period7d": "7 Дней",
+		"period30d": "30 Дней"
+	},
+	"footer": {
+		"themeBy": "Тема от "
+	},
+	"theme": {
+		"light": "Светлая тема",
+		"dark": "Темная тема",
+		"system": "Как в Системе"
+	},
+	"error": {
+		"pageNotFound": "Страница не найдена",
+		"backToHome": "Вернуться на главную"
+	},
+	"tabSwitch": {
+		"Detail": "Детали",
+		"Network": "Сеть",
+		"Online": "Online"
+	},
+	"monitor": {
+		"noData": "Нет данных мониторинга сервера, пожалуйста, сначала добавьте монитор службы",
+		"avgDelay": "Задержка",
+		"monitorCount": "Сервисы",
+		"packetLoss": "Потеря пакетов",
+		"clearSelections": "Очистить",
+		"peakCut": "Peak cut",
+		"period1d": "1 день",
+		"period7d": "7 дней",
+		"period30d": "30 дней"
+	},
+	"billingInfo": {
+		"remaining": "Осталось",
+		"error": "ошибка",
+		"indefinite": "Неопределено",
+		"expired": "Истекло",
+		"days": "дней",
+		"price": "Цена",
+		"free": "Бесплатно",
+		"usage-baseed": "Оплата по использованию"
+	},
+	"TypeCommand": "Введите команду или выполните поиск...",
+	"NoResults": "Ничего не найдено.",
+	"Servers": "Серверы",
+	"Shortcuts": "Горячие клавиши",
+	"ToggleLightMode": "Переключить на светлую тему",
+	"ToggleDarkMode": "Переключить на темную тему",
+	"ToggleSystemMode": "Использовать системную тему",
+	"Home": "Главная",
+	"sort": {
+		"label": "Сортировка",
+		"types": {
+			"default": "По умолчанию",
+			"name": "Имя",
+			"uptime": "Аптайм",
+			"system": "Система",
+			"cpu": "CPU",
+			"mem": "Память",
+			"disk": "Диск",
+			"up": "Загрузка",
+			"down": "Скачивание",
+			"up_total": "Загружено",
+			"down_total": "Скачано"
+		}
+	},
+	"serverOnlineHistory": {
+		"days1": "1d",
+		"days7": "7d",
+		"days30": "30d",
+		"onlineRate": "Online rate",
+		"totalOnline": "Online in window",
+		"lastActive": "Last active",
+		"dailyOnline": "Daily online time",
+		"periods": "Online periods",
+		"ongoing": "Ongoing",
+		"noData": "No online records",
+		"loginRequired": "This window requires login; guests can switch to 1d",
+		"offlinePeriods": "Offline periods",
+		"periodsOnline": "Online",
+		"periodsOffline": "Offline",
+		"expandMore": "Expand more",
+		"today": "Today"
+	}
+}

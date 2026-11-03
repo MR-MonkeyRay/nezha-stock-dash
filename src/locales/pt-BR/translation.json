@@ -1,22 +1,17 @@
 {
+	"nezha": "Nezha Monitoramento",
 	"overview": "Visão geral",
 	"dashboard": "Painel de controle",
+	"login": "Login",
+	"online": "Online",
+	"offline": "Offline",
 	"whereTheTimeIs": "Onde está a hora",
 	"refreshing": "Atualizando",
 	"info": {
-		"websocketConnecting": "Conectando WebSocket",
-		"websocketConnected": "WebSocket conectado",
-		"websocketDisconnected": "WebSocket desconectado",
-		"processing": "Processando...",
 		"noServers": "Nenhum servidor disponível",
 		"noMatchingServers": "Nenhum servidor corresponde aos filtros atuais"
 	},
 	"serverOverview": {
-		"totalServers": "Total de Servidores",
-		"onlineServers": "Servidores Conectados",
-		"offlineServers": "Servidores Desconectados",
-		"totalBandwidth": "Largura de Banda Total",
-		"speed": "Velocidade",
 		"network": "Rede"
 	},
 	"map": {
@@ -27,22 +22,10 @@
 	"serverCard": {
 		"mem": "MEM",
 		"stg": "STG",
-		"days": "Dias",
-		"hours": "Horas",
 		"upload": "Upload",
-		"download": "Download",
-		"system": "Sistema",
-		"uptime": "Disponibilidade",
-		"totalUpload": "Envio total",
-		"totalDownload": "Recebimento total"
+		"download": "Download"
 	},
-	"nezha": "Nezha Monitoramento",
-	"login": "Login",
-	"online": "Online",
-	"offline": "Offline",
 	"cycleTransfer": {
-		"used": "Usado",
-		"total": "Total",
 		"nextUpdate": "Próxima atualização"
 	},
 	"serviceTracker": {
@@ -54,21 +37,15 @@
 		"loading": "Carregando..."
 	},
 	"serverDetail": {
-		"status": "Status",
-		"online": "Online",
 		"days": "Dias",
 		"hours": "Horas",
-		"offline": "Offline",
 		"unknown": "Desconhecido",
-		"uptime": "Disponibilidade",
 		"version": "Versão",
 		"arch": "Arquitetura",
 		"mem": "Memória",
 		"disk": "Armazenamento",
 		"region": "Região",
 		"system": "Sistema",
-		"upload": "Envio",
-		"download": "Recebimento",
 		"lastActive": "Ultima atividade",
 		"temperature": "Temperatura",
 		"bootTime": "Tempo de inicio"
@@ -119,11 +96,6 @@
 		"period1d": "1 Dia",
 		"period7d": "7 Dias",
 		"period30d": "30 Dias"
-	},
-	"pwa": {
-		"offlineReady": "Aplicativo pronto para funcionar offline",
-		"newContent": "Novo conteúdo disponivel",
-		"reload": "Atualizar"
 	},
 	"billingInfo": {
 		"remaining": "Restante",

@@ -88,7 +88,7 @@ describe("language and theme switchers", () => {
 
 	it("persists an explicit language choice", async () => {
 		const user = userEvent.setup();
-		localStorage.removeItem("language");
+		localStorage.removeItem("preferredLanguage");
 
 		render(<LanguageSwitcher />);
 
@@ -97,8 +97,8 @@ describe("language and theme switchers", () => {
 		);
 		await user.click(screen.getByText("繁體中文"));
 
-		expect(localStorage.getItem("language")).toBe("zh-TW");
-		localStorage.removeItem("language");
+		expect(localStorage.getItem("preferredLanguage")).toBe("zh-TW");
+		localStorage.removeItem("preferredLanguage");
 	});
 
 	it("updates the theme through the mode menu", async () => {

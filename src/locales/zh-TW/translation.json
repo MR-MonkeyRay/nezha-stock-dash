@@ -8,19 +8,10 @@
 	"whereTheTimeIs": "目前時間",
 	"refreshing": "重新整理中",
 	"info": {
-		"websocketConnecting": "WebSocket 連線中",
-		"websocketConnected": "WebSocket 連線成功",
-		"websocketDisconnected": "WebSocket 連線中斷",
-		"processing": "處理中...",
 		"noServers": "暫無伺服器",
 		"noMatchingServers": "沒有符合目前篩選條件的伺服器"
 	},
 	"serverOverview": {
-		"totalServers": "總伺服器",
-		"onlineServers": "線上伺服器",
-		"offlineServers": "離線伺服器",
-		"totalBandwidth": "總頻寬",
-		"speed": "速率",
 		"network": "網路"
 	},
 	"map": {
@@ -31,18 +22,10 @@
 	"serverCard": {
 		"mem": "記憶體",
 		"stg": "儲存空間",
-		"days": "天",
-		"hours": "小時",
 		"upload": "上傳",
-		"download": "下載",
-		"system": "系統",
-		"uptime": "運作時間",
-		"totalUpload": "總上傳",
-		"totalDownload": "總下載"
+		"download": "下載"
 	},
 	"cycleTransfer": {
-		"used": "已使用",
-		"total": "總量",
 		"nextUpdate": "下次更新"
 	},
 	"serviceTracker": {
@@ -54,21 +37,15 @@
 		"loading": "載入中..."
 	},
 	"serverDetail": {
-		"status": "狀態",
-		"online": "線上",
 		"days": "天",
 		"hours": "小時",
-		"offline": "離線",
 		"unknown": "未知",
-		"uptime": "運作時間",
 		"version": "版本",
 		"arch": "架構",
 		"mem": "記憶體",
 		"disk": "磁碟",
 		"region": "地區",
 		"system": "系統",
-		"upload": "上傳",
-		"download": "下載",
 		"lastActive": "最後回報時間",
 		"temperature": "溫度",
 		"bootTime": "啟動時間"
@@ -133,11 +110,6 @@
 		"loadError": "無法載入監控資料。",
 		"staleData": "監控資料更新失敗，正在顯示上次取得的資料。",
 		"retry": "重試"
-	},
-	"pwa": {
-		"offlineReady": "可離線使用之應用程式",
-		"newContent": "有新內容可用",
-		"reload": "更新"
 	},
 	"billingInfo": {
 		"remaining": "剩餘天數",
@@ -223,12 +195,10 @@
 		"trading": "交易中",
 		"breadth": "漲跌分佈",
 		"total": "總數",
-		"members": "上市",
 		"turnover": "成交 (網路)",
 		"traffic": "流量",
 		"live": "即時",
 		"reconnecting": "重連中",
-		"disconnected": "已斷開",
 		"name": "名稱",
 		"last": "現價 CPU",
 		"change": "漲跌",
@@ -250,7 +220,6 @@
 		"open": "開盤",
 		"close": "收盤",
 		"avg": "均價",
-		"kline": "K線",
 		"volume": "量 (網路)",
 		"profile": "簡況",
 		"back": "返回",

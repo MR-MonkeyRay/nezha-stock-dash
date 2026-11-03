@@ -1,0 +1,141 @@
+{
+	"nezha": "Monitor Nezha",
+	"overview": "Descripción general",
+	"dashboard": "Panel",
+	"login": "Iniciar sesión",
+	"online": "En línea",
+	"offline": "Fuerda de línea",
+	"whereTheTimeIs": "Hora actual",
+	"refreshing": "Actualizando",
+	"info": {
+		"noServers": "No hay servidores disponibles",
+		"noMatchingServers": "Ningún servidor coincide con los filtros actuales"
+	},
+	"serverOverview": {
+		"network": "Red"
+	},
+	"map": {
+		"Distributions": "Servidores distribuidos en",
+		"Regions": "Regiones",
+		"Servers": "Servidores"
+	},
+	"serverCard": {
+		"mem": "Ram",
+		"stg": "Alm.",
+		"upload": "Subida",
+		"download": "Bajada"
+	},
+	"cycleTransfer": {
+		"nextUpdate": "próxima actualización"
+	},
+	"serviceTracker": {
+		"noService": "No hay datos de servicio",
+		"uptime": "Tiempo de actividad",
+		"delay": "Latencia",
+		"daysAgo": "días atrás",
+		"today": "Hoy",
+		"loading": "Cargando..."
+	},
+	"serverDetail": {
+		"days": "Días",
+		"hours": "Horas",
+		"unknown": "Desconocido",
+		"version": "Versión",
+		"arch": "Arch",
+		"mem": "Memoria",
+		"disk": "Disco",
+		"region": "Región",
+		"system": "Sistema Operativo",
+		"lastActive": "Última vez activo",
+		"temperature": "Temperatura",
+		"bootTime": "Inicio del sistema"
+	},
+	"serverDetailChart": {
+		"process": "Procesos",
+		"disk": "Disco",
+		"mem": "Memoria",
+		"swap": "Swap",
+		"upload": "Subida",
+		"download": "Bajada"
+	},
+	"footer": {
+		"themeBy": "Tema por. "
+	},
+	"theme": {
+		"light": "Claro",
+		"dark": "Oscuro",
+		"system": "Sistema"
+	},
+	"error": {
+		"pageNotFound": "Página no encontrada",
+		"backToHome": "Volver al Inicio"
+	},
+	"tabSwitch": {
+		"Detail": "Detalle",
+		"Network": "Red",
+		"Online": "Online"
+	},
+	"monitor": {
+		"noData": "No hay datos de servidores, primero agregue un monitor de servicio",
+		"avgDelay": "Latencia",
+		"monitorCount": "Servicios",
+		"packetLoss": "Pérdida de paquetes",
+		"clearSelections": "Limpiar",
+		"peakCut": "Peak cut",
+		"period1d": "1 Día",
+		"period7d": "7 Días",
+		"period30d": "30 Días"
+	},
+	"billingInfo": {
+		"remaining": "Restante",
+		"error": "error",
+		"indefinite": "Indedinido",
+		"expired": "Expirado",
+		"days": "días",
+		"price": "Precio",
+		"free": "Gratis",
+		"usage-baseed": "Basado en el uso"
+	},
+	"TypeCommand": "Escriba un comando o busca...",
+	"NoResults": "No se encontraron resultados.",
+	"Servers": "Servidores",
+	"Shortcuts": "Atajos",
+	"ToggleLightMode": "Activar el modo claro",
+	"ToggleDarkMode": "Activar el modo oscuro",
+	"ToggleSystemMode": "Activar modo del sistema",
+	"Home": "Inicio",
+	"sort": {
+		"label": "Ordenar",
+		"types": {
+			"default": "Predeterminado",
+			"name": "Nombre",
+			"uptime": "Tiempo activo",
+			"system": "Sistema",
+			"cpu": "CPU",
+			"mem": "Memoria",
+			"disk": "Disco",
+			"up": "Subida",
+			"down": "Bajada",
+			"up_total": "Subida total",
+			"down_total": "Bajada total"
+		}
+	},
+	"serverOnlineHistory": {
+		"days1": "1d",
+		"days7": "7d",
+		"days30": "30d",
+		"onlineRate": "Online rate",
+		"totalOnline": "Online in window",
+		"lastActive": "Last active",
+		"dailyOnline": "Daily online time",
+		"periods": "Online periods",
+		"ongoing": "Ongoing",
+		"noData": "No online records",
+		"loginRequired": "This window requires login; guests can switch to 1d",
+		"offlinePeriods": "Offline periods",
+		"periodsOnline": "Online",
+		"periodsOffline": "Offline",
+		"expandMore": "Expand more",
+		"today": "Today"
+	}
+}

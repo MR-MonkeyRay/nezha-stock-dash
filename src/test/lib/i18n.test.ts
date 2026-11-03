@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { SUPPORTED_LANGUAGES } from "@/lib/language";
 
 const i18nMocks = vi.hoisted(() => ({ init: vi.fn(), on: vi.fn() }));
 vi.mock("i18next", () => ({
@@ -18,7 +19,7 @@ describe("i18n bootstrap", () => {
 		vi.resetModules();
 		i18nMocks.init.mockClear();
 		i18nMocks.on.mockClear();
-		localStorage.removeItem("language");
+		localStorage.removeItem("preferredLanguage");
 		document.documentElement.lang = "en";
 	});
 
@@ -32,7 +33,7 @@ describe("i18n bootstrap", () => {
 
 	it("prefers a saved choice over the browser language", async () => {
 		mockBrowserLanguages(["zh-CN"]);
-		localStorage.setItem("language", "en-US");
+		localStorage.setItem("preferredLanguage", "en-US");
 		await import("@/i18n");
 		expect(i18nMocks.init).toHaveBeenCalledWith(
 			expect.objectContaining({ lng: "en-US" }),
@@ -56,8 +57,15 @@ describe("i18n bootstrap", () => {
 		await import("@/i18n");
 		const [event, listener] = i18nMocks.on.mock.calls[0];
 		expect(event).toBe("languageChanged");
-		listener("pt_BR");
+		listener("pt-BR");
 		expect(document.documentElement.lang).toBe("pt-BR");
 		expect(setItem).not.toHaveBeenCalled();
+	});
+
+	it("loads a translation file for every supported language", async () => {
+		const { resources } = await import("@/i18n");
+		for (const { code } of SUPPORTED_LANGUAGES) {
+			expect(resources[code]?.translation, code).toEqual(expect.any(Object));
+		}
 	});
 });

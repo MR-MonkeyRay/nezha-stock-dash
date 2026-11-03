@@ -1,13 +1,13 @@
 import { safeLocalStorage } from "@/lib/storage";
 
-/** Storage key for an explicit user choice. Unchanged from upstream so saved
- * choices and custom code that reads it keep working. */
-export const LANGUAGE_STORAGE_KEY = "language";
+/** Storage key for an explicit choice made in the language switcher. */
+export const LANGUAGE_STORAGE_KEY = "preferredLanguage";
 
 export const DEFAULT_LANGUAGE = "en-US";
 
-/** Supported locales in switcher order. `name` is the endonym so every option
- * stays recognisable whatever the current UI language is. */
+/** Supported locales in switcher order; each `code` is a BCP 47 tag and the
+ * name of its `src/locales/<code>/translation.json` folder. `name` is the
+ * endonym so every option stays recognisable whatever the UI language is. */
 export const SUPPORTED_LANGUAGES = [
 	{ code: "zh-CN", name: "简体中文" },
 	{ code: "zh-TW", name: "繁體中文" },
@@ -20,7 +20,7 @@ export const SUPPORTED_LANGUAGES = [
 	{ code: "gl", name: "Galego" },
 	{ code: "id", name: "Bahasa Indonesia" },
 	{ code: "ja", name: "日本語" },
-	{ code: "pt_BR", name: "Português (Brasil)" },
+	{ code: "pt-BR", name: "Português (Brasil)" },
 	{ code: "ro", name: "Română" },
 	{ code: "uk", name: "Українська" },
 ] as const;
@@ -40,15 +40,14 @@ const BY_PRIMARY: Record<string, LanguageCode> = {
 	fr: "fr",
 	gl: "gl",
 	id: "id",
-	in: "id", // legacy Indonesian code still sent by some Android browsers
 	ja: "ja",
-	pt: "pt_BR",
+	pt: "pt-BR",
 	ro: "ro",
 	uk: "uk",
 };
 
-/** Map a BCP 47 tag (or the underscore form some backends store, such as
- * `zh_CN`) onto a supported resource code, or `undefined` when unsupported. */
+/** Map a BCP 47 tag, or the gettext form the Nezha backend stores (`zh_CN`),
+ * onto a supported code, or `undefined` when unsupported. */
 export function resolveLanguage(
 	tag: string | null | undefined,
 ): LanguageCode | undefined {
@@ -113,17 +112,16 @@ export function regionName(
 	lng: string,
 ): string | undefined {
 	if (!code) return undefined;
-	const tag = lng.replace(/_/g, "-");
-	let formatter = regionNameFormatters.get(tag);
+	let formatter = regionNameFormatters.get(lng);
 	if (formatter === undefined) {
 		try {
-			formatter = new Intl.DisplayNames([tag, DEFAULT_LANGUAGE], {
+			formatter = new Intl.DisplayNames([lng, DEFAULT_LANGUAGE], {
 				type: "region",
 			});
 		} catch {
 			formatter = null;
 		}
-		regionNameFormatters.set(tag, formatter);
+		regionNameFormatters.set(lng, formatter);
 	}
 	try {
 		return formatter?.of(code.toUpperCase());

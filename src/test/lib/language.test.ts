@@ -12,7 +12,7 @@ import {
 
 afterEach(() => {
 	vi.restoreAllMocks();
-	localStorage.removeItem("language");
+	localStorage.removeItem("preferredLanguage");
 });
 
 describe("resolveLanguage", () => {
@@ -29,12 +29,11 @@ describe("resolveLanguage", () => {
 		["en", "en-US"],
 		["en-GB", "en-US"],
 		["EN_us", "en-US"],
-		["pt", "pt_BR"],
-		["pt-PT", "pt_BR"],
-		["pt_BR", "pt_BR"],
+		["pt", "pt-BR"],
+		["pt-PT", "pt-BR"],
+		["pt_BR", "pt-BR"],
 		["de-AT", "de-DE"],
 		["ru", "ru-RU"],
-		["in-ID", "id"],
 		["uk-UA", "uk"],
 	])("maps %s to %s", (tag, expected) => {
 		expect(resolveLanguage(tag)).toBe(expected);
@@ -91,7 +90,7 @@ describe("startup and site language", () => {
 		expect(getStoredLanguage()).toBe("ja");
 		expect(getInitialLanguage()).toBe("ja");
 
-		localStorage.removeItem("language");
+		localStorage.removeItem("preferredLanguage");
 		expect(getInitialLanguage()).toBe("zh-CN");
 
 		languages.mockReturnValue(["ko"]);
@@ -99,7 +98,7 @@ describe("startup and site language", () => {
 	});
 
 	it("ignores a saved value that is no longer supported", () => {
-		localStorage.setItem("language", "xx");
+		localStorage.setItem("preferredLanguage", "xx");
 		expect(getStoredLanguage()).toBeUndefined();
 	});
 
@@ -122,7 +121,7 @@ describe("regionName", () => {
 	it("localises ISO region codes", () => {
 		expect(regionName("us", "en-US")).toBe("United States");
 		expect(regionName("JP", "zh-CN")).toBe("日本");
-		expect(regionName("JP", "pt_BR")).toBe("Japão");
+		expect(regionName("JP", "pt-BR")).toBe("Japão");
 	});
 
 	it("returns undefined for missing or malformed codes", () => {

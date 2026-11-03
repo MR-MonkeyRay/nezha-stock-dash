@@ -8,19 +8,10 @@
 	"whereTheTimeIs": "Where the time is",
 	"refreshing": "Refreshing",
 	"info": {
-		"websocketConnecting": "WebSocket connecting",
-		"websocketConnected": "WebSocket connected",
-		"websocketDisconnected": "WebSocket disconnected",
-		"processing": "Processing...",
 		"noServers": "No servers available",
 		"noMatchingServers": "No servers match the current filters"
 	},
 	"serverOverview": {
-		"totalServers": "Total Servers",
-		"onlineServers": "Online Servers",
-		"offlineServers": "Offline Servers",
-		"totalBandwidth": "Total Bandwidth",
-		"speed": "Speed",
 		"network": "Network"
 	},
 	"map": {
@@ -31,18 +22,10 @@
 	"serverCard": {
 		"mem": "MEM",
 		"stg": "STG",
-		"days": "Days",
-		"hours": "Hours",
 		"upload": "Upload",
-		"download": "Download",
-		"system": "System",
-		"uptime": "Uptime",
-		"totalUpload": "Upload",
-		"totalDownload": "Download"
+		"download": "Download"
 	},
 	"cycleTransfer": {
-		"used": "used",
-		"total": "total",
 		"nextUpdate": "next update"
 	},
 	"serviceTracker": {
@@ -54,21 +37,15 @@
 		"loading": "Loading..."
 	},
 	"serverDetail": {
-		"status": "Status",
-		"online": "Online",
 		"days": "Days",
 		"hours": "Hours",
-		"offline": "Offline",
 		"unknown": "Unknown",
-		"uptime": "Uptime",
 		"version": "Version",
 		"arch": "Arch",
 		"mem": "Mem",
 		"disk": "Disk",
 		"region": "Region",
 		"system": "System",
-		"upload": "Upload",
-		"download": "Download",
 		"lastActive": "Last active time",
 		"temperature": "Temperature",
 		"bootTime": "Boot time"
@@ -133,11 +110,6 @@
 		"loadError": "Unable to load monitor data.",
 		"staleData": "Monitor data could not be refreshed. Showing the last available data.",
 		"retry": "Try again"
-	},
-	"pwa": {
-		"offlineReady": "App ready to work offline",
-		"newContent": "New content available",
-		"reload": "Update"
 	},
 	"billingInfo": {
 		"remaining": "Remaining",
@@ -223,12 +195,10 @@
 		"trading": "Trading",
 		"breadth": "Market breadth",
 		"total": "Total",
-		"members": "Listed",
 		"turnover": "Network",
 		"traffic": "Traffic",
 		"live": "Live",
 		"reconnecting": "Reconnecting",
-		"disconnected": "Disconnected",
 		"name": "Name",
 		"last": "CPU",
 		"change": "Chg",
@@ -250,7 +220,6 @@
 		"open": "Open",
 		"close": "Close",
 		"avg": "Avg",
-		"kline": "K-Line",
 		"volume": "Vol (net)",
 		"profile": "Profile",
 		"back": "Back",

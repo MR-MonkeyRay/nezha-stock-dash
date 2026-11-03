@@ -8,19 +8,10 @@
 	"whereTheTimeIs": "当前时间",
 	"refreshing": "刷新中",
 	"info": {
-		"websocketConnecting": "WebSocket 连接中",
-		"websocketConnected": "WebSocket 连接成功",
-		"websocketDisconnected": "WebSocket 连接断开",
-		"processing": "处理中...",
 		"noServers": "暂无服务器",
 		"noMatchingServers": "没有符合当前筛选条件的服务器"
 	},
 	"serverOverview": {
-		"totalServers": "服务器总数",
-		"onlineServers": "在线服务器",
-		"offlineServers": "离线服务器",
-		"totalBandwidth": "总流量",
-		"speed": "速率",
 		"network": "网络"
 	},
 	"map": {
@@ -31,18 +22,10 @@
 	"serverCard": {
 		"mem": "内存",
 		"stg": "存储",
-		"days": "天",
-		"hours": "小时",
 		"upload": "上传",
-		"download": "下载",
-		"system": "系统",
-		"uptime": "运行时间",
-		"totalUpload": "总上传",
-		"totalDownload": "总下载"
+		"download": "下载"
 	},
 	"cycleTransfer": {
-		"used": "已使用",
-		"total": "总计",
 		"nextUpdate": "下次更新"
 	},
 	"serviceTracker": {
@@ -54,21 +37,15 @@
 		"loading": "加载中..."
 	},
 	"serverDetail": {
-		"status": "状态",
-		"online": "在线",
 		"days": "天",
 		"hours": "小时",
-		"offline": "离线",
 		"unknown": "未知",
-		"uptime": "运行时间",
 		"version": "版本",
 		"arch": "架构",
 		"mem": "内存",
 		"disk": "磁盘",
 		"region": "区域",
 		"system": "系统",
-		"upload": "上传",
-		"download": "下载",
 		"lastActive": "最后上报时间",
 		"temperature": "温度",
 		"bootTime": "启动时间"
@@ -133,11 +110,6 @@
 		"loadError": "无法加载监控数据。",
 		"staleData": "监控数据刷新失败，正在显示上次获取的数据。",
 		"retry": "重试"
-	},
-	"pwa": {
-		"offlineReady": "应用可以离线使用了",
-		"newContent": "发现新版本",
-		"reload": "更新"
 	},
 	"billingInfo": {
 		"remaining": "剩余天数",
@@ -223,12 +195,10 @@
 		"trading": "交易中",
 		"breadth": "涨跌分布",
 		"total": "总数",
-		"members": "上市",
 		"turnover": "成交 (网络)",
 		"traffic": "流量",
 		"live": "实时",
 		"reconnecting": "重连中",
-		"disconnected": "已断开",
 		"name": "名称",
 		"last": "现价 CPU",
 		"change": "涨跌",
@@ -250,7 +220,6 @@
 		"open": "开盘",
 		"close": "收盘",
 		"avg": "均价",
-		"kline": "K线",
 		"volume": "量 (网络)",
 		"profile": "简况",
 		"back": "返回",

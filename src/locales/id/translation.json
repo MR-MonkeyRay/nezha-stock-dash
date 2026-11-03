@@ -8,25 +8,11 @@
 	"whereTheTimeIs": "Di mana waktunya",
 	"refreshing": "Menyegarkan",
 	"info": {
-		"websocketConnecting": "WebSocket menghubungkan",
-		"processing": "Memproses...",
-		"websocketDisconnected": "WebSocket terputus",
-		"websocketConnected": "WebSocket terhubung",
 		"noServers": "Tidak ada server yang tersedia",
 		"noMatchingServers": "Tidak ada server yang cocok dengan filter saat ini"
 	},
 	"serverOverview": {
-		"totalServers": "Total Server",
-		"onlineServers": "Server Daring",
-		"offlineServers": "Server Luring",
-		"speed": "Kecepatan",
-		"totalBandwidth": "Total Bandwidth",
 		"network": "Jaringan"
-	},
-	"theme": {
-		"light": "Terang",
-		"dark": "Gelap",
-		"system": "Sistem"
 	},
 	"map": {
 		"Distributions": "Server didistribusikan di",
@@ -36,18 +22,10 @@
 	"serverCard": {
 		"mem": "MEM",
 		"stg": "STG",
-		"days": "Hari",
-		"hours": "Jam",
 		"upload": "Unggah",
-		"download": "Unduh",
-		"system": "Sistem",
-		"uptime": "Waktu aktif",
-		"totalUpload": "Unggah",
-		"totalDownload": "Unduh"
+		"download": "Unduh"
 	},
 	"cycleTransfer": {
-		"used": "digunakan",
-		"total": "total",
 		"nextUpdate": "pembaruan berikutnya"
 	},
 	"serviceTracker": {
@@ -59,21 +37,15 @@
 		"loading": "Memuat..."
 	},
 	"serverDetail": {
-		"status": "Status",
-		"online": "Daring",
 		"days": "Hari",
 		"hours": "Jam",
-		"offline": "Luring",
 		"unknown": "Tidak diketahui",
-		"uptime": "Waktu aktif",
 		"version": "Versi",
 		"arch": "Arsitektur",
 		"mem": "Memori",
 		"disk": "Disk",
 		"region": "Wilayah",
 		"system": "Sistem",
-		"upload": "Unggah",
-		"download": "Unduh",
 		"lastActive": "Waktu aktif terakhir",
 		"temperature": "Suhu",
 		"bootTime": "Waktu boot"
@@ -94,6 +66,11 @@
 	},
 	"footer": {
 		"themeBy": "Tema oleh "
+	},
+	"theme": {
+		"light": "Terang",
+		"dark": "Gelap",
+		"system": "Sistem"
 	},
 	"error": {
 		"pageNotFound": "Halaman tidak ditemukan",
@@ -119,11 +96,6 @@
 		"period1d": "1 Hari",
 		"period7d": "7 Hari",
 		"period30d": "30 Hari"
-	},
-	"pwa": {
-		"offlineReady": "Aplikasi siap bekerja luring",
-		"newContent": "Konten baru tersedia",
-		"reload": "Perbarui"
 	},
 	"billingInfo": {
 		"remaining": "Tersisa",

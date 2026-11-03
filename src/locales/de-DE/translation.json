@@ -1,0 +1,130 @@
+{
+	"nezha": "Nezha Monitoring",
+	"overview": "Überblick",
+	"dashboard": "Dashboard",
+	"login": "Login",
+	"online": "Online",
+	"offline": "Offline",
+	"whereTheTimeIs": "Wo die Zeit ist",
+	"refreshing": "Aktualisieren",
+	"info": {
+		"noServers": "Keine Server verfügbar",
+		"noMatchingServers": "Keine Server entsprechen den aktuellen Filtern"
+	},
+	"serverOverview": {
+		"network": "Netzwerk"
+	},
+	"map": {
+		"Distributions": "Server sind verteilt in",
+		"Regions": "Regionen",
+		"Servers": "server"
+	},
+	"serverCard": {
+		"mem": "MEM",
+		"stg": "STG",
+		"upload": "Upload",
+		"download": "Download"
+	},
+	"cycleTransfer": {
+		"nextUpdate": "nächstes update"
+	},
+	"serviceTracker": {
+		"noService": "Keine Servicedaten",
+		"uptime": "Uptime",
+		"daysAgo": "vor Tagen",
+		"today": "Heute",
+		"loading": "Laden..."
+	},
+	"serverDetail": {
+		"days": "Tage",
+		"unknown": "Unbekannt",
+		"version": "Version",
+		"arch": "Arch",
+		"mem": "Speicher",
+		"disk": "Festplatte",
+		"region": "Region",
+		"system": "System",
+		"lastActive": "Letzte Aktivität",
+		"temperature": "Temperatur"
+	},
+	"serverDetailChart": {
+		"process": "Prozess",
+		"disk": "Festplatte",
+		"mem": "Speicher",
+		"swap": "Swap",
+		"upload": "Upload",
+		"download": "Download"
+	},
+	"footer": {
+		"themeBy": "Design von "
+	},
+	"theme": {
+		"light": "Hell",
+		"dark": "Dunkel",
+		"system": "Folgen Sie dem System"
+	},
+	"error": {
+		"pageNotFound": "Seite nicht gefunden",
+		"backToHome": "Zurück zur Startseite"
+	},
+	"tabSwitch": {
+		"Detail": "Detail",
+		"Network": "Netzwerk",
+		"Online": "Online"
+	},
+	"monitor": {
+		"noData": "Kein Server Monitoring Daten, bitte fügen sie zuerst einen Monitor hinzu",
+		"avgDelay": "Latenz",
+		"monitorCount": "Services",
+		"packetLoss": "Paketverlust",
+		"clearSelections": "Löschen",
+		"peakCut": "Peak cut",
+		"period1d": "1 Tag",
+		"period7d": "7 Tage",
+		"period30d": "30 Tage"
+	},
+	"billingInfo": {
+		"remaining": "Verbleibend",
+		"error": "Fehler",
+		"indefinite": "Unbestimmt",
+		"expired": "Verfallen",
+		"days": "tage",
+		"price": "Preis",
+		"free": "Kostenlos",
+		"usage-baseed": "Verwendungsbasiert"
+	},
+	"sort": {
+		"label": "Sortieren",
+		"types": {
+			"default": "Standard",
+			"name": "Name",
+			"uptime": "Betriebszeit",
+			"system": "System",
+			"cpu": "CPU",
+			"mem": "RAM",
+			"disk": "Festplatte",
+			"up": "Upload",
+			"down": "Download",
+			"up_total": "Upload ges.",
+			"down_total": "Download ges."
+		}
+	},
+	"serverOnlineHistory": {
+		"days1": "1d",
+		"days7": "7d",
+		"days30": "30d",
+		"onlineRate": "Online rate",
+		"totalOnline": "Online in window",
+		"lastActive": "Last active",
+		"dailyOnline": "Daily online time",
+		"periods": "Online periods",
+		"ongoing": "Ongoing",
+		"noData": "No online records",
+		"loginRequired": "This window requires login; guests can switch to 1d",
+		"offlinePeriods": "Offline periods",
+		"periodsOnline": "Online",
+		"periodsOffline": "Offline",
+		"expandMore": "Expand more",
+		"today": "Today"
+	}
+}

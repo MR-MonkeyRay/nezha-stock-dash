@@ -48,7 +48,7 @@ export function LanguageSwitcher() {
 				{SUPPORTED_LANGUAGES.map((item, index) => (
 					<DropdownMenuItem
 						key={item.code}
-						lang={item.code.replace(/_/g, "-")}
+						lang={item.code}
 						onSelect={(e) => handleSelect(e, item.code)}
 						className={cn(
 							"text-xs",

@@ -38,7 +38,13 @@ K-line (`features/server-detail/KLineChart.tsx`) is lazy-loaded with `lightweigh
 
 Initialization awaits ordered external scripts and styles, exposes loading/ready/error, and aborts stale work. Each injection owns its DOM nodes and cleanup. Removing script nodes cannot undo arbitrary JavaScript side effects already executed.
 
-The public `window.*` names are unchanged. Writable configurable data properties are observed while consumers are mounted, so delayed assignments work without a mandatory new event. Existing custom accessors, readonly and nonconfigurable globals are never replaced; these retain a bounded five-second discovery fallback. `runtimeConfigChange` explicitly refreshes unusual custom integrations, and the existing `backgroundChange` event remains supported. Saved background and language keys are unchanged.
+The public `window.*` names are unchanged. Writable configurable data properties are observed while consumers are mounted, so delayed assignments work without a mandatory new event. Existing custom accessors, readonly and nonconfigurable globals are never replaced; these retain a bounded five-second discovery fallback. `runtimeConfigChange` explicitly refreshes unusual custom integrations, and the existing `backgroundChange` event remains supported. The saved background key is unchanged.
+
+## Internationalization
+
+`lib/language.ts` owns the supported locale list, tag resolution and persistence; `i18n.ts` loads every `locales/<code>/translation.json` for those codes, where each code is a BCP 47 tag. Startup language is the switcher choice saved as `preferredLanguage`, then the first supported entry of `navigator.languages`, then `en-US`. The backend's configured language (gettext form such as `zh_CN` is accepted) applies only when neither exists. Detection results are never persisted, and `<html lang>` follows the active language.
+
+`en-US` is the source of truth for keys. `zh-CN` and `zh-TW` are kept complete; other locales may lag and fall back to English, with `zh-TW` falling back to `zh-CN` first. Locale files carry no keys absent from `en-US`. The language menu lists endonyms, and country names come from `Intl.DisplayNames`.
 
 ## Verification
 
