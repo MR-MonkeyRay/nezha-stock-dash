@@ -38,9 +38,7 @@ export default function BillingInfo({
 			} catch (error) {
 				console.error(error);
 				return (
-					<div
-						className={cn("text-[10px] text-muted-foreground text-status-bad")}
-					>
+					<div className={"text-[10px] text-status-bad"}>
 						{t("billingInfo.remaining")}: {t("billingInfo.error")}
 					</div>
 				);
@@ -99,7 +97,7 @@ export default function BillingInfo({
 					{t("billingInfo.usage-baseed")}
 				</p>
 			) : null}
-			<p className={cn("text-[10px] text-muted-foreground text-status-bad")}>
+			<p className={"text-[10px] text-status-bad"}>
 				{t("billingInfo.expired")}: {daysLeftObject.days * -1}{" "}
 				{t("billingInfo.days")}
 			</p>

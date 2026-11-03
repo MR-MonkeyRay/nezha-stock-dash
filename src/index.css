@@ -163,14 +163,15 @@
 		--destructive-foreground: 0 0% 100%;
 		--border: 220 13% 90%;
 		--input: 220 13% 90%;
-		--ring: 218 100% 56%;
+		--ring: 218 100% 54%;
 		--radius: 0.25rem;
 
 		--red: 0 70% 51%;
 		--green: 140 100% 27%;
 		--flat: 0 0% 40%;
-		--suspended: 0 0% 55%;
-		--highlight: 218 100% 56%;
+		/* Text tokens below are tuned to WCAG AA (4.5:1) on white. */
+		--suspended: 0 0% 46%;
+		--highlight: 218 100% 54%;
 		--highlight-foreground: 0 0% 100%;
 		--chart-line: 214 90% 48%;
 		--chart-avg: 38 100% 42%;
@@ -178,8 +179,8 @@
 		--chart-axis: 220 9% 40%;
 		--crosshair: 220 14% 90%;
 		--status-ok: 214 90% 48%;
-		--status-warn: 38 100% 42%;
-		--status-bad: 21 90% 48%;
+		--status-warn: 38 100% 32%;
+		--status-bad: 21 90% 42%;
 		--ma-1: 38 100% 42%;
 		--ma-2: 195 100% 38%;
 		--ma-3: 306 67% 41%;
