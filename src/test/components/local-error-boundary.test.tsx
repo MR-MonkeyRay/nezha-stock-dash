@@ -1,7 +1,7 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
-import RetryableLazy from "@/components/RetryableLazy";
+import RetryableLazy, { preloadLazy } from "@/components/RetryableLazy";
 
 function Content({ broken, label }: { broken: boolean; label: string }) {
 	if (broken) throw new Error("render failed");
@@ -208,5 +208,26 @@ describe("local error recovery", () => {
 		rerender(ui("8"));
 		expect(await screen.findByText("server 8")).toBeInTheDocument();
 		expect(load).toHaveBeenCalledTimes(2);
+	});
+
+	it("renders a preloaded section without a suspense fallback", async () => {
+		const load = vi.fn(async () => ({
+			default: ({ label }: { label: string }) => <p>{label}</p>,
+		}));
+		await act(async () => {
+			preloadLazy(load);
+		});
+		preloadLazy(load);
+		expect(load).toHaveBeenCalledOnce();
+
+		render(
+			<RetryableLazy
+				load={load}
+				componentProps={{ label: "K-line ready" }}
+				fallback={<p>loading</p>}
+			/>,
+		);
+		expect(screen.getByText("K-line ready")).toBeInTheDocument();
+		expect(screen.queryByText("loading")).not.toBeInTheDocument();
 	});
 });

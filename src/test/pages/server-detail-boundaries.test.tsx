@@ -13,6 +13,8 @@ vi.mock("@/lib/server-detail-preload", () => ({
 		return mocks.loadCharts;
 	},
 	getPreloadedServerDetailChart: () => undefined,
+	// Idle preloading stays off: these tests drive each import by hand.
+	whenIdle: () => () => {},
 }));
 vi.mock("@/components/ServerDetailOverview", () => ({
 	default: () => <p>server overview</p>,

@@ -26,7 +26,7 @@ Metric-specific components own presentation, units and tooltips. Network history
 
 `hooks/use-metric-history.ts` uses TanStack Query keys containing server ID, metric and period. Aborts are forwarded to the transport. Results expose status, error and actual data period; incomplete or failed paired requests do not display stale series. Each member of a pair is cached independently and timestamps are joined using the primary series order.
 
-K-line (`features/server-detail/KLineChart.tsx`) is lazy-loaded with `lightweight-charts`. `candles.ts` picks a bucket size per period (at least three samples per candle; daily candles align to local midnight), builds OHLC, MA5/10/20 and a volume series from mean network speed. Colors are read from CSS variables and re-applied when the theme or price convention changes.
+K-line (`features/server-detail/KLineChart.tsx`) is lazy-loaded with `lightweight-charts`; the K-line, network and online-history tabs are preloaded with `preloadLazy` (`components/RetryableLazy.tsx`) once the detail page is idle, so a tab switch renders without a Suspense fallback (which React keeps up for ~300ms even when the module is cached). `candles.ts` picks a bucket size per period (at least three samples per candle; daily candles align to local midnight), builds OHLC, MA5/10/20 and a volume series from mean network speed. Colors are read from CSS variables and re-applied when the theme or price convention changes.
 
 ## Pure metrics and transport
 

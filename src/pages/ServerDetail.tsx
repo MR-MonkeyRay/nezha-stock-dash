@@ -4,12 +4,13 @@ import { Navigate, useParams } from "react-router-dom";
 import OnlineHistorySkeleton from "@/components/loading/OnlineHistorySkeleton";
 import { ServerDetailChartLoading } from "@/components/loading/ServerDetailLoading";
 import NetworkChartLoading from "@/components/NetworkChartLoading";
-import RetryableLazy from "@/components/RetryableLazy";
+import RetryableLazy, { preloadLazy } from "@/components/RetryableLazy";
 import ServerDetailOverview from "@/components/ServerDetailOverview";
 import TabSwitch from "@/components/TabSwitch";
 import {
 	getPreloadedServerDetailChart,
 	loadServerDetailChart,
+	whenIdle,
 } from "@/lib/server-detail-preload";
 
 const loadNetworkChart = () =>
@@ -32,6 +33,17 @@ export default function ServerDetail() {
 	useEffect(() => {
 		window.scrollTo({ top: 0, left: 0, behavior: "instant" });
 	}, []);
+	// Fetch the other tabs' code (K-line pulls in lightweight-charts) once the
+	// page is idle, so switching tabs does not wait on the network.
+	useEffect(
+		() =>
+			whenIdle(() => {
+				preloadLazy(loadKLineChart);
+				preloadLazy(loadNetworkChart);
+				preloadLazy(loadOnlineHistory);
+			}),
+		[],
+	);
 
 	// Internal values stay stable for custom CSS; labels come from tabSwitch.*.
 	const tabs = ["Detail", "KLine", "Network", "Online"];
