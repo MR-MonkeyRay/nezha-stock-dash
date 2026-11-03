@@ -51,9 +51,9 @@ export function ServerControls({
 	return (
 		<div
 			hidden={!hasServers}
-			className="mt-3 flex items-center justify-between gap-2 server-overview-controls"
+			className="mt-3 flex flex-wrap items-center gap-2 server-overview-controls"
 		>
-			<section className="flex w-full items-center gap-2 overflow-hidden">
+			<section className="flex shrink-0 items-center gap-2">
 				<fieldset className="relative m-0 grid h-8 min-w-0 shrink-0 grid-cols-2 overflow-hidden rounded-sm border border-border bg-card p-0 text-xs">
 					<legend className="sr-only">{t("market.viewMode")}</legend>
 					{/* Sliding thumb under the active segment. */}
@@ -113,15 +113,17 @@ export function ServerControls({
 						</span>
 					</button>
 				)}
-				<GroupSwitch
-					tabs={groupTabs}
-					currentTab={currentGroup}
-					setCurrentTab={handleTagChange}
-				/>
 			</section>
+			{/* Phones give the tabs their own row; wider screens fit one line. */}
+			<GroupSwitch
+				tabs={groupTabs}
+				currentTab={currentGroup}
+				setCurrentTab={handleTagChange}
+				className="order-last w-full sm:order-none sm:w-auto sm:flex-1"
+			/>
 			<div
 				className={cn(
-					"flex h-8 shrink-0 items-center rounded-sm border border-border bg-card text-xs text-muted-foreground transition-colors",
+					"ml-auto flex h-8 shrink-0 items-center rounded-sm border border-border bg-card text-xs text-muted-foreground transition-colors",
 					{
 						"bg-card/70": customBackgroundImage,
 					},

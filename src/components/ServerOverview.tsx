@@ -92,6 +92,15 @@ export default function ServerOverview({
 								</span>
 							</p>
 						</div>
+						{/* Phones get a narrower trend line beside the change row. */}
+						<Sparkline
+							values={quote.series}
+							direction={quote.direction}
+							width={88}
+							height={40}
+							live
+							className="mb-1 sm:hidden"
+						/>
 						<Sparkline
 							values={quote.series}
 							direction={quote.direction}

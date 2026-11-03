@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { ImageMinus } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { ModeToggle } from "@/components/ThemeSwitcher";
@@ -157,7 +157,7 @@ function Header({
 						</p>
 					)}
 				</section>
-				<section className="flex items-center gap-2 header-handles">
+				<section className="flex shrink-0 items-center gap-1.5 sm:gap-2 header-handles">
 					<div className="hidden sm:flex items-center gap-2">
 						<Links />
 						<DashboardLink />
@@ -215,17 +215,29 @@ function Header({
 						) : (
 							<Loader visible={true} />
 						)}
-						<p className="text-xs text-muted-foreground">
+						<p
+							className={cn("text-xs text-muted-foreground", {
+								"sr-only sm:not-sr-only": connected,
+							})}
+						>
 							{connected ? t("online") : t("market.reconnecting")}
 						</p>
 					</Button>
 				</section>
 			</section>
-			<div className="mt-1 flex w-full justify-between sm:hidden">
-				<DashboardLink />
+			{/* Phones: custom links get their own scrollable row, and the
+			    dashboard link joins the date row instead of a row of its own. */}
+			<div className="scrollbar-hidden mt-1 flex overflow-x-auto sm:hidden empty:hidden">
 				<Links />
 			</div>
-			<Overview loading={brandingLoading} />
+			<Overview
+				loading={brandingLoading}
+				aside={
+					<div className="sm:hidden">
+						<DashboardLink />
+					</div>
+				}
+			/>
 		</div>
 	);
 }
@@ -335,7 +347,7 @@ function DashboardLink() {
 	);
 }
 
-function Overview({ loading }: { loading: boolean }) {
+function Overview({ loading, aside }: { loading: boolean; aside?: ReactNode }) {
 	const { t } = useTranslation();
 	const time = useCurrentTime();
 	const [mounted, setMounted] = useState(false);
@@ -346,12 +358,16 @@ function Overview({ loading }: { loading: boolean }) {
 
 	if (loading) {
 		return (
-			<section
-				aria-hidden="true"
-				className="mt-3 flex h-6 items-center justify-between header-timer"
-			>
-				<SkeletonBar className="h-4 w-28" />
-				<SkeletonBar className="h-4 w-16" />
+			<section className="mt-3 flex h-6 items-center justify-between header-timer">
+				<div aria-hidden="true">
+					<SkeletonBar className="h-4 w-28" />
+				</div>
+				<div className="flex items-center gap-3">
+					{aside}
+					<div aria-hidden="true">
+						<SkeletonBar className="h-4 w-16" />
+					</div>
+				</div>
 			</section>
 		);
 	}
@@ -363,14 +379,18 @@ function Overview({ loading }: { loading: boolean }) {
 				<span className="num">{dayjs().format("YYYY-MM-DD")}</span>
 				<span className="hidden sm:inline">{t("whereTheTimeIs")}</span>
 			</p>
-			{mounted ? (
-				<p className="num text-sm font-semibold text-foreground">
-					{String(time.hh).padStart(2, "0")}:{String(time.mm).padStart(2, "0")}:
-					{String(time.ss).padStart(2, "0")}
-				</p>
-			) : (
-				<Skeleton className="h-[21px] w-16 animate-none rounded-[5px] bg-muted-foreground/10" />
-			)}
+			<div className="flex items-center gap-3">
+				{aside}
+				{mounted ? (
+					<p className="num text-sm font-semibold text-foreground">
+						{String(time.hh).padStart(2, "0")}:
+						{String(time.mm).padStart(2, "0")}:
+						{String(time.ss).padStart(2, "0")}
+					</p>
+				) : (
+					<Skeleton className="h-[21px] w-16 animate-none rounded-[5px] bg-muted-foreground/10" />
+				)}
+			</div>
 		</section>
 	);
 }
