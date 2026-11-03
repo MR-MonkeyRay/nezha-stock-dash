@@ -6,6 +6,7 @@ import { StatusProvider } from "@/context/status-provider";
 import type { WebSocketContextType } from "@/context/websocket-context";
 import { WebSocketContext } from "@/context/websocket-context";
 import { useStatus } from "@/hooks/use-status";
+import { VIRTUALIZE_FROM } from "@/hooks/use-window-list";
 import Servers from "@/pages/Server";
 import { createServer } from "@/test/fixtures";
 import { renderWithProviders } from "@/test/utils";
@@ -562,7 +563,8 @@ describe("Servers page", () => {
 		});
 	});
 
-	it("renders every card in large server lists without virtualization", () => {
+	it("renders only the visible window of large server lists", () => {
+		localStorage.setItem("serverView", "grid");
 		const servers = Array.from({ length: 2000 }, (_, index) =>
 			createServer({ id: index + 1, name: `server-${index + 1}` }),
 		);
@@ -575,7 +577,47 @@ describe("Servers page", () => {
 		expect(screen.getByTestId("server-overview")).toHaveTextContent(
 			"2000:2000:0",
 		);
-		expect(screen.getAllByTestId("server-card")).toHaveLength(2000);
+		const rendered = screen.getAllByTestId("server-card").length;
+		expect(rendered).toBeGreaterThan(0);
+		expect(rendered).toBeLessThan(200);
+		localStorage.removeItem("serverView");
+	});
+
+	it("renders every card of lists below the virtualization threshold", () => {
+		localStorage.setItem("serverView", "grid");
+		const servers = Array.from({ length: VIRTUALIZE_FROM - 1 }, (_, index) =>
+			createServer({ id: index + 1, name: `server-${index + 1}` }),
+		);
+
+		renderServerPage({
+			connected: true,
+			lastData: websocketPayload(servers),
+		});
+
+		expect(screen.getAllByTestId("server-card")).toHaveLength(
+			VIRTUALIZE_FROM - 1,
+		);
+		localStorage.removeItem("serverView");
+	});
+
+	it("never moves the window when a virtualized list mounts", () => {
+		localStorage.setItem("serverView", "grid");
+		const scrollTo = vi.fn();
+		vi.stubGlobal("scrollTo", scrollTo);
+		const servers = Array.from({ length: 500 }, (_, index) =>
+			createServer({ id: index + 1, name: `server-${index + 1}` }),
+		);
+
+		renderServerPage({
+			connected: true,
+			lastData: websocketPayload(servers),
+		});
+
+		expect(screen.getAllByTestId("server-card").length).toBeLessThan(100);
+		// It may re-assert the current offset, but never scrolls elsewhere.
+		for (const [options] of scrollTo.mock.calls)
+			expect(options).toMatchObject({ top: window.scrollY });
+		localStorage.removeItem("serverView");
 	});
 
 	it("toggles map and service tracker controls when service data exists", async () => {

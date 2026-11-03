@@ -251,3 +251,38 @@ describe("Watchlist", () => {
 		expect(screen.getByText("/server/1")).toBeInTheDocument();
 	});
 });
+
+describe("Watchlist virtualization", () => {
+	const many = Array.from({ length: 300 }, (_, index) =>
+		createServer({ id: index + 1, name: `server-${index + 1}` }),
+	);
+	const renderMany = () =>
+		renderWithProviders(
+			<Watchlist
+				servers={many}
+				quotes={new Map()}
+				now={NOW}
+				sortType="default"
+				sortOrder="desc"
+				setSortType={vi.fn()}
+				setSortOrder={vi.fn()}
+			/>,
+		);
+
+	it.each([
+		[true, ".watchlist-row"],
+		[false, ".quote-row"],
+	])("renders a window of rows with spacers (desktop=%s)", (desktop, row) => {
+		useDesktop(desktop);
+		const { container } = renderMany();
+		const rows = container.querySelectorAll(row);
+		expect(rows.length).toBeGreaterThan(0);
+		expect(rows.length).toBeLessThan(60);
+		expect(rows[0]).toHaveAttribute("data-index", "0");
+		// The bottom spacer reserves the height of the rows not rendered.
+		const spacer = container.querySelector("[data-spacer]:last-child");
+		expect(
+			Number.parseFloat((spacer as HTMLElement).style.height),
+		).toBeGreaterThan(1000);
+	});
+});

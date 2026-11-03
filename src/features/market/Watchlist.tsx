@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import BillingInfo from "@/components/billingInfo";
@@ -9,6 +9,7 @@ import { useRuntimeConfig } from "@/features/runtime-config/runtime-config";
 import { useEntrance } from "@/hooks/use-entrance";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useOpenServer, useServerLinkClick } from "@/hooks/use-open-server";
+import { useWindowList } from "@/hooks/use-window-list";
 import { formatBytes } from "@/lib/format";
 import {
 	GetFontLogoClass,
@@ -63,6 +64,21 @@ type ColumnKey =
 	| "traffic"
 	| "uptime"
 	| "intraday";
+
+/** Fixed widths keep columns still while values tick and while virtualized
+ * rows scroll in; the name column takes the remaining space. */
+const COLUMN_WIDTH: Partial<Record<ColumnKey, number>> = {
+	last: 76,
+	change: 76,
+	changePct: 84,
+	mem: 84,
+	disk: 84,
+	upSpeed: 96,
+	downSpeed: 96,
+	traffic: 104,
+	uptime: 60,
+	intraday: 112,
+};
 
 const SORTABLE: Partial<Record<ColumnKey, SortType>> = {
 	name: "name",
@@ -156,9 +172,19 @@ function WatchlistTable({ servers, quotes, now, ...sort }: WatchlistProps) {
 		{ key: "uptime", label: t("market.uptime") },
 		{ key: "intraday", label: t("market.intraday") },
 	];
+	const list = useWindowList<HTMLTableSectionElement>({
+		count: servers.length,
+		estimateSize: 48,
+		getKey: (index) => servers[index].id,
+	});
 	return (
 		<div className="watchlist overflow-x-auto rounded-md border border-border bg-card scrollbar-hidden">
-			<table className="w-full min-w-[960px] border-collapse text-[13px]">
+			<table className="w-full min-w-[960px] table-fixed border-collapse text-[13px]">
+				<colgroup>
+					{columns.map((column) => (
+						<col key={column.key} style={{ width: COLUMN_WIDTH[column.key] }} />
+					))}
+				</colgroup>
 				<thead className="sticky top-0 z-10 bg-muted/80 text-xs text-muted-foreground backdrop-blur">
 					<tr className="border-b border-border">
 						{columns.map((column) => (
@@ -172,16 +198,27 @@ function WatchlistTable({ servers, quotes, now, ...sort }: WatchlistProps) {
 						))}
 					</tr>
 				</thead>
-				<tbody className={cn(entering && "stagger")}>
-					{servers.map((server) => (
-						<WatchlistRow
-							key={server.id}
-							server={server}
-							now={now}
-							quote={quotes.get(server.id) ?? SUSPENDED_QUOTE}
-							showNetTransfer={showNetTransfer}
-						/>
-					))}
+				<tbody ref={list.ref} className={cn(entering && "stagger")}>
+					{list.paddingTop > 0 && (
+						<tr data-spacer style={{ height: list.paddingTop }} />
+					)}
+					{list.indices.map((index) => {
+						const server = servers[index];
+						return (
+							<WatchlistRow
+								key={server.id}
+								index={index}
+								measure={list.measure}
+								server={server}
+								now={now}
+								quote={quotes.get(server.id) ?? SUSPENDED_QUOTE}
+								showNetTransfer={showNetTransfer}
+							/>
+						);
+					})}
+					{list.paddingBottom > 0 && (
+						<tr data-spacer style={{ height: list.paddingBottom }} />
+					)}
 				</tbody>
 			</table>
 		</div>
@@ -200,11 +237,15 @@ function PlatformLogo({ platform }: { platform: string }) {
 }
 
 const WatchlistRow = memo(function WatchlistRow({
+	index,
+	measure,
 	server,
 	now,
 	quote,
 	showNetTransfer,
 }: {
+	index: number;
+	measure: ((element: Element | null) => void) | undefined;
 	server: NezhaServer;
 	now: number;
 	quote: Quote;
@@ -219,14 +260,16 @@ const WatchlistRow = memo(function WatchlistRow({
 	const dash = <span className="text-suspended">--</span>;
 	return (
 		<tr
+			ref={measure}
+			data-index={index}
 			onClick={(event) => open(server.id, event.currentTarget)}
 			onPointerEnter={preloadServerDetail}
 			className={cn(
-				"watchlist-row group cursor-pointer border-b border-border/60 transition-colors duration-(--dur-fast) last:border-0 hover:bg-accent/60 active:bg-accent [content-visibility:auto] [contain-intrinsic-size:auto_48px]",
+				"watchlist-row group cursor-pointer border-b border-border/60 transition-colors duration-(--dur-fast) last:border-0 hover:bg-accent/60 active:bg-accent",
 				halted && "text-muted-foreground",
 			)}
 		>
-			<td className="max-w-[260px] px-2 py-1.5 text-left shadow-[inset_2px_0_0_transparent] transition-shadow duration-(--dur-base) group-hover:shadow-[inset_2px_0_0_hsl(var(--highlight))]">
+			<td className="px-2 py-1.5 text-left shadow-[inset_2px_0_0_transparent] transition-shadow duration-(--dur-base) group-hover:shadow-[inset_2px_0_0_hsl(var(--highlight))]">
 				<div className="flex items-center gap-2">
 					<ServerFlag country_code={info.country_code} className="shrink-0" />
 					<div className="min-w-0">
@@ -344,6 +387,12 @@ function QuoteRows({ servers, quotes, now }: WatchlistProps) {
 	const { t } = useTranslation();
 	const entering = useEntrance();
 	const [mode, setMode] = useState<PillMode>("pct");
+	const cycle = useCallback(() => setMode((current) => NEXT_MODE[current]), []);
+	const list = useWindowList<HTMLUListElement>({
+		count: servers.length,
+		estimateSize: 57,
+		getKey: (index) => servers[index].id,
+	});
 	const modeLabel =
 		mode === "pct"
 			? t("market.changePct")
@@ -360,7 +409,7 @@ function QuoteRows({ servers, quotes, now }: WatchlistProps) {
 						type="button"
 						aria-label={t("market.cycleColumn")}
 						className="min-w-[4.5rem] text-right text-highlight transition-press motion-safe:press"
-						onClick={() => setMode(NEXT_MODE[mode])}
+						onClick={cycle}
 					>
 						<span key={mode} className="anim-swap">
 							{modeLabel}
@@ -369,29 +418,52 @@ function QuoteRows({ servers, quotes, now }: WatchlistProps) {
 					</button>
 				</span>
 			</div>
-			<ul className={cn(entering && "stagger")}>
-				{servers.map((server) => (
-					<QuoteRow
-						key={server.id}
-						server={server}
-						now={now}
-						quote={quotes.get(server.id) ?? SUSPENDED_QUOTE}
-						mode={mode}
-						onCycle={() => setMode(NEXT_MODE[mode])}
+			<ul ref={list.ref} className={cn(entering && "stagger")}>
+				{list.paddingTop > 0 && (
+					<li
+						aria-hidden="true"
+						data-spacer
+						style={{ height: list.paddingTop }}
 					/>
-				))}
+				)}
+				{list.indices.map((index) => {
+					const server = servers[index];
+					return (
+						<QuoteRow
+							key={server.id}
+							index={index}
+							measure={list.measure}
+							server={server}
+							now={now}
+							quote={quotes.get(server.id) ?? SUSPENDED_QUOTE}
+							mode={mode}
+							onCycle={cycle}
+						/>
+					);
+				})}
+				{list.paddingBottom > 0 && (
+					<li
+						aria-hidden="true"
+						data-spacer
+						style={{ height: list.paddingBottom }}
+					/>
+				)}
 			</ul>
 		</div>
 	);
 }
 
 const QuoteRow = memo(function QuoteRow({
+	index,
+	measure,
 	server,
 	now,
 	quote,
 	mode,
 	onCycle,
 }: {
+	index: number;
+	measure: ((element: Element | null) => void) | undefined;
 	server: NezhaServer;
 	now: number;
 	quote: Quote;
@@ -402,7 +474,11 @@ const QuoteRow = memo(function QuoteRow({
 	const info = selectServerMetrics(now, server);
 	const halted = quote.direction === "suspended";
 	return (
-		<li className="quote-row relative grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b border-border/60 px-3 py-2 transition-colors duration-(--dur-fast) last:border-0 has-[a:active]:bg-accent/60">
+		<li
+			ref={measure}
+			data-index={index}
+			className="quote-row relative grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b border-border/60 px-3 py-2 transition-colors duration-(--dur-fast) last:border-0 has-[a:active]:bg-accent/60"
+		>
 			<div className="min-w-0">
 				{/* Stretched link: the whole row opens the detail page. */}
 				<Link
